@@ -1,0 +1,80 @@
+:- module("testcases").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+:- ensure_loaded("trees").
+
+test <- [pred].
+testcase <- [pred].
+
+:- module_implementation.
+
+% SCRAMBLING TEST
+
+% Joanna loves John
+testcase("Ivana voli Ivana", T) :-
+  T = EDGE_SIGN\DTRS\
+    ( COMP_DTR\
+      ( LEXICON\["Ivana"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["voljeti"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & COMP_DTR\
+        ( LEXICON\["Ivan"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+        )
+      )
+    ).
+
+% John loves Joanna
+testcase("Ivana voli Ivana", T) :-
+  T = EDGE_SIGN\DTRS\
+    ( COMP_DTR\
+      ( LEXICON\["Ivan"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["voljeti"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & COMP_DTR\
+        ( LEXICON\["Ivana"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+        )
+      )
+    ).
+
+
+test_list <- [pred].
+test_list([]).
+test_list([[W, T] | CC]) :-
+  print(W),
+  parse(W),
+  printAVM(["Parsed"]),
+  trees(TT),
+  length(TT, L),
+  printAVM([L, "trees"]),
+  member(T, TT),
+  printAVM(["Canonical parse found"]),
+  test_list(CC).
+
+test :-
+  findall([W, T], testcase(W, T), CC),
+  test_list(CC),
+  print("Success"), !.
+test :-
+  print("Failed!").

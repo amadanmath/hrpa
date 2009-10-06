@@ -1,0 +1,48 @@
+:- module("lexicon").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+lexv <- [pred].
+lexn <- [pred].
+lexe <- [pred].
+
+:- module_implementation.
+
+
+
+lexe("do",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\prep
+    & VAL\COMPS\
+        [ noun & CASE\gen ])
+).
+
+
+
+lexv("voljeti", [4, 2],
+  SYNSEM\LOCAL\CAT\VAL\
+    ( COMPS\
+        [ noun & CASE\nom
+        , noun & CASE\acc
+        ]
+    )
+).
+
+lexv("dovesti", [1, 1],
+  SYNSEM\LOCAL\CAT\VAL\
+    ( COMPS\
+        [ noun & CASE\nom
+        , noun & CASE\acc
+        , $DESTINATION
+        ]
+    )
+) :-
+  $DESTINATION = noun & CASE\dat. % TODO: or PP, or optional
+
+
+
+lexn("dječak", "dječaka", SYNSEM\LOCAL\CAT\HEAD\(GENDER\masculine & ANIMATE\plus)).
+lexn("Ivana", "Ivana", SYNSEM\LOCAL\CAT\HEAD\GENDER\feminine).
+lexn("Ivan", "Ivana", SYNSEM\LOCAL\CAT\HEAD\(GENDER\masculine & ANIMATE\plus)).

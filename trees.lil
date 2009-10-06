@@ -1,0 +1,23 @@
+:- module("trees").
+:- module_interface.
+
+:- ensure_loaded("grammar").
+:- ensure_loaded("parser").
+:- ensure_loaded("display").
+
+trees <- [pred].
+
+:- module_implementation.
+
+gettreesbyroots <- [pred].
+gettreesbyroots([], []).
+gettreesbyroots([R | RR], TT) :-
+  findall([T], get_parse_tree(R, T), O),
+  flatten_list(O, P),
+  gettreesbyroots(RR, PP),
+  revappend(P, PP, TT).
+
+trees(TT) :-
+  root_edge_id_list(RR),
+  gettreesbyroots(RR, OO),
+  remove_duplicates(OO, TT).

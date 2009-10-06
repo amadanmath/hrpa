@@ -1,0 +1,12 @@
+hrpa - Croatian HPSG Parser
+Copyright (C) 2009, Goran Topic <amadan@mad.scientist.com>
+
+This software requires LiLFeS programming language and Unification
+Parser (UP), a part of Enju package, both developed in Tsujii
+Laboratory, University of Tokyo:
+
+http://www-tsujii.is.s.u-tokyo.ac.jp/lilfes/
+
+http://www-tsujii.is.s.u-tokyo.ac.jp/enju/
+
+The versions used were LiLFeS 1.3.8 and Enju 2.3.1.

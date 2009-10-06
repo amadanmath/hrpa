@@ -1,0 +1,155 @@
+:- module("types").
+:- module_interface.
+
+schema <- [bot].
+head_spec_schema <- [schema].
+head_comp_schema <- [schema].
+head_mod_schema <- [schema].
+
+head_str <- [bot] + [HEAD_DTR\].
+head_spec_str <- [head_str] + [COMP_DTR\].
+head_comp_str <- [head_str] + [SPEC_DTR\].
+head_mod_str <- [head_str] + [MOD_DTR\].
+head_fill_str <- [head_str] + [FILL_DTR\].
+
+bool <- [bot].
+plus <- [bool].
+minus <- [bool].
+
+flags <- [bot] + [OPT\bool].
+
+slash <- [bot]. % TODO add here!
+
+% phrase
+
+head <- [bot] + [PREDICATE\bool, CLITIC\bool].
+val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list].
+cat <- [bot] + [HEAD\head, VAL\val].
+local <- [bot] + [CAT\cat]. % CONT, CTX
+nonlocal <- [bot]. % TODO
+synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal, FL\flags]. % EXPR
+sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
+
+phrase <- [sign] + [DTRS\head_str].
+word <- [sign].
+
+case <- [bot].
+nom <- [case].
+gen <- [case].
+dat <- [case].
+acc <- [case].
+voc <- [case].
+loc <- [case].
+ins <- [case].
+has_case <- [head] + [CASE\case].
+
+gender <- [bot].
+masculine <- [gender].
+feminine <- [gender].
+neuter <- [gender].
+has_gender <- [head] + [GENDER\gender].
+
+number <- [bot].
+singular <- [number].
+plural <- [number].
+has_number <- [head] + [NUMBER\number].
+
+person <- [bot].
+first <- [person].
+second <- [person].
+third <- [person].
+has_person <- [head] + [PERSON\person].
+
+degree <- [bot].
+pos <- [degree].
+comp <- [degree]. % not a complement here! comparative!
+sup <- [degree].
+has_degree <- [head] + [DEGREE\degree].
+
+ntype <- [bot].
+common <- [ntype].
+proper <- [ntype].
+
+vtype <- [bot].
+main <- [vtype].
+aux <- [vtype].
+modal <- [vtype].
+copula <- [vtype].
+
+mood <- [bot].
+indicative <- [mood].
+imperative <- [mood].
+conditional <- [mood].
+infinitive <- [mood].
+% participle is a different category.
+
+ptype <- [bot].
+pron_personal <- [ptype].
+pron_demonstrative <- [ptype].
+pron_indefinite <- [ptype].
+pron_possessive <- [ptype].
+pron_interrogative <- [ptype].
+pron_relative <- [ptype].
+pron_reflexive <- [ptype].
+
+rtype <- [bot].
+part_negative <- [rtype].
+part_interrogative <- [rtype].
+part_modal <- [rtype].
+part_affirmative <- [rtype].
+
+reftype <- [bot].
+ref_pers <- [reftype].
+ref_poss <- [reftype].
+
+tense <- [bot].
+present <- [tense].
+imperfect <- [tense].
+future <- [tense].
+past <- [tense].
+pluperfect <- [tense].
+aorist <- [tense].
+has_tense <- [head] + [TENSE\tense].
+
+voice <- [bot].
+active <- [voice].
+passive <- [voice].
+has_voice <- [head] + [VOICE\voice].
+
+% CLITIC GROUP ORDER
+clitic <- [bot].
+cl_qm <- [clitic].
+cl_aux <- [cl_qm].
+cl_dat <- [cl_aux].
+cl_accgen <- [cl_dat].
+cl_self <- [cl_accgen].
+cl_aux3 <- [cl_self].
+
+has_def <- [head] + [DEFINITE\bool].
+has_anim <- [head] + [ANIMATE\bool].
+has_pol <- [head] + [POLAR\bool].
+has_finite <- [head] + [FINITE\bool].
+
+substantive <- [head, has_number, has_person].
+nominal <- [substantive, has_case, has_gender, has_anim, has_def].
+verbal <- [substantive, has_tense, has_finite, has_voice] + [VTYPE\vtype].
+
+% POS
+
+noun <- [nominal] + [NTYPE\ntype].
+adj <- [nominal, has_degree]. % ATYPE
+verb <- [verbal, has_pol] + [MOOD\mood].
+participle <- [nominal, verbal].
+adv <- [head, has_degree, has_pol]. % there must be more! :/
+prep <- [head, has_case]. % there might be more :)
+particle <- [head] + [RTYPE\rtype].
+
+%pron <- [head] + [PTYPE\ptype, REFTYPE\reftype].
+%pron_nominal <- [pron, nominal].
+%pron_adjectival <- [pron, adj].
+
+pron <- [bot] + [PTYPE\ptype, REFTYPE\reftype].
+pron_nominal <- [pron, noun].
+pron_adjectival <- [pron_nominal, adj]. % WRONG
+
+:- module_implementation.

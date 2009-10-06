@@ -1,0 +1,516 @@
+:- module("morph").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("lillib/lists").
+:- ensure_loaded("lillib/strings").
+
+lemmatize <- [pred].
+vfp <- [pred].
+
+:- module_implementation.
+
+flip <- [pred].
+flip(R, Z) :- reverse(R, M), listtostr(M, Z).
+
+pal <- [pred]. % palatalisation
+pal([107 | R], [141, 196 | R]) :- !.
+pal([103 | R], [190, 197 | R]) :- !.
+pal([104 | R], [161, 197 | R]) :- !.
+pal(R, R).
+
+sib <- [pred]. % sibilarisation
+sib([107 | R], [99 | R]) :- !.
+sib([103 | R], [122 | R]) :- !.
+sib([104 | R], [115 | R]) :- !.
+sib(R, R).
+
+pd <- [pred]. % DEBUG
+pd(T, A) :- flip(A, O), printAVM([T, O, A]).
+
+% type, present stem, infinitive stem
+vfp([1, 1], [98 | R], [115, 112 | R]). % grepsti
+vfp([1, 1], [X | R], [115 | R]) :- % dovesti, plesti, gristi
+  member(X, [100, 116, 122]).
+vfp([1, 2], [X | R], [101 | R]) :- % zeti (zmem), poceti
+  member(X, [109, 110]).
+vfp([1, 2], [106, 110, 97 | R], [101 | R]). % zeti (zanjem)
+vfp([1, 2], [106, 110 | R], [101 | R]). % zeti (znjem)
+vfp([1, 3], [110, 117 | R], [101, 108 | R]). % kleti
+vfp([1, 4], [106, 108, 111 | R], [97, 108 | R]). % klati
+vfp([1, 4], [118, 111 | R], [97, 118 | R]). % zvati
+vfp([1, 4], [106, 108, 97, 161, 197 | R], [97, 108, 115 | R]). % slati
+vfp([1, 4], [114, 101 | R], [97, 114 | R]). % brati
+vfp([1, 5], [114, 97 | R], [114 | R]). % trti (tarem)
+vfp([1, 5], R, R). % trti (trem)
+vfp([1, 6], [106, 108, 101 | R], [101, 106, 108 | R]). % mljeti
+vfp([1, 7], R, [101, 106, 105 | R]). % drijeti
+vfp([1, 8], [115, 101 | R], [101, 106, 105 | R]). % donijeti
+vfp([1, 9], [106, 105 | R], [101, 106 | R]). % smjeti
+vfp([1, 10], [106 | R], R). % piti, cuti
+vfp([1, 11], R, R). % moci, reci, vrci (special stem rules below)
+vfp([1, 12], [112 | R], [117 | R]). % posuti
+vfp([1, 13], [110 | R], R). % stati, moci (mognem), reci (reknem)
+vfp([1, 14], [100 | R], R). % dati (dadem)
+vfp([1, 15], [110, 100 | R], R). % dati (dadnem)
+vfp([1, 16], R, R). % ici
+vfp([1, 17], [145, 196 | R], [100 | R]). % naici
+vfp([1, 18], R, [101 | R]). % zreti
+vfp([2, 1], [110 | R], [117, 110 | R]). % mrznuti
+vfp([3, 1], [Y1, Y2 | R], [97, X | R]) :- % glodati, metati, vagati, skakati, micati, mahati, vezati, pisati
+  member([X, Y1, Y2], [[100, 145, 196], [116, 135, 196], [103, 190, 197], [122, 190, 197],
+      [107, 141, 196], [99, 141, 196], [104, 161, 197], [115, 161, 197]]).
+vfp([3, 1], [106, 108 | R], [97 | R]). % LJ: zobati, kapati, hramati, pozivati
+vfp([3, 1], [141, 196, 161, 197 | R], [97, 107, 115 | R]). % SC: iskati
+vfp([3, 2], [106 | R], [97, 118 | R]). % kljuvati
+vfp([3, 3], [106 | R], [97, 106 | R]). % grijati
+vfp([4, 1], R, [105 | R]). % raditi
+vfp([4, 2], R, [101, 106 | R]). % vidjeti
+vfp([4, 3], R, [97 | R]).
+vfp([5, _], R, R).
+vfp([6, C], [106, 117 | R], [97, 118, X | R]) :-
+  member([X, C], [[111, 1], [101, 1], [105, 2]]).
+vfp([7, 1], R, R).
+vfp([7, 2], R, [97 | R]).
+
+vfpsn3p <- [pred].
+vfps3p <- [pred].
+vfpsn3p([1, 11], [101 | R], M) :-
+  pal(M, R).
+vfps3p([1, 11], [X | R], [X | R]) :-
+  member(X, [103, 107, 104]).
+vfpsn3p([5, _], [97 | R], [97 | R]).
+vfps3p([5, _], [106, 97 | R], [97 | R]).
+vfpsn3p([K, _], [101 | R], R) :-
+  member(K, [1, 2, 3, 6]).
+vfpsn3p([4, _], [105 | R], R).
+vfps3p([K, C], R, R) :-
+  (K = 1, member(C, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18])); % 11 special
+  member(K, [2, 3, 4, 6]).
+vfpsn3p([7, 1], R, R).
+vfps3p([7, 1], [106 | R], R).
+vfpsn3p([7, 2], [105 | R], R).
+vfps3p([7, 2], R, R).
+
+vfps <- [pred].
+% type, infinitive suffix, present suffix, sign
+vfps(T, R, M, S) :-
+  (S = PERSON\first & NUMBER\singular;
+    S = PERSON\second & NUMBER\singular;
+    S = PERSON\third & NUMBER\singular;
+    S = PERSON\first & NUMBER\plural;
+    S = PERSON\second & NUMBER\plural),
+  vfpsn3p(T, R, M).
+vfps(T, R, M, S) :-
+  % mozem & mogu are both 1sg possibilities
+  ((T = [1, 11], S = PERSON\first & NUMBER\singular);
+    S = PERSON\third & NUMBER\plural),
+  vfps3p(T, R, M).
+
+
+vfi <- [pred].
+% type, imperfect stem, infinitive stem
+vfi([1, 11], M, I) :- % (FIXME !moci!), reci, vrci
+  sib(I, M).
+vfi([1, 16], Y, X) :-
+  vfp([1, 17], Y, X).
+vfi([4, 1], [145, 196 | R], [105, 100 | R]). % raditi - radjah % FIXME
+vfi(T, I, N) :- % default to present stem
+  T = [C, K],
+  ((C = 1, member(K, [1, 2, 3, 5, 6, 7, 9, 11, 16, 17, 18]));
+    C = 4;
+    T = [7, 2]),
+  vfp(T, I, N).
+vfi([2, 1], [110, 190, 197 | R], [117, 110, 122 | R]). % mrznuti
+vfi(T, R, R) :- % default to infinitive stem
+  member(T, [[1, 4], [1, 10], [3, _], [4, 3], [5, _], [6, _]]).
+
+vfis <- [pred].
+% type, infinitive suffix, imperfect suffix, sign
+vfis(T, [97, 106, 105 | R], R) :- % IJA: plesti - pletijah; kleti, raditi, vidjeti, drijeti, smjeti, vrci, reci (FIXME !moci!), jecati
+  member(T, [[1, 1], [1, 3], [1, 5], [1, 7], [1, 11], [4, _]]).
+vfis(T, [97 | R], R) :- % A: plesti - pletah; zeti, trti, mljeti, smjeti, naici, zreti, moci (FIXME !reci, vrci!), raditi, jecati, spati
+  T = [4, 1]; T = [4, 3]; T = [7, 2];
+  (T = [1, C], member(C, [1, 2, 5, 6, 9, 11, 16, 17, 18])).
+vfis(T, R, R) :- % X:
+  member(T, [[1, 4], [3, _], [5, _], [6, _]]).
+vfis(T, [97, 106 | R], R) :- % JA: piti
+  member(T, [[1, 10], [2, _]]).
+
+vfa <- [pred].
+% type, aorist stem, infinitive stem
+vfa(T, M, I) :- % default to present stem
+  member(T, [[1, 1], [1, 11], [1, 17]]),
+  vfp(T, M, I).
+vfa([1, 13], [117, 110 | R], R). % stati - stanuh
+vfa([1, C], [100 | R], R) :- % stati - stadoh, dati
+  member(C, [13, 14, 15]).
+vfa([K, C], M, M) :- % default to infinitive stem
+  (K = 1, member(C, [2, 3, 4, 5, 6, 7, 8, 10, 12, 13]));
+  member(K, [3, 4, 5, 6, 7]).
+vfa([2, 1], R, [117, 110 | R]). % smrznuti - smrzoh
+
+vfaeo <- [pred].
+% [1, 13] for stati - stadoh
+vfaeo(T) :- member(T, [[1, 1], [1, 11], [1, 13], [1, 14], [1, 15], [1, 17], [2, 1]]).
+
+vfa0 <- [pred].
+vfa0([K, C]) :-
+  (K = 1, member(C, [2, 3, 4, 5, 6, 7, 8, 10, 12, 13]));
+  member(K, [3, 4, 5, 6, 7]).
+
+vfasn23s <- [pred].
+vfas23s <- [pred].
+vfasn23s(_, [111 | R], R).
+vfas23s([1, 11], R, M) :-
+  !,
+  pal(M, R).
+vfas23s(_, [101 | R], R).
+
+vfas0 <- [pred].
+vfas0(_, R, R).
+
+vfas <- [pred].
+% type, infinitive suffix, aorist suffix, sign
+vfas(T, R, M, S) :-
+  vfaeo(T),
+  (S = PERSON\first & NUMBER\singular;
+    S = PERSON\first & NUMBER\plural;
+    S = PERSON\second & NUMBER\plural;
+    S = PERSON\third & NUMBER\plural),
+  vfasn23s(T, R, M).
+vfas(T, R, M, S) :-
+  vfaeo(T),
+  (S = PERSON\second & NUMBER\singular;
+    S = PERSON\third & NUMBER\singular),
+  vfas23s(T, R, M).
+vfas(T, R, M, _) :-
+  vfa0(T),
+  vfas0(T, R, M).
+
+
+vfm <- [pred].
+% type, imperative stem, infinitive stem
+vfm(T, M, I) :- % default to present stem
+  member(T, [[1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8],
+      [1, 9], [1, 10], [1, 12], [1, 13], [1, 16], [1, 17], [1, 18],
+      [2, 1], [3, 1], [3, 2], [3, 3], [4, _], [5, _], [6, _], [7, 2]]),
+  vfp(T, M, I).
+vfm([1, 11], M, I) :- % (FIXME !moci!), reci, vrci
+  sib(I, M).
+vfm(T, R, R) :-
+  member(T, [[1, 14], [1, 15], [7, 1]]).
+
+vfms <- [pred].
+% type, infinitive suffix, aorist suffix, sign
+vfms(T, [105 | R], R, _) :-
+  member(T, [[1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8],
+      [1, 11], [1, 12], [1, 13], [1, 16], [1, 17], [1, 18],
+      [2, 1], [3, 1], [4, _], [7, 2]]).
+vfms(T, R, R, _) :-
+  member(T, [[1, 9], [1, 10], [3, 2], [3, 3], [6, _]]).
+vfms(T, [106 | R], R, _) :-
+  member(T, [[1, 14], [1, 15], [5, _], [7, 1]]).
+
+
+verbmakeinfinitive <- [pred].
+% root, sign, type
+verbmakeinfinitive(R, Z) :-
+  R = [H | T],
+  (member(H, [103, 107, 104, 100])
+      -> I = [105, 135, 196 | T]
+      ; I = [105, 116 | R]),
+  flip(I, Z).
+
+verbpresentroot <- [pred].
+% stem, sign, type
+verbpresentroot(R, S, T, Z) :-
+  vfps(T, R, M, S),
+  vfp(T, M, I),
+  verbmakeinfinitive(I, Z).
+
+verbimperfectroot <- [pred].
+% stem, sign, type
+verbimperfectroot(R, T, Z) :-
+  vfis(T, R, M),
+  vfi(T, M, I),
+  verbmakeinfinitive(I, Z).
+
+verbaoristroot <- [pred].
+verbaoristroot(R, S, T, Z) :-
+  vfas(T, R, M, S),
+  vfa(T, M, I),
+  verbmakeinfinitive(I, Z).
+
+verbimperativeroot <- [pred].
+verbimperativeroot(R, S, T, Z) :-
+  vfms(T, R, M, S),
+  vfm(T, M, I),
+  verbmakeinfinitive(I, Z).
+
+verbpresent <- [pred].
+% stem, sign, type
+verbpresent(R, S, T, Z) :-
+  verbpresentroot(R, S, T, Z),
+  S = verb & TENSE\present & MOOD\indicative & VOICE\active & PREDICATE\plus.
+
+verbimperfect <- [pred].
+% stem, sign, type
+verbimperfect(R, S, T, Z) :-
+  verbimperfectroot(R, T, Z),
+  S = verb & TENSE\imperfect & MOOD\indicative & VOICE\active & PREDICATE\plus.
+
+verbaorist <- [pred].
+% stem, sign, type
+verbaorist(R, S, T, Z) :-
+  verbaoristroot(R, S, T, Z),
+  S = verb & TENSE\aorist & MOOD\indicative & VOICE\active & PREDICATE\plus.
+
+verbimperative <- [pred].
+verbimperative(R, S, T, Z) :-
+  verbimperativeroot(R, S, T, Z),
+  S = verb & MOOD\imperative & VOICE\active & PREDICATE\plus.
+
+verbinfl <- [pred].
+% Present
+verbinfl([109 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\singular & TENSE\present,
+  verbpresent(R, S, T, Z).
+verbinfl([117 | R], S, [1, 11], Z) :- % u
+  S = PERSON\first & NUMBER\singular & TENSE\present,
+  verbpresent(R, S, [1, 11], Z).
+verbinfl([161, 197 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\singular,
+  verbpresent(R, S, T, Z).
+verbinfl(R, S, T, Z) :-
+  S = PERSON\third & NUMBER\singular,
+  verbpresent(R, S, T, Z).
+verbinfl([111, 109 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\plural,
+  verbpresent(R, S, T, Z).
+verbinfl([101, 116 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\plural,
+  verbpresent(R, S, T, Z).
+verbinfl([117 | R], S, T, Z) :- % u
+  S = PERSON\third & NUMBER\plural,
+  T = [K, _],
+  member(K, [1, 2, 3, 5, 6, 7]),
+  verbpresent(R, S, T, Z).
+verbinfl([101 | R], S, T, Z) :- % e
+  S = PERSON\third & NUMBER\plural,
+  T = [4, _],
+  verbpresent(R, S, T, Z).
+% Imperfect
+verbinfl([104 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\singular,
+  verbimperfect(R, S, T, Z).
+verbinfl([101, 161, 197 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\singular,
+  verbimperfect(R, S, T, Z).
+verbinfl([101, 161, 197 | R], S, T, Z) :-
+  S = PERSON\third & NUMBER\singular,
+  verbimperfect(R, S, T, Z).
+verbinfl([111, 109, 115 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\plural,
+  verbimperfect(R, S, T, Z).
+verbinfl([101, 116, 115 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\plural,
+  verbimperfect(R, S, T, Z).
+verbinfl([117, 104 | R], S, T, Z) :-
+  S = PERSON\third & NUMBER\plural,
+  verbimperfect(R, S, T, Z).
+% Aorist
+verbinfl([104 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\singular,
+  verbaorist(R, S, T, Z).
+verbinfl(R, S, T, Z) :-
+  S = PERSON\second & NUMBER\singular,
+  verbaorist(R, S, T, Z).
+verbinfl(R, S, T, Z) :-
+  S = PERSON\third & NUMBER\singular,
+  verbaorist(R, S, T, Z).
+verbinfl([111, 109, 115 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\plural,
+  verbaorist(R, S, T, Z).
+verbinfl([101, 116, 115 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\plural,
+  verbaorist(R, S, T, Z).
+verbinfl([105, 161, 197 | R], S, T, Z) :-
+  S = PERSON\third & NUMBER\plural,
+  verbaorist(R, S, T, Z).
+verbinfl(R, MOOD\infinitive, [_, _], Z) :-
+  member(R, [[105, 116 | _], [105, 135, 196 | _]]),
+  flip(R, Z).
+verbinfl(R, S, T, Z) :-
+  S = PERSON\second & NUMBER\singular,
+  verbimperative(R, S, T, Z).
+verbinfl([119, 109 | R], S, T, Z) :-
+  S = PERSON\first & NUMBER\plural,
+  verbimperative(R, S, T, Z).
+verbinfl([101, 116 | R], S, T, Z) :-
+  S = PERSON\second & NUMBER\plural,
+  verbimperative(R, S, T, Z).
+
+
+nfmngen <- [pred]. % TODO: stem changes
+nfmngen([100, 117, 106, 108], "čovjeka") :- !. % special exception for "ljudi"
+nfmngen(R, Z) :-
+  M = [97 | R],
+  flip(M, Z).
+
+nffnom <- [pred].
+nffnom(R, Z) :-
+  flip([97 | R], Z).
+
+nfunpal <- [pred].
+nfunpal([141, 196, 161, 197 | R], [99, 115 | R]) :- !. % šč-sc (can't be anything else)
+nfunpal([141, 196 | R], [107, 116 | R]). % č-tk
+nfunpal([141, 196 | R], [99 | R]). % č-c
+nfunpal(R, Q) :- pal(Q, R).
+
+nfunsib <- [pred].
+nfunsib([99 | R], [107, 116 | R]). % c-tk
+nfunsib(R, Q) :- sib(Q, R).
+
+nfmplsuf <- [pred].
+nfmplsuf([118, 111 | R], R). % vjetr-ov-a
+nfmplsuf([118, 101 | R], Q) :- % prinč-ev-a
+  sib(Q, R).
+nfmplsuf([106, 105 | R], [105 | R]). % hobi-j-a
+nfmplsuf(R, R). % no cuts; both suffixed and unsuffixed are possible
+
+nffgenpl <- [pred].
+nffgenpl(R, Z) :-
+  flip([105 | R], Z).
+
+nffisins <- [pred]. % feminine "i" instrumental singular?
+nffisins([106, 108, 161, 197 | R], [108, 115 | R]) :- !. % šlju
+nffisins([106, 110, 161, 197 | R], [110, 115 | R]) :- !. % šnju
+nffisins([135, 196, 161, 197 | R], [116, 115 | R]) :- !. % šću
+nffisins([106, 110, 190, 197 | R], [110, 122 | R]) :- !. % žnju
+nffisins([106, 108, X | R], [X | R]) :- % [bpv]lju
+  member(X, [98, 112, 118]), !.
+nffisins([106, X1, X2 | R], [X1, X2 | R]) :- % [čšž]ju
+  member([X1, X2], [[141, 196], [161, 197], [190, 197]]), !.
+nffisins([106, X1, X2 | R], [X1, X2 | R]) :- % [čšž]ju
+  member([X1, X2], [[141, 196], [161, 197], [190, 197]]), !.
+nffisins([145, 196 | R], [100 | R]) :- !. % đu
+nffisins([135, 196 | R], [135, 196 | R]) :- !. % ću
+nffisins([106, X | R], [X | R]) :-
+  member(X, [108, 110]), !. % [nl]ju
+
+nouninfl <- [pred].
+% masculine/neuter "a": Nsg, Gsg
+nouninfl(R, GENDER\masculine & NUMBER\singular & CASE\nom, 1, Z) :-
+  flip(R, Z). % base form already
+nouninfl(R, GENDER\neuter & NUMBER\singular & CASE\C, 1, Z) :-
+  (C = nom; C = acc; C = voc),
+  flip(R, Z). % base form already
+nouninfl([97 | R], GENDER\G & NUMBER\singular & CASE\gen, 2, Z) :-
+  (G = masculine; G = neuter),
+  flip([97 | R], Z).
+nouninfl([117 | R], GENDER\G & NUMBER\singular & CASE\dat, 2, Z) :-
+  (G = masculine; G = neuter),
+  nfmngen(R, Z).
+nouninfl(R, GENDER\masculine & NUMBER\singular & CASE\acc & ANIMATE\minus, 1, Z) :-
+  flip(R, Z).
+nouninfl(R, GENDER\masculine & NUMBER\singular & CASE\acc & ANIMATE\plus, 2, Z) :-
+  flip(R, Z).
+nouninfl(R, GENDER\masculine & NUMBER\singular & CASE\voc, 1, Z) :-
+  flip(R, Z).
+nouninfl([117 | R], GENDER\masculine & NUMBER\singular & CASE\voc, 2, Z) :-
+  nfmngen(R, Z).
+nouninfl([101 | R], GENDER\masculine & NUMBER\singular & CASE\voc, 2, Z) :-
+  nfunpal(R, Q),
+  nfmngen(Q, Z).
+nouninfl([117 | R], GENDER\G & NUMBER\singular & CASE\loc, 2, Z) :-
+  (G = masculine; G = neuter),
+  nfmngen(R, Z).
+nouninfl([109, 111 | R], GENDER\G & NUMBER\singular & CASE\ins, 2, Z) :- % om
+  (G = masculine; G = neuter),
+  nfmngen(R, Z).
+nouninfl([109, 101 | R], GENDER\G & NUMBER\singular & CASE\ins, 2, Z) :- % em
+  (G = masculine; G = neuter),
+  nfmngen(R, Z).
+nouninfl([105 | R], GENDER\masculine & NUMBER\plural & CASE\nom, 2, Z) :-
+  (nfunsib(R, Q); nfmplsuf(R, Q)),
+  nfmngen(Q, Z).
+nouninfl([97 | R], GENDER\neuter & NUMBER\plural & CASE\C, 2, Z) :-
+  (C = nom; C = acc; C = voc),
+  nfmngen(R, Z).
+nouninfl([97 | R], GENDER\masculine & NUMBER\plural & CASE\gen, 1, Z) :-
+  (nfmplsuf(R, Q); Q = [111 | R]), % djed-ov-a; kimon-(o)-a
+  nfmngen(Q, Z).
+nouninfl([97 | R], GENDER\neuter & NUMBER\plural & CASE\gen, 2, Z) :-
+  ((R = [X, 97 | M], Q = [X | M]); R = Q), % ogledalce - ogledal-a-c-a, ogledalc-a
+  nfmngen(Q, Z).
+nouninfl([97, 109, 105 | R], GENDER\masculine & NUMBER\plural & CASE\C, 2, Z) :-
+  nfmplsuf(R, Q),
+  (C = dat; C = loc; C = ins),
+  nfmngen(Q, Z).
+nouninfl([97, 109, 105 | R], GENDER\neuter & NUMBER\plural & CASE\C, 2, Z) :-
+  (C = dat; C = loc; C = ins),
+  nfmngen(R, Z).
+nouninfl([101 | R], GENDER\masculine & NUMBER\plural & CASE\acc, 2, Z) :-
+  nfmplsuf(R, Q),
+  nfmngen(Q, Z).
+nouninfl([105 | R], GENDER\masculine & NUMBER\plural & CASE\voc, 2, Z) :-
+  (nfunsib(R, Q); nfmplsuf(R, Q)),
+  nfmngen(Q, Z).
+% feminine "e": Nsg, [Gpl] (Gpl only if unstable a is present)
+nouninfl([97 | R], GENDER\feminine & NUMBER\singular & CASE\nom, 1, Z) :-
+  flip([97 | R], Z). % base form already
+nouninfl([101 | R], GENDER\feminine & NUMBER\singular & CASE\gen, 1, Z) :-
+  nffnom(R, Z).
+nouninfl([105 | R], GENDER\feminine & NUMBER\singular & CASE\C, 1, Z) :-
+  (C = dat; C = loc),
+  nfunsib(R, Q),
+  nffnom(Q, Z).
+nouninfl([117 | R], GENDER\feminine & NUMBER\singular & CASE\acc, 1, Z) :-
+  nffnom(R, Z).
+nouninfl([111 | R], GENDER\feminine & NUMBER\singular & CASE\voc, 1, Z) :-
+  nffnom(R, Z).
+nouninfl([109, 111 | R], GENDER\feminine & NUMBER\singular & CASE\ins, 1, Z) :-
+  nffnom(R, Z).
+nouninfl([101 | R], GENDER\feminine & NUMBER\plural & CASE\C, 1, Z) :-
+  (C = nom; C = acc; C = voc),
+  nffnom(R, Z).
+nouninfl([97 | R], GENDER\feminine & NUMBER\plural & CASE\gen, 1, Z) :-
+  nffnom([97 | R], Z).
+nouninfl([97 | R], GENDER\feminine & NUMBER\plural & CASE\gen, 2, Z) :-
+  flip([97 | R], Z).
+nouninfl([105 | R], GENDER\feminine & NUMBER\plural & CASE\gen, -2, Z) :-
+  % NOTE: special case; -2 means, 2 exists, but search for 1
+  nffnom(R, Z).
+nouninfl([97, 109, 97 | R], GENDER\feminine & NUMBER\plural & CASE\C, 1, Z) :-
+  (C = dat; C = loc; C = ins),
+  nffnom(R, Z).
+% feminine "i": Nsg, Gpl
+% TODO: mater (sg-irregular, pl-"e")
+% TODO: oko, uho (sg-oko/uho-N, pl-oč/uš-F)
+% nominative covered under "e"
+nouninfl([105 | R], GENDER\feminine & NUMBER\singular & CASE\C, 2, Z) :-
+  (C = gen; C = dat; C = voc; C = loc; C = ins),
+  nffgenpl(R, Z).
+nouninfl(R, GENDER\feminine & NUMBER\singular & CASE\acc, 2, Z) :-
+  nffgenpl(R, Z).
+nouninfl([117 | R], GENDER\feminine & NUMBER\singular & CASE\ins, 2, Z) :- % u
+  nffisins(R, P),
+  nffgenpl(P, Z).
+nouninfl([105 | R], GENDER\feminine & NUMBER\plural & CASE\C, 2, Z) :-
+  (C = nom; C = gen; C = acc; C = voc),
+  nffgenpl(R, Z).
+nouninfl([117, 106, 105 | R], GENDER\feminine & NUMBER\plural & CASE\gen, 2, Z) :- % special
+  nffgenpl(R, Z),
+  member(Z, ["oči", "uši", "kokoši"]).
+nouninfl([97, 109, 105 | R], GENDER\feminine & NUMBER\plural & CASE\C, 2, Z) :-
+  (C = dat; C = loc; C = ins),
+  nffgenpl(R, Z).
+
+
+findform <- [pred].
+findform(R, S, T, Z) :-
+  verbinfl(R, S, T, Z);
+  nouninfl(R, S, T, Z).
+
+lemmatize(W, S, T, Z) :- strtolist(W, L), reverse(L, R), findform(R, S, T, Z).

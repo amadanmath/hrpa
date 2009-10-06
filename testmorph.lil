@@ -1,0 +1,287 @@
+:- module("testmorph").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("morph").
+:- ensure_loaded("lillib/lists").
+:- ensure_loaded("lillib/strings").
+
+test <- [pred].
+
+:- module_implementation.
+
+verbcase <- [pred].
+% tense, finiteness (0/1), infinitive, present1sg, present3pl,
+% aorist or imperfect, imperative, a participle, p participle, adverb (f or inf)
+verbcase([1, 1], 1, "dovesti", "dovedem", "dovedu",
+    "dovedoh", "dovedi", "doveo", "doveden", "dovedavši").
+verbcase([1, 1], 0, "plesti", "pletem", "pletu",
+    "pletah", "pleti", "pleo", "pleten", "pletući").
+verbcase([1, 1], 1, "zaplesti", "zapletem", "zapletu",
+    "zapletoh", "zapleti", "zapleo", "zapleten", "zaplevši").
+verbcase([1, 1], 0, "gristi", "grizem", "grizu",
+    "grizah", "grizi", "grizao", "grižen", "grizući"). % NOTE grizao-grizla
+verbcase([1, 1], 1, "ugristi", "ugrizem", "ugrizu",
+    "ugrizoh", "ugrizi", "ugrizao", "ugrižen", "ugrizavši"). % --
+verbcase([1, 1], 0, "grepsti", "grebem", "grebu",
+    "grebah", "grebi", "grebao", "greben", "grebući"). % NOTE grebao-grebla
+verbcase([1, 1], 1, "ogrepsti", "ogrebem", "ogrebu",
+    "ogreboh", "ogrebi", "ogrebao", "ogreben", "ogrebavši").
+verbcase([1, 2], 0, "žeti", "žmem", "žmu",
+    "žmah", "žmi", "žeo", "žet", "žmući").
+verbcase([1, 2], 1, "početi", "počnem", "počnu",
+    "počeh", "počni", "počeo", "počet", "počevši").
+verbcase([1, 2], 0, "žeti", "žnjem", "žnju",
+    "žnjah", "žnji", "žnjeo", "žnjeven", "žnjući"). % variant
+verbcase([1, 2], 0, "žeti", "žanjem", "žanju",
+    "žanjah", "žanji", "žeo", "žet", "žanjući"). % variant
+verbcase([1, 2], 1, "požeti", "požanjem", "požanju",
+    "požeh", "požanji", "požeo", "požet", "požijevši").
+verbcase([1, 3], 0, "kleti", "kunem", "kunu",
+    "kunijah", "kuni", "kleo", "klet", "kunući").
+verbcase([1, 3], 1, "prokleti", "prokunem", "prokunu",
+    "prokleh", "prokuni", "prokleo", "proklet", "proklevši").
+verbcase([1, 4], 0, "klati", "koljem", "kolju",
+    "klah", "kolji", "klao", "klan", "koljući").
+verbcase([1, 4], 1, "zaklati", "zakoljem", "zakolju",
+    "zaklah", "zakolji", "zaklao", "zaklan", "zaklavši").
+verbcase([1, 4], 0, "zvati", "zovem", "zovu",
+    "zvah", "zovi", "zvao", "zvan", "zovući").
+verbcase([1, 4], 1, "pozvati", "pozovem", "pozovu",
+    "pozvah", "pozovi", "pozvao", "pozvan", "pozvavši").
+verbcase([1, 4], 0, "slati", "šaljem", "šalju",
+    "slah", "šalji", "slao", "slan", "šaljući").
+verbcase([1, 4], 1, "poslati", "pošaljem", "pošalju",
+    "poslah", "pošalji", "poslao", "poslan", "poslavši").
+verbcase([1, 4], 0, "brati", "berem", "beru",
+    "brah", "beri", "brao", "bran", "berući").
+verbcase([1, 4], 1, "razabrati", "razaberem", "razaberu",
+    "razabrah", "razaberi", "razabrao", "razabran", "razabravši").
+verbcase([1, 5], 0, "trti", "tarem", "taru",
+    "tarah", "tari", "tro", "trt", "tarući").
+verbcase([1, 5], 0, "trti", "trem", "tru",
+    "tarijah", "tri", "tro", "trven", "trući"). % variant
+verbcase([1, 5], 1, "utrti", "utarem", "utaru",
+    "utrh", "utari", "utro", "utrt", "utrvši").
+verbcase([1, 5], 1, "utrti", "utrem", "utru",
+    "utrh", "utri", "utro", "utrven", "utrvši"). % variant
+verbcase([1, 6], 0, "mljeti", "meljem", "melju",
+    "meljah", "melji", "mljeo", "mljeven", "meljući").
+verbcase([1, 6], 1, "samljeti", "sameljem", "samelju",
+    "samljeh", "samelji", "samljeo", "samljeven", "samljevši").
+verbcase([1, 7], 0, "drijeti", "drem", "dru",
+    "drijah", "dri", "dro", "drt", "drući"). % FIXME maybe
+verbcase([1, 7], 1, "prodrijeti", "prodrem", "prodru",
+    "prodrijeh", "prodri", "prodro", "prodrt", "prodrijevši").
+% no nonfinite example for [1, 8]?
+verbcase([1, 8], 1, "donijeti", "donesem", "donesu",
+    "donijeh", "donesi", "donio", "donijet", "donijevši"). % NOTE donio-donijela
+verbcase([1, 9], 0, "smjeti", "smijem", "smiju",
+    "smijah", "smij", "smio", "smjeven", "smijući"). % NOTE smio-smjela
+% no finite example for [1, 9]?
+verbcase([1, 10], 0, "piti", "pijem", "piju",
+    "pijah", "pij", "pio", "pit", "pijući").
+verbcase([1, 10], 0, "piti", "pijem", "piju",
+    "pijah", "pij", "pio", "pijen", "pijući"). % variant
+verbcase([1, 10], 1, "popiti", "popijem", "popiju",
+    "popih", "popij", "popio", "popit", "popivši").
+verbcase([1, 10], 1, "popiti", "popijem", "popiju",
+    "popih", "popij", "popio", "popijen", "popivši"). % variant
+verbcase([1, 10], 0, "čuti", "čujem", "čuju",
+    "čujah", "čuj", "čuo", "čut", "čujući").
+verbcase([1, 10], 0, "čuti", "čujem", "čuju",
+    "čujah", "čuj", "čuo", "čuven", "čujući"). % variant
+verbcase([1, 10], 1, "čuti", "čujem", "čuju",
+    "čuh", "čuj", "čuo", "čut", "čuvši").
+verbcase([1, 10], 1, "čuti", "čujem", "čuju",
+    "čuh", "čuj", "čuo", "čuven", "čuvši"). % variant
+verbcase([1, 11], 0, "moći", "mogu", "mogu",
+    "mogah", "N/A", "mogao", "N/A", "mogući"). % NOTE mogao-mogla
+verbcase([1, 11], 1, "moći", "mogu", "mogu",
+    "mogoh", "N/A", "mogao", "N/A", "mogavši"). % FIXME maybe
+verbcase([1, 11], 1, "reći", "rečem", "reku",
+    "rekoh", "reci", "rekao", "rečen", "rekavši"). % NOTE rekao-rekla
+verbcase([1, 11], 0, "vrći", "vršem", "vrhu",
+    "vrsijah", "vrsi", "vrhao", "vršen", "vrhući"). % FIXME maybe; NOTE vrhla?
+% no nonfinite example for [1, 8]?
+verbcase([1, 12], 1, "posuti", "pospem", "pospu",
+    "posuh", "pospi", "posuo", "posut", "posuvši").
+verbcase([1, 13], 1, "stati", "stanem", "stanu",
+    "stah", "stani", "stao", "stan", "stavši").
+verbcase([1, 13], 1, "stati", "stanem", "stanu",
+    "stadoh", "stani", "stao", "stan", "stavši"). % variant
+verbcase([1, 13], 1, "moći", "mognem", "mognu",
+    "mognuh", "mogni", "mogao", "mognut", "mognuvši"). % NOTE mogao-mogla
+verbcase([1, 13], 1, "reći", "reknem", "reknu",
+    "reknuh", "rekni", "rekao", "reknut", "reknuvši"). % NOTE rekao-rekla
+verbcase([1, 14], 1, "dati", "dadem", "dadu",
+    "dadoh", "daj", "dao", "dan", "davši").
+verbcase([1, 15], 1, "dati", "dadnem", "dadnu",
+    "dadoh", "daj", "dao", "dan", "davši").
+verbcase([1, 16], 0, "ići", "idem", "idu",
+    "iđah", "idi", "išao", "N/A", "idući"). % NOTE isao-isla
+verbcase([1, 17], 1, "naići", "naiđem", "naiđu",
+    "naiđoh", "naiđi", "naišao", "naiđen", "naišavši"). % --
+verbcase([1, 18], 0, "zreti", "zrem", "zru",
+    "zrah", "zri", "zrio", "zren", "zrući"). % NOTE zrio-zrela
+verbcase([2, 1], 0, "mrznuti", "mrznem", "mrznu",
+    "mržnjah", "mrzni", "mrznuo", "mrznut", "mrznući").
+verbcase([2, 1], 1, "smrznuti", "smrznem", "smrznu",
+    "smrzoh", "smrzni", "smrznuo", "smrznut", "smrznuvši").
+verbcase([3, 1], 0, "glodati", "glođem", "glođu",
+    "glodah", "glođi", "glodao", "glodan", "glođući").
+verbcase([3, 1], 1, "naglodati", "naglođem", "naglođu",
+    "naglodah", "naglođi", "naglodao", "naglodan", "naglodavši").
+verbcase([3, 1], 0, "metati", "mećem", "meću",
+    "metah", "meći", "metao", "metan", "mećući").
+verbcase([3, 1], 1, "nametati", "namećem", "nameću",
+    "nametah", "nameći", "nametao", "nametan", "nametavši").
+verbcase([3, 1], 0, "vagati", "važem", "važu",
+    "vagah", "važi", "vagao", "vagan", "važući").
+verbcase([3, 1], 1, "izvagati", "izvažem", "izvažu",
+    "izvagah", "izvaži", "izvagao", "izvagan", "izvagavši").
+verbcase([3, 1], 0, "skakati", "skačem", "skaču",
+    "skakah", "skači", "skakao", "skakan", "skačući").
+verbcase([3, 1], 1, "naskakati", "naskačem", "naskaču",
+    "naskakah", "naskači", "naskakao", "naskakan", "naskakavši").
+verbcase([3, 1], 0, "micati", "mičem", "miču",
+    "micah", "miči", "micao", "mican", "mičući").
+verbcase([3, 1], 0, "mahati", "mašem", "mašu",
+    "mahah", "maši", "mahao", "mahan", "mašući").
+verbcase([3, 1], 1, "uzmahati", "uzmašem", "uzmašu",
+    "uzmahah", "uzmaši", "uzmahao", "uzmahan", "uzmahavši").
+verbcase([3, 1], 0, "vezati", "vežem", "vežu",
+    "vezah", "veži", "vezao", "vezan", "vežući").
+verbcase([3, 1], 1, "zavezati", "zavežem", "zavežu",
+    "zavezah", "zaveži", "zavezao", "zavezan", "zavezavši").
+verbcase([3, 1], 0, "pisati", "pišem", "pišu",
+    "pisah", "piši", "pisao", "pisan", "pišući").
+verbcase([3, 1], 1, "raspisati", "raspišem", "raspišu",
+    "raspisah", "raspiši", "raspisao", "raspisan", "raspisavši").
+verbcase([3, 1], 0, "zobati", "zobljem", "zoblju",
+    "zobah", "zoblji", "zobao", "zoban", "zobljući").
+verbcase([3, 1], 1, "pozobati", "pozobljem", "pozoblju",
+    "pozobah", "pozoblji", "pozobao", "pozoban", "pozobavši").
+verbcase([3, 1], 0, "kapati", "kapljem", "kaplju",
+    "kapah", "kaplji", "kapao", "kapan", "kapljući").
+verbcase([3, 1], 1, "pokapati", "pokapljem", "pokaplju",
+    "pokapah", "pokaplji", "pokapao", "pokapan", "pokapavši").
+verbcase([3, 1], 0, "hramati", "hramljem", "hramlju",
+    "hramah", "hramlji", "hramao", "hraman", "hramljući").
+verbcase([3, 1], 1, "odhramati", "odhramljem", "odhramlju",
+    "odhramah", "odhramlji", "odhramao", "odhraman", "odhramavši").
+verbcase([3, 1], 0, "pozivati", "pozivljem", "pozivlju",
+    "pozivah", "pozivlji", "pozivao", "pozivan", "pozivljući").
+verbcase([3, 1], 1, "napozivati", "napozivljem", "napozivlju",
+    "napozivah", "napozivlji", "napozivao", "napozivan", "napozivavši").
+verbcase([3, 1], 0, "iskati", "iščem", "išču",
+    "iskah", "išči", "iskao", "iskan", "iščući").
+verbcase([3, 1], 1, "poiskati", "poiščem", "poišču",
+    "poiskah", "poišči", "poiskao", "poiskan", "poiskavši").
+verbcase([3, 2], 0, "kljuvati", "kljujem", "kljuju",
+    "kljuvah", "kljuj", "kljuvao", "kljuvan", "kljujući").
+verbcase([3, 2], 1, "nakljuvati", "nakljujem", "nakljuju",
+    "nakljuvah", "nakljuj", "nakljuvao", "nakljuvan", "nakljuvavši").
+verbcase([3, 3], 0, "grijati", "grijem", "griju",
+    "grijah", "grij", "grijao", "grijan", "grijući").
+verbcase([3, 3], 1, "zagrijati", "zagrijem", "zagriju",
+    "zagrijah", "zagrij", "zagrijao", "zagrijan", "zagrijavši").
+verbcase([4, 1], 0, "raditi", "radim", "rade",
+    "radijah", "radi", "radio", "rađen", "radivši").
+verbcase([4, 1], 0, "raditi", "radim", "rade",
+    "rađah", "radi", "radio", "rađen", "radeći"). % varijant
+verbcase([4, 1], 1, "zaraditi", "zaradim", "zarade",
+    "zaradih", "zaradi", "zaradio", "zarađen", "zaradivši").
+verbcase([4, 2], 0, "vidjeti", "vidim", "vide",
+    "vidijah", "vidi", "vidio", "viđen", "vidući"). % NOTE vidio-vidjela
+verbcase([4, 2], 1, "vidjeti", "vidim", "vide",
+    "vidjeh", "vidi", "vidio", "viđen", "vidjevši").
+verbcase([4, 3], 0, "ječati", "ječim", "ječe",
+    "ječah", "ječi", "ječio", "ječen", "ječeći").
+verbcase([4, 3], 0, "ječati", "ječim", "ječe",
+    "ječijah", "ječi", "ječio", "ječen", "ječeći"). % variant
+verbcase([4, 3], 0, "bježati", "bježim", "bježe",
+    "bježah", "bježi", "bježao", "bježan", "bježeći").
+verbcase([4, 3], 1, "razbježati", "razbježim", "razbježe",
+    "razbježah", "razbježi", "razbježao", "razbježan", "razbježavši").
+verbcase([4, 3], 0, "vrištati", "vrištim", "vrište",
+    "vrištah", "vrišti", "vrištao", "vrištan", "vrišteći").
+verbcase([4, 3], 1, "zavrištati", "zavrištim", "zavrište",
+    "zavrištah", "zavrišti", "zavrištao", "zavrištan", "zavrištavši").
+verbcase([4, 3], 0, "zviždati", "zviždim", "zvižde",
+    "zviždah", "zviždi", "zviždao", "zviždan", "zviždeći").
+verbcase([4, 3], 1, "zazviždati", "zazviždim", "zazvižde",
+    "zazviždah", "zazviždi", "zazviždao", "zazviždan", "zazviždavši").
+verbcase([5, 1], 0, "kopati", "kopam", "kopaju",
+    "kopah", "kopaj", "kopao", "kopan", "kopajući").
+verbcase([5, 1], 1, "prokopati", "prokopam", "prokopaju",
+    "prokopah", "prokopaj", "prokopao", "prokopan", "prokopavši").
+verbcase([5, 2], 0, "proučavati", "proučavam", "proučavaju",
+    "proučavah", "proučavaj", "proučavao", "proučavan", "proučavajući").
+verbcase([6, 1], 0, "kupovati", "kupujem", "kupuju",
+    "kupovah", "kupuj", "kupovao", "kupovan", "kupujući").
+verbcase([6, 1], 1, "pokupovati", "pokupujem", "pokupuju",
+    "pokupovah", "pokupuj", "pokupovao", "pokupovan", "pokupovavši").
+verbcase([6, 1], 0, "bičevati", "bičujem", "bičuju",
+    "bičevah", "bičuj", "bičevao", "bičevan", "bičujući").
+verbcase([6, 1], 1, "izbičevati", "izbičujem", "izbičuju",
+    "izbičevah", "izbičuj", "izbičevao", "izbičevan", "izbičevavši").
+verbcase([6, 2], 0, "smanjivati", "smanjujem", "smanjuju",
+    "smanjivah", "smanjuj", "smanjivao", "smanjivan", "smanjujući").
+verbcase([7, 1], 1, "dati", "dam", "daju",
+    "dah", "daj", "dao", "dan", "davši").
+verbcase([7, 2], 0, "spati", "spim", "spu",
+    "spah", "spi", "spao", "span", "speći").
+verbcase([7, 2], 1, "zaspati", "zaspim", "zaspu",
+    "zaspah", "zaspi", "zaspao", "zaspan", "zaspavši").
+
+try_lemmatize <- [pred].
+try_lemmatize(R, S, T, Z) :-
+  R = "N/A";
+  lemmatize(R, S, T, Z).
+
+testverblist <- [pred].
+testverblist([]).
+testverblist([V | R]) :-
+  printAVM(V),
+  V = [T, A, N, P1, P3, IA, I, PA, PP, APAA],
+  printAVM([N, "infinitive", N]),
+  try_lemmatize(N, MOOD\infinitive, T, N), !,
+  printAVM([N, "present", P1]),
+  try_lemmatize(P1, PERSON\first & NUMBER\singular & TENSE\present, T, N), !,
+  printAVM([N, "present 3pl", P3]),
+  try_lemmatize(P3, PERSON\third & NUMBER\plural & TENSE\present, T, N), !,
+  (A = 0 -> (
+      printAVM([N, "imperfect", IA]),
+      try_lemmatize(IA, PERSON\first & NUMBER\singular & TENSE\imperfect, T, N), !
+%,
+%      printAVM([N, "present adverb", APAA]),
+%      try_lemmatize(APAA, S, T, N), !
+    ) ; (
+      printAVM([N, "aorist", IA]),
+      try_lemmatize(IA, PERSON\first & NUMBER\singular & TENSE\aorist, T, N), !
+%,
+%      printAVM([N, "perfect adverb", APAA]),
+%      try_lemmatize(APAA, S, T, N), !
+  )),
+  printAVM([N, "imperative", I]),
+  try_lemmatize(I, PERSON\second & NUMBER\singular & MOOD\imperative, T, N), !,
+%  printAVM([N, "active participle", PA]),
+%  try_lemmatize(PA, NUMBER\singular & GENDER\masculine & CASE\nominative, T, N), !,
+%  printAVM([N, "passive participle", PP]),
+%  try_lemmatize(PP, NUMBER\singular & GENDER\masculine & CASE\nominative, T, N), !,
+  U = ["UNTESTED: ", APAA, PP, PA], printAVM(U), % DEBUG
+  !,
+  testverblist(R).
+
+testverbs <- [pred].
+testverbs :-
+  findall([T, A, N, P1, P3, IA, I, PA, PP, APAA],
+      verbcase(T, A, N, P1, P3, IA, I, PA, PP, APAA), R),
+  testverblist(R).
+
+test :- testverbs, !, print("SUCCESS").
+test :- print("FAILED."), fail.
+
+?- test.
+?- halt.

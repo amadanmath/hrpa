@@ -1,0 +1,27 @@
+:- module("word").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("morph").
+:- ensure_loaded("lexicon").
+:- ensure_loaded("lillib/lists").
+:- ensure_loaded("lillib/strings").
+
+word_to_sign <- [pred].
+
+:- module_implementation.
+
+find_word <- [pred].
+find_word(S, T, F, L) :-
+  S = SYNSEM\LOCAL\CAT\HEAD\noun,
+  (T = 1 -> (F = L, lexn(L, _, S)) ; lexn(L, F, S)).
+find_word(S, T, F, F) :-
+  S = SYNSEM\LOCAL\CAT\HEAD\verb,
+  lexv(F, T, S).
+
+word_to_sign(W, L, S) :-
+  (lemmatize(W, H, T, F), % changeable words (morphology resolution)
+      S = SYNSEM\LOCAL\CAT\HEAD\H,
+      find_word(S, T, F, L));
+  (lexe(W, S), % unchangeable words (exact match)
+      L = W).
