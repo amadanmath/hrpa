@@ -13,8 +13,9 @@ testcase <- [pred].
 % SCRAMBLING TEST
 
 % Joanna loves John
-testcase("Ivana voli Ivana", T) :-
-  T = EDGE_SIGN\DTRS\
+% John loves Joanna
+testcase("Ivana voli Ivana",
+  [ EDGE_SIGN\DTRS\
     ( COMP_DTR\
       ( LEXICON\["Ivana"]
       & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
@@ -33,11 +34,8 @@ testcase("Ivana voli Ivana", T) :-
         & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
         )
       )
-    ).
-
-% John loves Joanna
-testcase("Ivana voli Ivana", T) :-
-  T = EDGE_SIGN\DTRS\
+    )
+  , EDGE_SIGN\DTRS\
     ( COMP_DTR\
       ( LEXICON\["Ivan"]
       & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
@@ -56,21 +54,30 @@ testcase("Ivana voli Ivana", T) :-
         & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
         )
       )
-    ).
+    )
+  ]).
 
 
 test_list <- [pred].
 test_list([]).
-test_list([[W, T] | CC]) :-
+test_list([[W, CC] | LL]) :-
   print(W),
   parse(W),
-  printAVM(["Parsed"]),
   trees(TT),
-  length(TT, L),
-  printAVM([L, "trees"]),
-  member(T, TT),
-  printAVM(["Canonical parse found"]),
-  test_list(CC).
+  length(TT, TL),
+  length(CC, CL),
+  printAVM(["Found", TL, "parse trees"]),
+  printAVM(["There are", CL, "canonical parses"]),
+  set_difference(CC, TT, NF),
+  (NF = []
+    ->
+      printAVM(["All canonical parses found"])
+    ; (
+      printAVM(["Not found:"]),
+      print(NF),
+      fail)
+  ),
+  test_list(LL).
 
 test :-
   findall([W, T], testcase(W, T), CC),
