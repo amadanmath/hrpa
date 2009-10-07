@@ -1,0 +1,4 @@
+#!/bin/sh
+
+DIR=`cd ${0%/*} && dirname $PWD`
+up -n -nofom -l $DIR/testcases.lil -e 'test'
