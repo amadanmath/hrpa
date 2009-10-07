@@ -134,6 +134,10 @@ substantive <- [head, has_number, has_person].
 nominal <- [substantive, has_case, has_gender, has_anim, has_def].
 verbal <- [substantive, has_tense, has_finite, has_voice] + [VTYPE\vtype].
 
+% TODO add more preposition forms, together with lexicon
+pform <- [bot].
+do_gen <- [pform].
+
 % POS
 
 noun <- [nominal] + [NTYPE\ntype].
@@ -141,7 +145,7 @@ adj <- [nominal, has_degree]. % ATYPE
 verb <- [verbal, has_pol] + [MOOD\mood].
 participle <- [nominal, verbal].
 adv <- [head, has_degree, has_pol]. % there must be more! :/
-prep <- [head, has_case]. % there might be more :)
+prep <- [head, has_case] + [PFORM\pform]. % there might be more :)
 particle <- [head] + [RTYPE\rtype].
 
 %pron <- [head] + [PTYPE\ptype, REFTYPE\reftype].

@@ -8,18 +8,10 @@
 :- ensure_loaded("types").
 :- ensure_loaded("word").
 
-save_trees <- [pred].
-check <- [pred]. % DEBUG
-
 lex_entry <- [bot] + [LEX_WORD\bot, LEX_TEMPLATE\bot].
 
 % TYPE DECLARATIONS
 % =================
-
-lemma <- [pred].
-lexicon <- [pred].
-slexicon <- [pred].
-morph_to_sign <- [pred].
 
 principles <- [pred].
 id_principle <- [pred].
@@ -221,25 +213,11 @@ parser_init :-
   set_limit_sentence_length(40),
   set_limit_edge_number(20000).
 
-%% FIXIT: OUTPUT CONVENIENCE - make nice trees instead
 
-save_trees_int <- [pred].
-save_trees_int([], _).
-save_trees_int([$EDGE | $EDGES], $HANDLE) :-
-  get_parse_tree($EDGE, $TREE),
-  printAVMtostr($TREE, $STR),
-  writeln_string($HANDLE, $STR),
-  save_trees_int($EDGES, $HANDLE).
-
-save_trees($FILENAME) :-
-  open_file_stream($FILENAME, "w", $HANDLE),
-  top_edge_id_list($EDGES),
-  save_trees_int($EDGES, $HANDLE),
-  close($HANDLE).
-
-
-% LEXICON
+% LEXICON - TODO remove
 % =======
+lexicon <- [pred].
+slexicon <- [pred].
 
 % Leo
 lexicon("Leo", S) :-

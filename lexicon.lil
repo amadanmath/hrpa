@@ -14,7 +14,7 @@ lexe <- [pred].
 
 lexe("do",
   SYNSEM\LOCAL\CAT\
-    ( HEAD\prep
+    ( HEAD\PFORM\do_gen
     & VAL\COMPS\
         [ noun & CASE\gen ])
 ).
