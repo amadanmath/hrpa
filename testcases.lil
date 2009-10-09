@@ -10,7 +10,7 @@ testcase <- [pred].
 
 :- module_implementation.
 
-% SCRAMBLING TEST
+% SCRAMBLING TEST; HEAD-COMP SCHEMA
 
 % Joanna loves John
 % John loves Joanna
@@ -56,6 +56,15 @@ testcase("Ivana voli Ivana",
       )
     )
   ]).
+
+
+% ADJECTIVE and ADVERB TEST; HEAD-MOD SCHEMA
+
+% Young John loves Joanna, beautiful as a dream
+% testcase("Mladi Ivan voli Ivanu lijepu poput sna",
+
+
+% 
 
 
 test_list <- [pred].

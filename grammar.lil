@@ -94,15 +94,14 @@ noun_mod_order($LEFT, $RIGHT, $HEAD, $MOD) :-
 
 head_mod_schema_rule <- [pred].
 head_mod_schema_rule($LEFT, $RIGHT, $HEAD, $MOD, $MOTHER) :- % nominal
-  % modifier goes to the right if complex, to the left if simple
   $HEAD = SYNSEM\LOCAL\CAT\(VAL\(SPR\$SPEC &
                                  COMPS\$COMPS &
                                  MOD\$HEADMOD &
-                                 SUBJ\$SUBJ)),
-  $HEAD = SYNSEM\$HEADSYNSEM,
+                                 SUBJ\$SUBJ) &
+                            HEAD\$HEADHEAD),
   $MOD = SYNSEM\LOCAL\CAT\VAL\(SPR\$MODSPR &
                                COMPS\$MODCOMPS &
-                               MOD\[$HEADSYNSEM]),
+                               MOD\[$HEADHEAD]),
   only_optional($MODCOMPS),
   only_optional($MODSPR),
   noun_mod_order($LEFT, $RIGHT, $HEAD, $MOD),

@@ -22,12 +22,10 @@ lexe("do",
 
 
 lexv("voljeti", [4, 2],
-  SYNSEM\LOCAL\CAT\VAL\
-    ( COMPS\
-        [ noun & CASE\nom
-        , noun & CASE\acc
-        ]
-    )
+  SYNSEM\LOCAL\CAT\VAL\COMPS\
+    [ noun & CASE\nom
+    , noun & CASE\acc
+    ]
 ).
 
 lexv("dovesti", [1, 1],
@@ -41,6 +39,14 @@ lexv("dovesti", [1, 1],
 ) :-
   $DESTINATION = noun & CASE\dat. % TODO: or PP, or optional
 
+
+% FIXME - when adjective declension is done
+lexe("lijepi", 
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\(adj & CASE\nom & DEFINITE\plus & NUMBER\singular & GENDER\masculine)
+    & VAL\MOD\[noun]
+    )
+).
 
 
 lexn("dječak", "dječaka", SYNSEM\LOCAL\CAT\HEAD\(GENDER\masculine & ANIMATE\plus)).
