@@ -60,11 +60,90 @@ testcase("Ivana voli Ivana",
 
 % ADJECTIVE and ADVERB TEST; HEAD-MOD SCHEMA
 
-% Young John loves Joanna, beautiful as a dream
-% testcase("Mladi Ivan voli Ivanu lijepu poput sna",
+% Young John loved Joanna, beautiful as a dream
+testcase("mladi Ivan voljaše Ivanu lijepu poput sna",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\DTRS\
+      ( MOD_DTR\
+        ( LEXICON\["mladi"] % FIXME mlad
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+        )
+      & HEAD_DTR\
+        ( LEXICON\["Ivan"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+        )
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["voljeti"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( TENSE\imperfect
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["Ivana"]
+          & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+          )
+        & MOD_DTR\DTRS\
+          ( HEAD_DTR\
+            ( LEXICON\["lijepa"] % FIXME lijep
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+            )
+          & MOD_DTR\DTRS\
+            ( HEAD_DTR\
+              LEXICON\["poput"]
+            & COMP_DTR\
+              ( LEXICON\["san"]
+              & SYNSEM\LOCAL\CAT\HEAD\CASE\gen
+              )
+            )
+          )
+        )
+      )
+    )
+  ]).
 
 
-% 
+% PRO DROP TEST; OPTIONAL ARGUMENT TEST
+
+% Joanna watches (someone)
+% (Someone) watches John
+testcase("Ivana gleda",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\
+      ( LEXICON\["Ivana"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+      )
+    & HEAD_DTR\
+      ( LEXICON\["gledati"]
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( TENSE\present
+        & PERSON\third
+        & NUMBER\singular
+        )
+      )
+    )
+  , EDGE_SIGN\DTRS\
+    ( HEAD_DTR\
+      ( LEXICON\["gledati"]
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( TENSE\present
+        & PERSON\third
+        & NUMBER\singular
+        )
+      )
+    & COMP_DTR\
+      ( LEXICON\["Ivan"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+      )
+    )
+  ]).
+
+
+
 
 
 test_list <- [pred].
@@ -75,17 +154,9 @@ test_list([[W, CC] | LL]) :-
   trees(TT),
   length(TT, TL),
   length(CC, CL),
-  printAVM(["Found", TL, "parse trees"]),
-  printAVM(["There are", CL, "canonical parses"]),
+  printAVM(["Found", TL, "parse trees for", CL, "canonical parses"]),
   set_difference(CC, TT, NF),
-  (NF = []
-    ->
-      printAVM(["All canonical parses found"])
-    ; (
-      printAVM(["Not found:"]),
-      print(NF),
-      fail)
-  ),
+  NF = [],
   test_list(LL).
 
 test :-
