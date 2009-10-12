@@ -43,7 +43,7 @@ lexv("dovesti", [1, 1],
 % FIXME - when adjective declension is done
 lexe("lijepi", 
   SYNSEM\LOCAL\CAT\
-    ( HEAD\(adj & CASE\nom & DEFINITE\plus & NUMBER\singular & GENDER\masculine)
+    ( HEAD\(adjective & CASE\nom & DEFINITE\plus & NUMBER\singular & GENDER\masculine)
     & VAL\MOD\[noun]
     )
 ).

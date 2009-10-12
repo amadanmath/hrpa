@@ -1,17 +1,6 @@
 :- module("types").
 :- module_interface.
 
-schema <- [bot].
-head_spec_schema <- [schema].
-head_comp_schema <- [schema].
-head_mod_schema <- [schema].
-
-head_str <- [bot] + [HEAD_DTR\].
-head_spec_str <- [head_str] + [COMP_DTR\].
-head_comp_str <- [head_str] + [SPEC_DTR\].
-head_mod_str <- [head_str] + [MOD_DTR\].
-head_fill_str <- [head_str] + [FILL_DTR\].
-
 bool <- [bot].
 plus <- [bool].
 minus <- [bool].
@@ -22,15 +11,31 @@ slash <- [bot]. % TODO add here!
 
 % phrase
 
-head <- [bot] + [PREDICATE\bool, CLITIC\bool].
+head <- [bot] + [PREDICATE\bool, CLITIC\bool, FL\flags].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list].
 cat <- [bot] + [HEAD\head, VAL\val].
 local <- [bot] + [CAT\cat]. % CONT, CTX
-nonlocal <- [bot]. % TODO
-synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal, FL\flags]. % EXPR
+stores <- [bot] + [CLSTORE\list]. % QSTORE
+nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
+synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
-phrase <- [sign] + [DTRS\head_str].
+schema <- [bot].
+head_spec_schema <- [schema].
+head_comp_schema <- [schema].
+head_mod_schema <- [schema].
+head_aux_schema <- [schema].
+
+head_str <- [bot] + [HEAD_DTR\sign].
+head_spec_str <- [head_str] + [SPEC_DTR\sign].
+head_comp_str <- [head_str] + [COMP_DTR\sign].
+head_mod_str <- [head_str] + [MOD_DTR\sign].
+head_aux_str <- [head_str] + [AUX_DTR\sign].
+head_cl_str <- [head_str] + [CL_DTR\sign].
+
+phrase <- [sign].
+binary_phrase <- [phrase] + [DTRS\head_str].
+unary_phrase <- [phrase] + [DTR\sign].
 word <- [sign].
 
 case <- [bot].
@@ -70,11 +75,12 @@ ntype <- [bot].
 common <- [ntype].
 proper <- [ntype].
 
-vtype <- [bot].
-main <- [vtype].
-aux <- [vtype].
-modal <- [vtype].
-copula <- [vtype].
+% TODO maybe remove
+%vtype <- [bot].
+%main <- [vtype].
+%aux <- [vtype].
+%modal <- [vtype].
+%copula <- [vtype].
 
 mood <- [bot].
 indicative <- [mood].
@@ -106,7 +112,7 @@ tense <- [bot].
 present <- [tense].
 imperfect <- [tense].
 future <- [tense].
-past <- [tense].
+perfect <- [tense].
 pluperfect <- [tense].
 aorist <- [tense].
 has_tense <- [head] + [TENSE\tense].
@@ -130,9 +136,18 @@ has_anim <- [head] + [ANIMATE\bool].
 has_pol <- [head] + [POLAR\bool].
 has_finite <- [head] + [FINITE\bool].
 
-substantive <- [head, has_number, has_person].
-nominal <- [substantive, has_case, has_gender, has_anim, has_def].
-verbal <- [substantive, has_tense, has_finite, has_voice] + [VTYPE\vtype].
+has_np <- [head, has_number, has_person].
+has_gnp <- [head, has_gender, has_np].
+has_cgnp <- [head, has_case, has_gnp].
+has_dcgnp <- [head, has_def, has_cgnp].
+has_ddcgnp <- [head, has_degree, has_dcgnp].
+
+noun_like <- [head, has_dcgnp, has_anim].
+adj_like <- [head, has_ddcgnp].
+adv_like <- [head, has_degree, has_pol].
+verb_like <- [head, has_tense, has_finite, has_voice, has_np].
+
+verb_gnp <- [verb_like, has_gnp].
 
 % TODO add more preposition forms, together with lexicon
 pform <- [bot].
@@ -140,20 +155,20 @@ do_gen <- [pform].
 
 % POS
 
-noun <- [nominal] + [NTYPE\ntype].
-adj <- [nominal, has_degree]. % ATYPE
-verb <- [verbal, has_pol] + [MOOD\mood].
-participle <- [nominal, verbal].
-adv <- [head, has_degree, has_pol]. % there must be more! :/
-prep <- [head, has_case] + [PFORM\pform]. % there might be more :)
-particle <- [head] + [RTYPE\rtype].
+noun <- [noun_like].
+adjective <- [adj_like].
+adverb <- [adv_like].
+verb <- [verb_like, has_pol] + [MOOD\mood].
+compound_verb <- [verb, verb_gnp].
+participle <- [verb_gnp, has_cgnp].
+prep <- [head] + [PFORM\pform]. % there might be more :)
+particle <- [head] + [RTYPE\rtype]. % TODO check for RTYPE...
 
-%pron <- [head] + [PTYPE\ptype, REFTYPE\reftype].
-%pron_nominal <- [pron, nominal].
-%pron_adjectival <- [pron, adj].
-
-pron <- [bot] + [PTYPE\ptype, REFTYPE\reftype].
-pron_nominal <- [pron, noun].
-pron_adjectival <- [pron_nominal, adj]. % WRONG
+pro <- [head] + [PTYPE\ptype, REFTYPE\reftype]. % TODO check for PTYPE, REFTYPE
+pro_degree <- [pro, has_degree].
+pro_dcgnp <- [pro_degree, has_ddcgnp].
+pro_noun <- [head, pro_dcgnp, noun_like].
+pro_adj <- [head, pro_dcgnp, adj_like].
+pro_adv <- [head, pro_degree, adv_like].
 
 :- module_implementation.

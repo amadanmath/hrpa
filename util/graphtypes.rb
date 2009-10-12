@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 $file = "types.lil"
-$dir = File.dirname(File.dirname(__FILE__))
+$dir = File.dirname(File.expand_path(File.dirname(__FILE__)))
 
 base = { "string" => "str", "integer" => "int", "float" => "flt", "nil" => "nil", "cons" => "cons", "list" => "list", "bot" => "bot" }
 
@@ -55,7 +55,11 @@ descs.each do |cl, feats|
 end
 dot << uses.join("\n")
 dot << "}"
+dot = dot.join("\n")
 
-IO.popen("dot -Tpng -otypes.png", "w") do |f|
-  f.puts dot.join("\n")
+IO.popen("dot -Tpng -o#{$dir}/types.png", "w") do |f|
+  f.puts dot
+end
+File.open("#{$dir}/types.dot", "w") do |f|
+  f.puts dot
 end

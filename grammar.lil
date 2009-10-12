@@ -13,10 +13,6 @@ lex_entry <- [bot] + [LEX_WORD\bot, LEX_TEMPLATE\bot].
 % TYPE DECLARATIONS
 % =================
 
-principles <- [pred].
-id_principle <- [pred].
-head_feature_principle <- [pred].
-phonology_principle <- [pred].
 
 :- module_implementation.
 
@@ -70,7 +66,7 @@ head_comp_schema_rule($LEFT, $RIGHT, $HEAD, $COMP, $MOTHER) :-
   only_optional($COMPSPR),
   $HEADCOMPS = [_ | _], % make sure it's non-empty
   $COMP = SYNSEM\LOCAL\CAT\HEAD\$COMPHEAD,
-  restriction($COMP, [SYNSEM\, FL\, OPT\]),
+  restriction($COMPHEAD, [FL\, OPT\]),
   find_and_delete($HEADCOMPS, $COMPHEAD, $MOTHERCOMPS),
   ((($SUBJLIST = [$SUBJ], $COMP = SYNSEM\$SUBJ ); % subjects need to agree
       $HEAD = prep                         % prep complements need to agree
@@ -114,23 +110,32 @@ head_mod_schema_rule($LEFT, $RIGHT, $HEAD, $MOD, $MOTHER) :- % nominal
                   MOD_DTR\$MOD).
 
 % Immediate Dominance: collects other principles
+id_principle <- [pred].
 id_principle(head_comp_schema, $LEFT, $RIGHT, $HEAD, $COMP, $MOTHER) :-
   head_comp_schema_rule($LEFT, $RIGHT, $HEAD, $COMP, $MOTHER).
 id_principle(head_mod_schema, $LEFT, $RIGHT, $HEAD, $MOD, $MOTHER) :-
   head_mod_schema_rule($LEFT, $RIGHT, $HEAD, $MOD, $MOTHER).
 
 % HFP: Mother and Head share head features.
+head_feature_principle <- [pred].
 head_feature_principle($HEAD, $MOTHER) :-
   $MOTHER = (SYNSEM\LOCAL\CAT\HEAD\$X),
   $HEAD = (SYNSEM\LOCAL\CAT\HEAD\$X).
 
-phonology_principle($LEFT, $RIGHT, $MOTHER) :-
+phonology_principle_binary <- [pred].
+phonology_principle_binary($LEFT, $RIGHT, $MOTHER) :-
   $LEFT = (PHONOLOGY\$LEFTPHON & LEXICON\$LEFTLEX),
   $RIGHT = (PHONOLOGY\$RIGHTPHON & LEXICON\$RIGHTLEX),
   $MOTHER = (PHONOLOGY\$MOTHERPHON & LEXICON\$MOTHERLEX),
   append($LEFTPHON, $RIGHTPHON, $MOTHERPHON),
   append($LEFTLEX, $RIGHTLEX, $MOTHERLEX).
 
+phonology_principle_unary <- [pred].
+phonology_principle_unary($DTR, $MOTHER) :-
+  $DTR = (PHONOLOGY\$PHON & LEXICON\$LEX),
+  $MOTHER = (PHONOLOGY\$PHON & LEXICON\$LEX).
+
+principles <- [pred].
 principles($SCHEMA, $LEFT, $RIGHT, $MOTHER) :-
   id_principle($SCHEMA, $LEFT, $RIGHT, $HEAD, _, $MOTHER),
   head_feature_principle($HEAD, $MOTHER).
@@ -147,7 +152,7 @@ default($FS, $FEATURE, $DEFAULT, $OTHER) :-
 fill_defaults <- [pred].
 fill_defaults(S) :-
   S = SYNSEM\LOCAL\CAT\(HEAD\$HEAD & VAL\$VAL),
-  default(S, [FL\, OPT\], minus, plus),
+  default($HEAD, [FL\, OPT\], minus, plus),
   default($VAL, SPR\, [], [_]),
   default($VAL, COMPS\, [], [_]),
   default($VAL, MOD\, [], [_]),
@@ -155,7 +160,7 @@ fill_defaults(S) :-
   default($HEAD, NUMBER\, singular, plural),
   default($HEAD, PREDICATE\, minus, plus),
   % verbs normally have 1st arg as subject
-  (($VAL = COMPS\[$SUBJ | _], $HEAD = verb) -> 
+  (($VAL = COMPS\[$SUBJ | _], $HEAD = verb) -> % FIXME verb -> verbal (including verb and participle)
       default($VAL, SUBJ\, [$SUBJ], []) ; % verbs default to having a subject
       default($VAL, SUBJ\, [], [_])),     % other POS default to not having it
   (($VAL = SUBJ\[FL\OPT\plus]) -> true ; true).
@@ -167,7 +172,7 @@ fill_defaults(S) :-
 % binary branching licence (+$SCHEMA, +$LEFT, +$RIGHT, -$MOTHER, -$DCP)
 id_schema_binary($SCHEMA, $LEFT, $RIGHT, $MOTHER, $DCP) :-
   principles($SCHEMA, $LEFT, $RIGHT, $MOTHER),
-  $DCP = phonology_principle($LEFT, $RIGHT, $MOTHER).
+  $DCP = phonology_principle_binary($LEFT, $RIGHT, $MOTHER).
 
 % unary branching licence (+$SCHEMA, +$DTR, -$MOTHER, -$DCP)
 id_schema_unary(_, _, _, _) :- fail.
@@ -282,12 +287,12 @@ lexicon("dati",
 
 % good
 lexicon("dobar", S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\adj &
+  S = SYNSEM\LOCAL\CAT\(HEAD\adjective &
                         VAL\MOD\[LOCAL\CAT\HEAD\noun]).
 
 % pretty
 lexicon("lijep", S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\adj &
+  S = SYNSEM\LOCAL\CAT\(HEAD\adjective &
                         VAL\MOD\[LOCAL\CAT\HEAD\noun]).
 
 
@@ -297,20 +302,7 @@ lexicon("poput", S) :-
                         VAL\(SPR\[] &
                              COMPS\[LOCAL\CAT\HEAD\(noun & CASE\gen)] &
                              MOD\[LOCAL\CAT\HEAD\$HEAD])),
-  ($HEAD = noun; $HEAD = verb; $HEAD = adj; $HEAD = adv).
-
-% in/into
-lexicon("u", S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\(prep & CASE\$CASE) &
-                        VAL\(COMPS\$COMPS &
-                             MOD\$MOD)),
-  $COMPS = [LOCAL\CAT\HEAD\noun],
-% with accusative and genitive (?), can only complement
-  ((($CASE = gen; $CASE = acc), $MOD = []);
-% in locative, can modify nouns and verbs? "cat in bag, to work in kitchen"
-    ($CASE = loc,
-      $MOD = [LOCAL\CAT\HEAD\$HEAD],
-      ($HEAD = noun; $HEAD = verb))).
+  ($HEAD = noun; $HEAD = verb; $HEAD = adjective; $HEAD = adverb).
 
 % from
 lexicon("iz", S) :-
@@ -320,9 +312,9 @@ lexicon("iz", S) :-
                              MOD\[LOCAL\CAT\HEAD\noun])).
 
 % very
-lexicon("vrlo", SYNSEM\LOCAL\CAT\(HEAD\adv &
+lexicon("vrlo", SYNSEM\LOCAL\CAT\(HEAD\adverb &
                                   VAL\MOD\[LOCAL\CAT\HEAD\$HEAD])) :-
-  $HEAD = adj; $HEAD = adv.
+  $HEAD = adjective; $HEAD = adverb.
 
 
 % PRONOUNS
@@ -345,7 +337,7 @@ lexicon("biti1", S) :-
         LOCAL\CAT\HEAD\$NHEAD,
         LOCAL\CAT\HEAD\$AHEAD],
       $NHEAD = noun & CASE\nom,
-      $AHEAD = adj,
+      $AHEAD = adjective,
       headagree($NHEAD, $AHEAD)
   ); ($COMPS = [ % TODO! TODO a LOT!
         LOCAL\CAT\HEAD\(noun & CASE\nom),

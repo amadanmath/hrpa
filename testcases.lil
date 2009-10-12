@@ -107,7 +107,7 @@ testcase("mladi Ivan voljaše Ivanu lijepu poput sna",
   ]).
 
 
-% PRO DROP TEST; OPTIONAL ARGUMENT TEST
+% PRO DROP and OPTIONAL ARGUMENT TEST; HEAD-COMP SCHEMA
 
 % Joanna watches (someone)
 % (Someone) watches John
@@ -127,7 +127,11 @@ testcase("Ivana gleda",
       )
     )
   , EDGE_SIGN\DTRS\
-    ( HEAD_DTR\
+    ( COMP_DTR\
+      ( LEXICON\["Ivan"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+      )
+    & HEAD_DTR\
       ( LEXICON\["gledati"]
       & SYNSEM\LOCAL\CAT\HEAD\
         ( TENSE\present
@@ -135,14 +139,215 @@ testcase("Ivana gleda",
         & NUMBER\singular
         )
       )
-    & COMP_DTR\
+    )
+  ]).
+
+
+% OBLIQUE NOUNS AS ADVERBIALS; HEAD-MOD SCHEMA
+
+% John watches Joanna's dreams with a magical TV (lit. John to-Joanna watches dreams with-[magical TV])
+testcase("Ivan Ivani gleda snove čarobnim televizorom",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\
       ( LEXICON\["Ivan"]
       & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+      )
+    & HEAD_DTR\DTRS\
+      ( MOD_DTR\
+        ( LEXICON\["Ivana"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\dat
+        )
+      & HEAD_DTR\DTRS\
+        ( HEAD_DTR\DTRS\
+          ( HEAD_DTR\
+            ( LEXICON\["gledati"]
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( TENSE\present
+              & PERSON\third
+              & NUMBER\singular
+              )
+            )
+          & COMP_DTR\
+            ( LEXICON\["san"]
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+            )
+          )
+        & MOD_DTR\DTRS\
+          ( MOD_DTR\
+            ( LEXICON\["posebnim"] % FIXME poseban
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\ins
+            )
+          & HEAD_DTR\
+            ( LEXICON\["televizorom"]
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\ins
+            )
+          )
+        )
       )
     )
   ]).
 
 
+% AUXILIARY BINDING - DIRECT (AUX CLITIC on the RIGHT)
+
+% John is watched (lit. watched is John)
+testcase("gledan je televizor",
+  [ EDGE_SIGN\DTRS\
+    ( HEAD_DTR\
+      ( DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["gledan"] % FIXME gledati
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( participle
+            & VOICE\passive
+            & TENSE\perfect
+            & GENDER\masculine
+            & NUMBER\singular
+            & CASE\nom
+            )
+          )
+        & AUX_DTR\
+          ( LEXICON\["je"] % FIXME biti
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( verb
+            & CLITIC\plus
+            & FINITE\minus
+            & VOICE\active
+            & TENSE\present
+            & PERSON\third
+            & NUMBER\singular
+            )
+          )
+        )
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( compound_verb
+        & CLITIC\minus
+        & VOICE\passive
+        & TENSE\perfect
+        & GENDER\masculine
+        & PERSON\third
+        & NUMBER\singular
+        )
+      )
+    & COMP_DTR\
+      ( LEXICON\["Ivan"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+      )
+    )
+  ]).
+
+
+% CLITIC STORE; HEAD-CLITIC SCHEMA, CLITIC BINDING SCHEMA (unary)
+
+% John gives it to him (John to-him it gives)
+testcase("Ivan mu ga je dao",
+  [ EDGE_SIGN\
+    ( DTR\
+      ( DTR\
+        ( DTR\
+          ( DTRS\
+            ( COMP_DTR\
+              ( DTRS\
+                ( HEAD_DTR\
+                  ( DTRS\
+                    ( HEAD_DTR\
+                      ( DTRS\
+                        ( HEAD_DTR\
+                          ( LEXICON\["Ivan"]
+                          & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+                          )
+                        & CL_DTR\
+                          ( $mu
+                          & LEXICON\["mu"] % FIXME on
+                          & SYNSEM\LOCAL\CAT\HEAD\
+                            ( CASE\dat
+                            & CLITIC\plus
+                            )
+                          )
+                        )
+                      & SYNSEM\NONLOCAL\INHER\CLSTORE\
+                        [ $mu
+                        ]
+                      )
+                    & CL_DTR\
+                      ( $ga
+                      & LEXICON\["ga"] % FIXME on
+                      & SYNSEM\LOCAL\CAT\HEAD\
+                        ( CASE\acc
+                        & CLITIC\plus
+                        )
+                      )
+                    )
+                  & SYNSEM\NONLOCAL\INHER\CLSTORE\
+                    [ $ga
+                    , $mu
+                    ]
+                  )
+                & CL_DTR\
+                  ( $je
+                  & LEXICON\["je"] % FIXME biti
+                  & SYNSEM\LOCAL\CAT\HEAD\
+                    ( verb
+                    & CLITIC\plus
+                    & FINITE\minus
+                    & VOICE\active
+                    & TENSE\present
+                    & PERSON\third
+                    & NUMBER\singular
+                    )
+                  )
+                )
+              & SYNSEM\NONLOCAL\INHER\CLSTORE\
+                [ $je
+                , $mu
+                , $ga
+                ]
+              )
+            & HEAD_DTR\
+              ( LEXICON\["dao"] % FIXME dati
+              & SYNSEM\LOCAL\CAT\HEAD\
+              ( participle
+                & VOICE\active
+                & TENSE\perfect
+                & GENDER\masculine
+                & NUMBER\singular
+                & CASE\nom
+                )
+              )
+            )
+          )
+        & SYNSEM\LOCAL\CAT\ % aux is bound
+          ( HEAD\
+            ( $verb
+            & compound_verb
+            & CLITIC\minus
+            & VOICE\passive
+            & TENSE\perfect
+            & GENDER\masculine
+            & PERSON\third
+            & NUMBER\singular
+            )
+          & VAL\COMPS\
+            [ CASE\acc
+            , CASE\dat
+            ]
+          )
+        )
+      & SYNSEM\LOCAL\CAT\ % direct object is bound
+        ( HEAD\$verb
+        & VAL\COMPS\
+          [ CASE\dat ]
+        )
+      )
+    & SYNSEM\
+      ( LOCAL\CAT\ % indirect object is bound
+        ( HEAD\$verb
+        & VAL\COMPS\[]
+        )
+      & NONLOCAL\INHER\CLSTORE\[] % all the clitics are accounted for
+      )
+    )
+  ]).
 
 
 
