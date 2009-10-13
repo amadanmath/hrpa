@@ -350,10 +350,133 @@ testcase("Ivan mu ga je dao",
   ]).
 
 
+% POLARITY and INFINITIVE BINDING; HEAD-AUX SCHEMA
 
-test_list <- [pred].
-test_list([]).
-test_list([[W, CC] | LL]) :-
+% I will not switch on the TV (lit. TV I-won't to-switch-on)
+testcase("Televizor neću gledati",
+  [ EDGE_SIGN\
+    ( DTRS\
+      ( COMP_DTR\
+        ( LEXICON\["televizor"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+        )
+      & HEAD_DTR\DTRS\
+        ( AUX_DTR\
+          ( LEXICON\["neću"] % FIXME ["ne htjeti"]?
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( MOOD\indicative
+            & CLITIC\minus
+            & FINITE\minus
+            & VOICE\active
+            & TENSE\present
+            & PERSON\first
+            & NUMBER\singular
+            & POLAR\minus
+            )
+          )
+        & HEAD_DTR\
+          ( LEXICON\["upaliti"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( MOOD\infinitive
+            & FINITE\plus
+            )
+          )
+        )
+      )
+    & SYNSEM\LOCAL\CAT\HEAD\
+      ( FINITE\plus % NOTE this is from HEAD, not AUX!
+      & MOOD\indicative
+      & VOICE\active
+      & TENSE\present
+      & PERSON\first
+      & NUMBER\singular
+      & POLAR\minus
+      )
+    )
+  ]).
+
+
+% COMPLEMENTIZER; HEAD-MARKER SCHEMA
+
+% He wants Joanna to love him (lit. He wants that Joanna him loves)
+testcase("Htio bi da ga Ivana voli",
+  [ EDGE_SIGN\DTRS\
+    ( HEAD_DTR\
+      ( DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["htio"] % FIXME htjeti
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( participle
+            & NUMBER\singular
+            & GENDER\masculine
+            )
+          )
+        & AUX_DTR\
+          ( LEXICON\["biti"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( verb
+            & CLITIC\plus
+            & FINITE\plus
+            & VOICE\active
+            & TENSE\aorist
+            & PERSON\first
+            & NUMBER\singular
+            )
+          )
+        )
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( compound_verb
+        & CLITIC\minus
+        & VOICE\active
+        & TENSE\present
+        & MOOD\conditional
+        & PERSON\first
+        & NUMBER\singular
+        & GENDER\masculine
+        )
+      )
+    & COMP_DTR\
+      ( DTR\
+        ( DTRS\
+          ( MARK_DTR\DTRS\
+            ( HEAD_DTR\LEXICON\["da"]
+            & CL_DTR\
+              ( LEXICON\["ga"] % FIXME on
+              & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+              )
+            )
+          & HEAD_DTR\DTRS\
+            ( COMP_DTR\
+              ( LEXICON\["Ivana"]
+              & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+              )
+            & HEAD_DTR\
+              ( LEXICON\["voljeti"]
+              & SYNSEM\LOCAL\CAT\HEAD\
+                ( NUMBER\singular
+                & PERSON\third
+                )
+              )
+            )
+          )
+        )
+      & SYNSEM\LOCAL\CAT\VAL\COMPS\[] % "ga" is bound
+      )
+    )
+  ]).
+
+
+% ATTACHMENT AMBIGUITY and CONTROL VERB
+
+% It was not hard for John to steal Joanna's bag
+%   (lit. to-John bag of Joanna not was hard to-steal)
+% testcase("Ivanu torbu od Ivane nije bilo teško ukrasti",
+
+
+
+
+test_sentence <- [pred].
+test_sentence(W, CC) :-
   print(W),
   parse(W),
   trees(TT),
@@ -361,12 +484,16 @@ test_list([[W, CC] | LL]) :-
   length(CC, CL),
   printAVM(["Found", TL, "parse trees for", CL, "canonical parses"]),
   set_difference(CC, TT, NF),
-  NF = [],
+  NF = [].
+
+test_list <- [pred].
+test_list([]).
+test_list([[W, CC] | LL]) :-
+  (test_sentence(W, CC)
+    -> print("==> OK  :)")
+    ;  print("==> Failed")),
   test_list(LL).
 
 test :-
   findall([W, T], testcase(W, T), CC),
-  test_list(CC),
-  print("Success"), !.
-test :-
-  print("Failed!").
+  test_list(CC).

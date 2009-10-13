@@ -21,17 +21,18 @@ synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
 schema <- [bot].
-head_spec_schema <- [schema].
 head_comp_schema <- [schema].
 head_mod_schema <- [schema].
 head_aux_schema <- [schema].
+head_cl_schema <- [schema].
+head_mark_schema <- [schema].
 
 head_str <- [bot] + [HEAD_DTR\sign].
-head_spec_str <- [head_str] + [SPEC_DTR\sign].
 head_comp_str <- [head_str] + [COMP_DTR\sign].
 head_mod_str <- [head_str] + [MOD_DTR\sign].
 head_aux_str <- [head_str] + [AUX_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
+head_mark_str <- [head_str] + [MARK_DTR\sign].
 
 phrase <- [sign].
 binary_phrase <- [phrase] + [DTRS\head_str].
