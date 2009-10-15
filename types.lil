@@ -153,6 +153,7 @@ verb_gnp <- [verb_like, has_gnp].
 % TODO add more preposition forms, together with lexicon
 pform <- [bot].
 do_gen <- [pform].
+od_gen <- [pform].
 
 % POS
 

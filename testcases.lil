@@ -398,7 +398,7 @@ testcase("Televizor neću gledati",
 
 % COMPLEMENTIZER; HEAD-MARKER SCHEMA
 
-% He wants Joanna to love him (lit. He wants that Joanna him loves)
+% He wants Joanna to love him (lit. He-wants would that him Joanna loves)
 testcase("Htio bi da ga Ivana voli",
   [ EDGE_SIGN\DTRS\
     ( HEAD_DTR\
@@ -466,13 +466,210 @@ testcase("Htio bi da ga Ivana voli",
   ]).
 
 
-% ATTACHMENT AMBIGUITY and CONTROL VERB
+% ADJECTIVAL/NOMINAL PREDICATION; HEAD-AUX SCHEMA
 
-% It was not hard for John to steal Joanna's bag
-%   (lit. to-John bag of Joanna not was hard to-steal)
-% testcase("Ivanu torbu od Ivane nije bilo teško ukrasti",
+% TV isn't slanted (adjective interpretation)
+% TV isn't a blackbird (noun interpretation)
+testcase("televizor nije kos",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\
+      ( LEXICON\["televizor"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+      )
+    & HEAD_DTR\DTRS\
+      ( AUX_DTR\
+        ( LEXICON\["nije"] % FIXME "ne biti"
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( verb
+          & CLITIC\minus
+          & FINITE\minus
+          & VOICE\active
+          & TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & HEAD_DTR\
+        ( LEXICON\["kos"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( noun
+          & CASE\nom
+          )
+        )
+      )
+    )
+  , EDGE_SIGN\DTRS\
+    ( COMP_DTR\
+      ( LEXICON\["televizor"]
+      & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+      )
+    & HEAD_DTR\DTRS\
+      ( AUX_DTR\
+        ( LEXICON\["nije"] % FIXME "ne biti"
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( verb
+          & CLITIC\minus
+          & FINITE\minus
+          & VOICE\active
+          & TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & HEAD_DTR\
+        ( LEXICON\["kos"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( adjective
+          & CASE\nom
+          & GENDER\masculine
+          )
+        )
+      )
+    )
+  ]).
 
 
+
+% ATTACHMENT AMBIGUITY and TOUGH-CONSTRUCTION
+
+% It was not hard for John to steal TV from Joanna
+% It was not hard for John to steal Joanna's TV
+%   (lit. to-John isn't was hard to-steal TV from/of Joanna)
+% TODO PROBLEM: where does the dative argument come from?
+testcase("Ivanu nije bilo teško ukrasti televizor od Ivane",
+  [ EDGE_SIGN\DTRS\
+    ( HEAD_DTR\DTRS\
+      ( COMP_DTR\
+        ( LEXICON\["Ivan"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\dat
+        )
+      & HEAD_DTR\DTRS\
+        ( AUX_DTR\DTRS\
+          ( AUX_DTR\
+            ( LEXICON\["nije"] % FIXME "ne biti"
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( verb
+              & CLITIC\minus
+              & FINITE\minus
+              & VOICE\active
+              & TENSE\present
+              & PERSON\third
+              & NUMBER\singular
+              )
+            )
+          & HEAD_DTR\
+            ( LEXICON\["bilo"] % FIXME biti
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( participle
+              & CLITIC\minus
+              & VOICE\active
+              & TENSE\perfect
+              & CASE\nom
+              & GENDER\neuter
+              & NUMBER\singular
+              )
+            )
+          )
+        & HEAD_DTR\
+          ( LEXICON\["teško"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( adjective
+            & CASE\nom
+            & GENDER\neuter
+            )
+          )
+        )
+      )
+    & COMP_DTR\DTRS\
+      ( HEAD_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["ukrasti"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( MOOD\infinitive
+            & FINITE\plus
+            )
+          )
+        & COMP_DTR\
+          ( LEXICON\["televizor"]
+          & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( HEAD_DTR\SYNSEM\LOCAL\CAT\HEAD\PFORM\od_gen
+        & COMP_DTR\
+          ( LEXICON\["Ivana"]
+          & SYNSEM\LOCAL\CAT\HEAD\CASE\gen
+          )
+        )
+      )
+    )
+  , EDGE_SIGN\DTRS\
+    ( HEAD_DTR\DTRS\
+      ( COMP_DTR\
+        ( LEXICON\["Ivan"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\dat
+        )
+      & HEAD_DTR\DTRS\
+        ( AUX_DTR\DTRS\
+          ( AUX_DTR\
+            ( LEXICON\["nije"] % FIXME "ne biti"
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( verb
+              & CLITIC\minus
+              & FINITE\minus
+              & VOICE\active
+              & TENSE\present
+              & PERSON\third
+              & NUMBER\singular
+              )
+            )
+          & HEAD_DTR\
+            ( LEXICON\["bilo"] % FIXME biti
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( participle
+              & CLITIC\minus
+              & VOICE\active
+              & TENSE\perfect
+              & CASE\nom
+              & GENDER\neuter
+              & NUMBER\singular
+              )
+            )
+          )
+        & HEAD_DTR\
+          ( LEXICON\["teško"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( adjective
+            & CASE\nom
+            & GENDER\neuter
+            )
+          )
+        )
+      )
+    & COMP_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["ukrasti"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( MOOD\infinitive
+          & FINITE\plus
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["televizor"]
+          & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+          )
+        & MOD_DTR\DTRS\
+          ( HEAD_DTR\SYNSEM\LOCAL\CAT\HEAD\PFORM\od_gen
+          & COMP_DTR\
+            ( LEXICON\["Ivana"]
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\gen
+            )
+          )
+        )
+      )
+    )
+  ]).
 
 
 test_sentence <- [pred].
