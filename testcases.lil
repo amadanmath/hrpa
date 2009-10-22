@@ -536,6 +536,9 @@ testcase("televizor nije kos",
 % It was not hard for John to steal Joanna's TV
 %   (lit. to-John isn't was hard to-steal TV from/of Joanna)
 % TODO PROBLEM: where does the dative argument come from?
+% NOTE This analysis might not be correct
+%     televizor Ivanu od Ivane nije bilo teško ukrasti
+%   cannot be analysed in this way (except by using 2-3 traces)
 testcase("Ivanu nije bilo teško ukrasti televizor od Ivane",
   [ EDGE_SIGN\DTRS\
     ( HEAD_DTR\DTRS\
@@ -670,6 +673,64 @@ testcase("Ivanu nije bilo teško ukrasti televizor od Ivane",
       )
     )
   ]).
+
+
+% NUMBERS; HEAD-COMP SCHEMA
+
+% two students (paucal [gen sg]) aren't ten students (plural [gen pl])
+testcase("dva studenta nisu deset studenata",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["dva"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( CASE\nom
+          & NUMBER\plural
+          & GENDER\neuter
+          )
+        )
+      & COMP_DTR\
+        ( LEXICON\["student"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( CASE\gen
+          & NUMBER\singular
+          )
+        )
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["nisu"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( verb
+          & CLITIC\minus
+          & FINITE\minus
+          & VOICE\active
+          & TENSE\present
+          & PERSON\third
+          & NUMBER\plural
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["deset"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( CASE\nom
+            & NUMBER\singular
+            & GENDER\neuter
+            )
+          )
+        & COMP_DTR\
+          ( LEXICON\["student"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( CASE\gen
+            & NUMBER\plural
+            )
+          )
+        )
+      )
+    )
+  ]).
+
 
 
 test_sentence <- [pred].
