@@ -190,22 +190,24 @@ testcase("Ivan Ivani gleda snove čarobnim televizorom",
 
 % AUXILIARY BINDING - DIRECT (AUX CLITIC on the RIGHT)
 
-% John is watched (lit. watched is John)
+% TV is watched (lit. watched is TV)
 testcase("gledan je televizor",
   [ EDGE_SIGN\DTRS\
     ( HEAD_DTR\
       ( DTRS\
         ( HEAD_DTR\
           ( LEXICON\["gledan"] % FIXME gledati
-          & SYNSEM\LOCAL\CAT\HEAD\
-            ( participle
-            & VOICE\passive
-            & TENSE\perfect
-            & GENDER\masculine
-            & NUMBER\singular
-            & CASE\nom
+          & SYNSEM\LOCAL\CAT\(
+            ( HEAD\
+              ( participle
+              & VOICE\passive
+              & TENSE\perfect
+              & GENDER\masculine
+              & NUMBER\singular
+              & CASE\nom
+              )
+            & VAL\COMPS\[CASE\acc] % NOTE passivization transformation (in morphology?)
             )
-          )
         & AUX_DTR\
           ( LEXICON\["je"] % FIXME biti
           & SYNSEM\LOCAL\CAT\HEAD\
@@ -351,6 +353,7 @@ testcase("Ivan mu ga je dao",
 
 
 % POLARITY and INFINITIVE BINDING; HEAD-AUX SCHEMA
+% NOTE check! maybe regular complement, coupled with long-distance relationship of TV?
 
 % I will not switch on the TV (lit. TV I-won't to-switch-on)
 testcase("Televizor neću gledati",
@@ -466,7 +469,7 @@ testcase("Htio bi da ga Ivana voli",
   ]).
 
 
-% ADJECTIVAL/NOMINAL PREDICATION; HEAD-AUX SCHEMA
+% ADJECTIVAL/NOMINAL PREDICATION
 
 % TV isn't slanted (adjective interpretation)
 % TV isn't a blackbird (noun interpretation)
@@ -477,7 +480,7 @@ testcase("televizor nije kos",
       & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
       )
     & HEAD_DTR\DTRS\
-      ( AUX_DTR\
+      ( HEAD_DTR\
         ( LEXICON\["nije"] % FIXME "ne biti"
         & SYNSEM\LOCAL\CAT\HEAD\
           ( verb
@@ -489,11 +492,12 @@ testcase("televizor nije kos",
           & NUMBER\singular
           )
         )
-      & HEAD_DTR\
+      & COMP_DTR\
         ( LEXICON\["kos"]
         & SYNSEM\LOCAL\CAT\HEAD\
           ( noun
           & CASE\nom
+          & GENDER\masculine
           )
         )
       )
@@ -504,7 +508,7 @@ testcase("televizor nije kos",
       & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
       )
     & HEAD_DTR\DTRS\
-      ( AUX_DTR\
+      ( HEAD_DTR\
         ( LEXICON\["nije"] % FIXME "ne biti"
         & SYNSEM\LOCAL\CAT\HEAD\
           ( verb
@@ -516,7 +520,7 @@ testcase("televizor nije kos",
           & NUMBER\singular
           )
         )
-      & HEAD_DTR\
+      & COMP_DTR\
         ( LEXICON\["kos"]
         & SYNSEM\LOCAL\CAT\HEAD\
           ( adjective
@@ -724,6 +728,129 @@ testcase("dva studenta nisu deset studenata",
           & SYNSEM\LOCAL\CAT\HEAD\
             ( CASE\gen
             & NUMBER\plural
+            )
+          )
+        )
+      )
+    )
+  ]).
+
+
+% COMPLEX NUMBERS
+
+% Less than five students have loved more than three students
+testcase("manje od pet studenata je voljelo više od tri studenta",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\DTRS\
+        bot % TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      & CL_DTR\
+        ( LEXICON\["je"] % FIXME biti
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( verb
+          & CLITIC\plus
+          & FINITE\minus
+          & VOICE\active
+          & TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["voljelo"] % FIXME voljeti
+        & SYNSEM\LOCAL\CAT\HEAD\
+        ( participle
+          & VOICE\active
+          & TENSE\perfect
+          & GENDER\neuter
+          & NUMBER\singular
+          & CASE\nom
+          )
+        )
+      & COMP_DTR\DTRS\
+        bot % TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      )
+    )
+  ]).
+
+
+% RELATIVIZERS, with PREPOSITIONS, and with both HEAD-SPEC and HEAD-MOD SCHEMATA
+
+% John(i) to whom the student(j) is going loves Joanna with whom (he(i/j)) watches TV.
+testcase("Ivan kojem student ide voli Ivanu s kojom gleda televizor",
+  [ EDGE_SIGN\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["Ivan"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+        )
+      & MOD_DTR\DTRS\
+        ( MARK_DTR\
+          ( LEXICON\["koji"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( CASE\dat
+            & NUMBER\singular
+            & GENDER\masculine
+            )
+          )
+        & HEAD_DTR\DTRS\
+          ( COMP_DTR\
+            ( LEXICON\["student"]
+            & SYNSEM\LOCAL\CAT\HEAD\CASE\nom
+            )
+          & HEAD_DTR\
+            ( LEXICON\["ići"]
+            & SYNSEM\LOCAL\CAT\HEAD\
+              ( TENSE\present
+              & PERSON\third
+              & NUMBER\singular
+              )
+            )
+          )
+        )
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["voljeti"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( TENSE\present
+          & PERSON\third
+          & NUMBER\singular
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["Ivana"]
+          & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+          )
+        & MOD_DTR\DTRS\
+          ( MARK_DTR\DTRS\ % TODO prepositions inherit VAL\MOD of their complement
+            ( HEAD_DTR\
+              LEXICON\["s"]
+            & COMP_DTR\
+              ( LEXICON\["koji"]
+              & SYNSEM\LOCAL\CAT\HEAD\
+                ( CASE\ins
+                & NUMBER\singular
+                & GENDER\feminine
+                )
+              )
+            )
+          & HEAD_DTR\DTRS\
+            ( HEAD_DTR\
+              ( LEXICON\["gledati"]
+              & SYNSEM\LOCAL\CAT\HEAD\
+                ( TENSE\present
+                & PERSON\third
+                & NUMBER\singular
+                )
+              )
+            & COMP_DTR\
+              ( LEXICON\["televizor"]
+              & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+              )
             )
           )
         )
