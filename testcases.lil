@@ -197,7 +197,7 @@ testcase("gledan je televizor",
       ( DTRS\
         ( HEAD_DTR\
           ( LEXICON\["gledan"] % FIXME gledati
-          & SYNSEM\LOCAL\CAT\(
+          & SYNSEM\LOCAL\CAT\
             ( HEAD\
               ( participle
               & VOICE\passive
@@ -208,6 +208,7 @@ testcase("gledan je televizor",
               )
             & VAL\COMPS\[CASE\acc] % NOTE passivization transformation (in morphology?)
             )
+          )
         & AUX_DTR\
           ( LEXICON\["je"] % FIXME biti
           & SYNSEM\LOCAL\CAT\HEAD\
@@ -738,41 +739,84 @@ testcase("dva studenta nisu deset studenata",
 
 % COMPLEX NUMBERS
 
-% Less than five students have loved more than three students
-testcase("manje od pet studenata je voljelo više od tri studenta",
-  [ EDGE_SIGN\DTRS\
-    ( COMP_DTR\DTRS\
-      ( HEAD_DTR\DTRS\
-        bot % TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      & CL_DTR\
-        ( LEXICON\["je"] % FIXME biti
-        & SYNSEM\LOCAL\CAT\HEAD\
-          ( verb
-          & CLITIC\plus
-          & FINITE\minus
-          & VOICE\active
-          & TENSE\present
-          & PERSON\third
-          & NUMBER\singular
+% Less than five students have loved more than one student
+testcase("manje od pet studenata je voljelo više od jednog studenta",
+  [ EDGE_SIGN\
+    DTR\DTRS\
+      ( COMP_DTR\DTRS\
+        ( HEAD_DTR\DTRS\
+          ( HEAD_DTR\
+            LEXICON\["manje"] % special word, independent from "malo" (few)
+          & COMP_DTR\DTRS\
+            ( HEAD_DTR\
+              LEXICON\["od"]
+            & COMP_DTR\DTRS\
+              ( HEAD_DTR\
+                LEXICON\["pet"]
+              & COMP_DTR\
+                ( LEXICON\["student"]
+                & SYNSEM\LOCAL\CAT\HEAD\
+                  ( CASE\gen
+                  & NUMBER\plural
+                  )
+                )
+              )
+            )
+          )
+        & CL_DTR\
+          ( LEXICON\["je"] % FIXME biti
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( verb
+            & CLITIC\plus
+            & FINITE\minus
+            & VOICE\active
+            & TENSE\present
+            & PERSON\third
+            & NUMBER\singular
+            )
+          )
+        )
+      & HEAD_DTR\DTRS\
+        ( HEAD_DTR\
+          ( LEXICON\["voljelo"] % FIXME voljeti
+          & SYNSEM\LOCAL\CAT\HEAD\
+          ( participle
+            & VOICE\active
+            & TENSE\perfect
+            & GENDER\neuter
+            & NUMBER\singular
+            & CASE\nom
+            )
+          )
+        & COMP_DTR\DTRS\
+          ( HEAD_DTR\DTRS\
+            ( HEAD_DTR\
+              LEXICON\["više"] % special word, independent from "puno" (a lot)
+            & COMP_DTR\DTRS\
+              ( HEAD_DTR\
+                LEXICON\["od"]
+              & COMP_DTR\DTRS\
+                ( HEAD_DTR\
+                  ( LEXICON\["jednog"]
+                  & SYNSEM\LOCAL\CAT\HEAD\
+                    ( CASE\gen
+                    & NUMBER\singular
+                    & GENDER\masculine
+                    )
+                  )
+                & COMP_DTR\
+                  ( LEXICON\["student"]
+                  & SYNSEM\LOCAL\CAT\HEAD\
+                    ( CASE\gen
+                    & NUMBER\singular
+                    )
+                  )
+                )
+              )
+            )
           )
         )
       )
-    & HEAD_DTR\DTRS\
-      ( HEAD_DTR\
-        ( LEXICON\["voljelo"] % FIXME voljeti
-        & SYNSEM\LOCAL\CAT\HEAD\
-        ( participle
-          & VOICE\active
-          & TENSE\perfect
-          & GENDER\neuter
-          & NUMBER\singular
-          & CASE\nom
-          )
-        )
-      & COMP_DTR\DTRS\
-        bot % TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      )
-    )
   ]).
 
 
