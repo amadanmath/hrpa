@@ -1,0 +1,21 @@
+Reflexive pseudopassive and passive:
+    Naveliko            se    [je]    riba      jučer     jela
+  ((In-large-quantities REFL) [AUX]) (fish-NOM (yesterday eaten))
+  Fish was eaten in large quantities yesterday.
+
+  REFL transform the verb's COMPS list, just like passivization:
+    [EATER(nom), EATEN(acc)]
+      becomes
+    [            EATEN(nom)]
+
+  While passivization can be treated as a lexical transformation at the
+  point of recognising passive participle morphology, pseudopassivized
+  verb has active morphology, and is only transformed when put together
+  with the REFL.  However, in this scenario, "riba" (fish-NOM) cannot be
+  recognised, since at the time of binding of "fish" and "yesterday
+  eaten", the information from REFL is not yet available.
+
+  Alternately, allow the fish to be bound to the nominative slot? On
+  pure syntax level, deleting a non-nominative slot would then suffice -
+  But how to expunge its index from the verb's meaning when REFL is
+  finally seen?
