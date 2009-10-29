@@ -1,21 +1,72 @@
-Reflexive pseudopassive and passive:
-    Naveliko            se    [je]    riba      jučer     jela
-  ((In-large-quantities REFL) [AUX]) (fish-NOM (yesterday eaten))
-  Fish was eaten in large quantities yesterday.
+REFL-acc
 
-  REFL transform the verb's COMPS list, just like passivization:
-    [EATER(nom), EATEN(acc)]
-      becomes
-    [            EATEN(nom)]
+  Reflexive pseudopassive
 
-  While passivization can be treated as a lexical transformation at the
-  point of recognising passive participle morphology, pseudopassivized
-  verb has active morphology, and is only transformed when put together
-  with the REFL.  However, in this scenario, "riba" (fish-NOM) cannot be
-  recognised, since at the time of binding of "fish" and "yesterday
-  eaten", the information from REFL is not yet available.
+        Naveliko            se    [je]    riba      jučer     jela
+      ((In-large-quantities REFL) [AUX]) (fish-NOM (yesterday eaten))
+      Fish was eaten in large quantities yesterday.
 
-  Alternately, allow the fish to be bound to the nominative slot? On
-  pure syntax level, deleting a non-nominative slot would then suffice -
-  But how to expunge its index from the verb's meaning when REFL is
-  finally seen?
+    REFL transform the verb's COMPS list, just like passivization:
+
+      [EATER(nom), EATEN(acc)]
+        becomes
+      [            EATEN(nom)]
+
+    While passivization can be treated as a lexical transformation at
+    the point of recognising passive participle morphology,
+    pseudopassivized verb has active morphology, and is only transformed
+    when put together with the REFL.  However, in this scenario, "riba"
+    (fish-NOM) cannot be recognised, since at the time of binding of
+    "fish" and "yesterday eaten", the information from REFL is not yet
+    available.
+
+    Alternately, allow the fish to be bound to the nominative slot? On
+    pure syntax level, deleting a non-nominative slot would then suffice
+    - But how to expunge its index from the verb's meaning when REFL is
+    finally seen?
+
+    Or - generate all verbs in both ways, just in case? One of them must
+    be bound to pseudopassive REFL, the other can't. This might be the
+    best option, but it does double processing time for each active
+    verb.
+
+  Desiderative REFL causes a similar transformation:
+
+      [EATER(dat), EATEN(acc)]
+
+    However, the dative is also otherwise always an option, in the
+    benefactive/possessive meaning, and thus does not cause the problems
+    above.  However, the problem of connecting the correct
+    (desiderative) meaning where it is intended still remains. Also, the
+    desiderative reflexive abolishes the nominative subject.
+
+      a) Jede se žgance
+      b) Jedu mi se žganci
+
+  Reciprocal REFL does too
+
+    It modifies the meaning of the verb, and deletes the accusative
+    slot.
+
+  Lexically required REFL and true reflexive
+
+    They do not require special considerations. Lexically required verbs
+    will carry an appropriate REFL feature that needs to be satisfied by
+    binding with a REFL. True reflexives will just bind with a REFL as
+    an argument.
+
+
+RECIPROCAL
+
+    Ivan(nom) i Ivana(nom) udaraju jedan(nom) drugoga(acc)
+    Ivan(nom) i Ivana(nom) rukuju se jedan(nom) s drugim(ins)
+    Upoznajem Ivana(acc) i Ivanu(acc) jednog(acc) s drugim(ins)
+
+  The reciprocal position will be filled with "drugi" in its proper
+  case, and immediately before that constituent, "jedan" will be
+  inserted, with case corresponding to the antecedent's. Gender and
+  number will be the same for "jedan" and "drugi": gender corresponds to
+  the general rule for collections in Croatian (masculine if mixed);
+  number is pragmatically determined (can be both singular and plural,
+  depending on whether the antecedent can form subgroups or not), and
+  thus outside the scope of syntax.
