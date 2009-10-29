@@ -903,6 +903,79 @@ testcase("Ivan kojem student ide voli Ivanu s kojom gleda televizor",
   ]).
 
 
+% RECIPROCAL
+
+% Children put books next to each other
+testcase("Djeca stavljaju knjige jedne kraj drugih",
+  [
+    "TODO"
+  ]).
+
+
+% TRUE REFLEXIVE
+
+% Joanna looks at herself.
+testcase("Ivana se gleda",
+  [
+    "TODO"
+  ]).
+
+
+% LEXICALLY-REQUIRED REFLEXIVE
+
+% Joanna laughs
+testcase("Ivana se smije",
+  [
+    "TODO"
+  ]).
+
+
+% PSEUDOPASSIVE REFLEXIVE, NOM FORM
+
+% Grits are being eaten. (lit. They-eat REFL grits-nom)
+testcase("jedu se žganci",
+  [
+    "TODO"
+  ]).
+
+
+% PSEUDOPASSIVE REFLEXIVE, ACC FORM
+
+% Grits are being eaten. (lit. It-eats REFL grits-acc)
+testcase("jede se žgance",
+  [
+    "TODO"
+  ]).
+
+
+% DESIDERATIVE REFLEXIVE, NOM FORM
+
+% I'd like to eat grits. (lit. They-eat to-me REFL grits-nom)
+testcase("jedu mi se žganci",
+  [
+    "TODO"
+  ]).
+
+
+% DESIDERATIVE REFLEXIVE, ACC FORM
+
+% I'd like to eat grits. (lit. It-eats to-me REFL grits-acc)
+testcase("jede mi se žgance",
+  [
+    "TODO"
+  ]).
+
+
+% PARTITIVE GENITIVE and IMPERATIVE
+
+% Give me some grits! (Lit. Give-imp to-me of-grits)
+testcase("daj mi žganaca",
+  [
+    "TODO"
+  ]).
+
+
+
 
 test_sentence <- [pred].
 test_sentence(W, CC) :-
