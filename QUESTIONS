@@ -32,7 +32,7 @@ REFL-acc
 
   Desiderative REFL causes a similar transformation:
 
-      [EATER(dat), EATEN(acc)]
+      [EATER(dat), EATEN(nom)]
 
     However, the dative is also otherwise always an option, in the
     benefactive/possessive meaning, and thus does not cause the problems
@@ -62,6 +62,10 @@ RECIPROCAL
     Ivan(nom) i Ivana(nom) rukuju se jedan(nom) s drugim(ins)
     Upoznajem Ivana(acc) i Ivanu(acc) jednog(acc) s drugim(ins)
 
+    John and Joanna hit each other
+    John and Joanna shake-hands each with other
+    I introduce John and Joanna each with other
+
   The reciprocal position will be filled with "drugi" in its proper
   case, and immediately before that constituent, "jedan" will be
   inserted, with case corresponding to the antecedent's. Gender and
@@ -70,3 +74,75 @@ RECIPROCAL
   number is pragmatically determined (can be both singular and plural,
   depending on whether the antecedent can form subgroups or not), and
   thus outside the scope of syntax.
+
+
+LONG-DISTANCE DEPENDENCIES
+
+  In cases where COMPS arguments are missing, they can be put into the
+  STORE at the top of the clause, if there is exactly one COMPS missing.
+  For example:
+
+    a) Vidim djevojku koja jede jabuku
+       I-see girl     who  eats apple
+  
+  "jede jabuku" has noun-nom still in COMPS. It can be transfered to
+  INHER\REL, which will be bound to "koja". "koja" is CASE\nom, MOD\noun
+  and TO_BIND\REL\(noun & CASE\nom).
+
+    b) Vidim jabuku koju djevojka jede
+       I-see apple  who  girl     eats
+
+  Same; "koju" is CASE\acc, MOD\noun, TO_BIND\REL\(noun & CASE\acc)
+
+    c) Vidim djevojku čiju  jabuku jedem
+       I-see girl     whose apple  I-eat
+
+  "čiju" (whose) is MOD\[noun & CASE\acc], CASE\acc, TO_BIND\REL\(noun &
+  CASE\acc). TO_BIND is inherited from either HEAD or non-HEAD, so "čiju
+  jabuku" gets bound by HEAD-MOD schema, still having TO_BIND - and then
+  that binds the trace.
+
+    d) Vidim jabuku koju  mi    djevojka jede
+       I-see apple  which to-me girl     eats
+
+  Same as d). "mi" clitic does not have a COMPS entry, so it is bound as
+  a modifier. TODO: how does the possessive/benefactive meaning enter
+  here?
+
+    e) Vidim djevojku s    kojom jedem jabuke
+       I-see girl     with who   I-eat apples
+
+  "s" (with) is COMPS\(noun & CASE\ins). "kojom" is CASE\ins,
+  TO_BIND\REL\(noun & CASE\ins), MOD\noun. "s kojom" is bound by
+  HEAD-COMP schema, and "s kojom" thus has TO_BIND\REL\(noun & CASE\ins)
+  and MOD\noun (both of which would have to be inherited from "kojom").
+
+    f) Koga vidim da   jede jabuku?
+       Whom I-see that eats apple?
+
+  "koga" (whom) binds the noun-animate trace at the sentence top. TODO:
+  How is the sentence top detected (also important for clitic attachment
+  rules)
+
+    g) Čiju  jabuku vidim da   jede?
+       Whose apple  I-see that he-eats?
+
+  Same as c), but with a question-variant of "čiju" instead of the
+  relativizing one.
+
+    h) Jabuku vidim da   jede.
+       Apple  I-see that he-eats.
+
+  "jabuku" is topicalized here; the trace generated at "jede" sentence
+  top is bound at the overall "vidim da jede" sentence top.
+
+
+PREPOSITIONS - MARKING-MARKED or HEAD-COMPLEMENT?
+
+  Long Distance Dependencies example e), where most important
+  information must be inherited from "kojom" (who), suggests "kojom" is
+  a head, not "s" (with). Also, it would be more intuitive specifying
+  verb complements (CASE\gen & MARKED\od, instead of PFORM\od_gen).
+  
+  On the other hand, how would non-complement prepositions contribute
+  meaning, and become modifiers?
