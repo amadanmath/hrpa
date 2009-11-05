@@ -916,17 +916,47 @@ testcase("Djeca stavljaju knjige jedne kraj drugih",
 
 % Joanna looks at herself.
 testcase("Ivana se gleda",
-  [
-    "TODO"
+  [ EDGE_SIGN\DTR\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\LEXICON\["Ivana"]
+      & CL_DTR\
+        ( LEXICON\["se"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+        )
+      )
+    & HEAD_DTR\
+      ( LEXICON\["gledati"]
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( TENSE\present
+        & PERSON\third
+        & NUMBER\singular
+        )
+      )
+    )
   ]).
 
 
-% LEXICALLY-REQUIRED REFLEXIVE
+% LEXICALLY-REQUIRED REFLEXIVE - no rule required
 
 % Joanna laughs
 testcase("Ivana se smije",
-  [
-    "TODO"
+  [ EDGE_SIGN\DTR\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\LEXICON\["Ivana"]
+      & CL_DTR\
+        ( LEXICON\["se"]
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\acc
+        )
+      )
+    & HEAD_DTR\
+      ( LEXICON\["smijati"]
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( TENSE\present
+        & PERSON\third
+        & NUMBER\singular
+        )
+      )
+    )
   ]).
 
 
@@ -934,15 +964,6 @@ testcase("Ivana se smije",
 
 % Grits are being eaten. (lit. They-eat REFL grits-nom)
 testcase("jedu se žganci",
-  [
-    "TODO"
-  ]).
-
-
-% PSEUDOPASSIVE REFLEXIVE, ACC FORM
-
-% Grits are being eaten. (lit. It-eats REFL grits-acc)
-testcase("jede se žgance",
   [
     "TODO"
   ]).
@@ -957,6 +978,17 @@ testcase("jedu mi se žganci",
   ]).
 
 
+% UNSURE ABOUT GRAMMATICALITY
+% PSEUDOPASSIVE REFLEXIVE, ACC FORM
+
+% Grits are being eaten. (lit. It-eats REFL grits-acc)
+testcase("jede se žgance",
+  [
+    "TODO"
+  ]).
+
+
+% UNSURE ABOUT GRAMMATICALITY
 % DESIDERATIVE REFLEXIVE, ACC FORM
 
 % I'd like to eat grits. (lit. It-eats to-me REFL grits-acc)
@@ -966,12 +998,43 @@ testcase("jede mi se žgance",
   ]).
 
 
+% UNSURE ABOUT GRAMMATICALITY
+% DESIDERATIVE REFLEXIVE, PARTITIVE FORM
+
+% I'd like to eat some grits. (lit. It-eats to-me REFL grits-gen)
+testcase("jede mi se žganaca",
+  [
+    "TODO"
+  ]).
+
+
 % PARTITIVE GENITIVE and IMPERATIVE
 
 % Give me some grits! (Lit. Give-imp to-me of-grits)
 testcase("daj mi žganaca",
-  [
-    "TODO"
+  [ EDGE_SIGN\DTR\DTRS\
+    ( HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["dati"]
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( MOOD\imperative
+          & PERSON\second
+          & NUMBER\singular
+          )
+        )
+      & CL_DTR\
+        ( LEXICON\["mi"] % TODO "ja"
+        & SYNSEM\LOCAL\CAT\HEAD\CASE\dat
+        )
+      )
+    & HEAD_DTR\
+      ( LEXICON\["žganci"]
+      & SYNSEM\LOCAL\CAT\HEAD\
+        ( CASE\gen
+        & NUMBER\plural
+        )
+      )
+    )
   ]).
 
 
