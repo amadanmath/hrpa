@@ -998,16 +998,6 @@ testcase("jede mi se žgance",
   ]).
 
 
-% UNSURE ABOUT GRAMMATICALITY
-% DESIDERATIVE REFLEXIVE, PARTITIVE FORM
-
-% I'd like to eat some grits. (lit. It-eats to-me REFL grits-gen)
-testcase("jede mi se žganaca",
-  [
-    "TODO"
-  ]).
-
-
 % PARTITIVE GENITIVE and IMPERATIVE
 
 % Give me some grits! (Lit. Give-imp to-me of-grits)
@@ -1038,6 +1028,56 @@ testcase("daj mi žganaca",
   ]).
 
 
+% QUESTION, LONG-DISTANCE DEPENDENCY
+
+% Who did you think I loved
+testcase("koga ste mislile da volim",
+  [ EDGE_SIGN\DTR\DTRS\
+    ( COMP_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["koga"] % TODO "tko"
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( CASE\acc
+          )
+        )
+      & CL_DTR\
+        ( LEXICON\["si"] % TODO biti
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( CLITIC\plus
+          & TENSE\present
+          & PERSON\second
+          & NUMBER\singular
+          & FINITE\minus
+          )
+        )
+      )
+    & HEAD_DTR\DTRS\
+      ( HEAD_DTR\
+        ( LEXICON\["mislile"] % TODO misliti
+        & SYNSEM\LOCAL\CAT\HEAD\
+          ( participle
+            & VOICE\active
+            & TENSE\perfect
+            & GENDER\feminine
+            & NUMBER\plural
+            & CASE\nom
+          )
+        )
+      & COMP_DTR\DTRS\
+        ( MARK_DTR\LEXICON\["da"]
+        & HEAD_DTR\
+          ( LEXICON\["voljeti"]
+          & SYNSEM\LOCAL\CAT\HEAD\
+            ( TENSE\present
+            & PERSON\first
+            & NUMBER\singular
+            & MOOD\indicative
+            )
+          )
+        )
+      )
+    )
+  ]).
 
 
 test_sentence <- [pred].
