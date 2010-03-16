@@ -1028,7 +1028,7 @@ testcase("daj mi žganaca",
   ]).
 
 
-% QUESTION, LONG-DISTANCE DEPENDENCY
+% ARGUMENT QUESTION, LONG-DISTANCE DEPENDENCY
 
 % Who did you think I loved
 testcase("koga ste mislile da volim",
@@ -1079,6 +1079,32 @@ testcase("koga ste mislile da volim",
     )
   ]).
 
+
+% NON-ARGUMENT QUESTION, LONG-DISTANCE DEPENDENCY
+
+% Who did you talk about you watching TV with?
+%   (lit. With who AUX spoken that you-watch TV)
+testcase("s kim si pričao da gledaš televizor",
+  [ EDGE_SIGN\DTR\DTRS\
+    ( COMP_STR\DTRS\
+      ( HEAD_DTR\DTRS\
+        ( HEAD_DTR\
+        & COMP_DTR\
+        )
+      & COMP_DTR\
+      )
+    & HEAD_STR\DTRS\
+      ( HEAD_DTR\
+      & COMP_DTR\DTRS\
+        ( MARK_DTR\
+        & HEAD_DTR\DTRS\
+          ( HEAD_DTR\
+          & COMP_DTR\
+          )
+        )
+      )
+    )
+  ]).
 
 test_sentence <- [pred].
 test_sentence(W, CC) :-

@@ -153,3 +153,32 @@ CONJUNCTIONS
   Intuitively, coordinating conjunctions are symmetrical. However, this
   approach might work: in A CONJ B, CONJ modifies A and complements for
   B. Except for semantics, again.
+
+CLITICS
+
+    Da li si joj ga se rijesio?
+
+  Da - particle, clitic host - y/n question marker
+  li - particle, clitic - question marker (obligatory with "da" marker)
+  si - AUX ("you were"/"you did"); AUX-PRED or HEAD-COMP
+  joj - benefactive ("for her"); HEAD-MOD
+  ga - genitive (ablative) ("of him"); HEAD-COMP
+  se - REFL, required by the lexically reflexive verb; HEAD-COMP
+  rijesio - verb participle ("got rid of") - HEAD.
+
+  How are the particles bound? As HEAD-MOD?
+
+ADVERBISATION OF ADJECTIVES (and pasv. parts.) IN NOMINATIVE NEUTER SINGULAR
+
+UNRESOLVED SENTENCES
+
+    Povijesno gledano, Zagreb je   izrastao iz   dva naselja na susjednim
+    mod>     mod>      comp>  <aux head     <mod <comp
+
+    brdima, Gradeca i Kaptola, koji čine jezgru današnjeg Zagreba,
+
+
+    njegovo povijesno središte.
+
+
+

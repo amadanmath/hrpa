@@ -19,11 +19,12 @@ lex_entry <- [bot] + [LEX_WORD\bot, LEX_TEMPLATE\bot].
 % ID SCHEMA DEFINITIONS
 % =====================
 
-% only true for lists of OPT\plus
+% only true for lists of MAND\minus (default)
+% i.e. obligatory arguments must be marked MAND\plus
 only_optional <- [pred].
 only_optional([]).
 only_optional([X | Xs]) :-
-  \+ X = FL\OPT\minus,
+  X = MAND\minus,
   only_optional(Xs).
 
 % the difference from delete/3: fail if not found
@@ -31,183 +32,189 @@ find_and_delete <- [pred].
 find_and_delete([X | Xs], X, Xs).
 find_and_delete([X | Xs], Y, [X | Ys]) :- find_and_delete(Xs, Y, Ys).
 
-headagree <- [pred].
-headagree($XHEAD, $YHEAD) :-
-  (($XHEAD = has_case & CASE\$XCASE, $YHEAD = has_case & CASE\$YCASE) -> $XCASE = $YCASE ; true),
-  (($XHEAD = has_person & PERSON\$XPERSON, $YHEAD = has_person & PERSON\$YPERSON) -> $XPERSON = $YPERSON ; true),
-  (($XHEAD = has_number & NUMBER\$XNUMBER, $YHEAD = has_number & NUMBER\$YNUMBER) -> $XNUMBER = $YNUMBER ; true),
-  (($XHEAD = has_gender & GENDER\$XGENDER, $YHEAD = has_gender & GENDER\$YGENDER) -> $XGENDER = $YGENDER ; true).
-
-agree <- [pred].
-agree($X, $Y) :-
-  $X = SYNSEM\LOCAL\CAT\HEAD\$XHEAD,
-  $Y = SYNSEM\LOCAL\CAT\HEAD\$YHEAD,
-  headagree($XHEAD, $YHEAD).
-
+% on top level (PREDICATE\plus), allow either order
+% others are head-first (e.g. PREP-comp, NOUN-comp)
 scrambling_order <- [pred].
-scrambling_order($FIRST, $SECOND, $HEAD, $COMP) :-
-  $HEAD = SYNSEM\LOCAL\CAT\HEAD\PREDICATE\plus,
-  $FIRST = $COMP,
-  $SECOND = $HEAD.
-scrambling_order($FIRST, $SECOND, $HEAD, $COMP) :-
-  $FIRST = $HEAD,
-  $SECOND = $COMP.
+scrambling_order($first, $second, $head, $comp) :-
+  $head = SYNSEM\LOCAL\CAT\HEAD\PREDICATE\plus,
+  $first = $comp,
+  $second = $head.
+scrambling_order($first, $second, $head, $comp) :-
+  $first = $head,
+  $second = $comp.
 
 head_comp_schema_rule <- [pred].
-head_comp_schema_rule($LEFT, $RIGHT, $HEAD, $COMP, $MOTHER) :-
-  scrambling_order($LEFT, $RIGHT, $HEAD, $COMP),
-  $HEAD = SYNSEM\LOCAL\CAT\VAL\(COMPS\$HEADCOMPS &
-                                SPR\$SPEC &
-                                MOD\$HEADMOD &
-                                SUBJ\$SUBJLIST),
-  $COMP = SYNSEM\LOCAL\CAT\VAL\(SPR\$COMPSPR &
-                                COMPS\$COMPCOMPS),
-  only_optional($COMPCOMPS),
-  only_optional($COMPSPR),
-  $HEADCOMPS = [_ | _], % make sure it's non-empty
-  $COMP = SYNSEM\LOCAL\CAT\HEAD\$COMPHEAD,
-  restriction($COMPHEAD, [FL\, OPT\]),
-  find_and_delete($HEADCOMPS, $COMPHEAD, $MOTHERCOMPS),
-  ((($SUBJLIST = [$SUBJ], $COMP = SYNSEM\$SUBJ ); % subjects need to agree
-      $HEAD = prep                         % prep complements need to agree
-    ) -> agree($HEAD, $COMP) ; true),
-  $MOTHER = SYNSEM\LOCAL\CAT\VAL\(COMPS\$MOTHERCOMPS &
-                                  SPR\$SPEC &
-                                  MOD\$HEADMOD &
-                                  SUBJ\$SUBJLIST) &
-            DTRS\(HEAD_DTR\$HEAD &
-                  COMP_DTR\$COMP).
+head_comp_schema_rule($left, $right, $head, $comp, $mother) :-
+  scrambling_order($left, $right, $head, $comp),
+  $head
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( COMPS\$headcomps
+      & SPR\$headspr
+      & MOD\$headmod
+      & SUBJ\$headsubj
+      ),
+  $comp
+    = SYNSEM\
+      ( $compsynsem
+      & LOCAL\CAT\VAL\
+        ( SPR\$compspr
+        & COMPS\$compcomps
+        )
+      ),
+  only_optional($compcomps),
+  only_optional($compspr),
+  find_and_delete($headcomps, $compsynsem, $mothercomps),
+  $mother
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( COMPS\$mothercomps
+      & SPR\$headspr
+      & MOD\$headmod
+      & SUBJ\$headsubj
+      )
+    & DTRS\
+      ( HEAD_DTR\$head
+      & COMP_DTR\$comp
+      ).
 
 % TODO change:
-% if $MOD contains head_comp or head_mark, $MOD right
+% if $mod contains head_comp or head_mark, $mod right
 noun_mod_order <- [pred].
-noun_mod_order($LEFT, $RIGHT, $HEAD, $MOD) :-
-  $LEFT = $HEAD,
-  $RIGHT = $MOD,
-  $MOD = PHONOLOGY\[_, _ | _], !.
-noun_mod_order($LEFT, $RIGHT, $HEAD, $MOD) :-
-  $RIGHT = $HEAD, $LEFT = $MOD.
+noun_mod_order($left, $right, $head, $mod) :-
+  $right = $head, $left = $mod.
 
 head_mod_schema_rule <- [pred].
-head_mod_schema_rule($LEFT, $RIGHT, $HEAD, $MOD, $MOTHER) :- % nominal
-  $HEAD = SYNSEM\LOCAL\CAT\(VAL\(SPR\$SPEC &
-                                 COMPS\$COMPS &
-                                 MOD\$HEADMOD &
-                                 SUBJ\$SUBJ) &
-                            HEAD\$HEADHEAD),
-  $MOD = SYNSEM\LOCAL\CAT\VAL\(SPR\$MODSPR &
-                               COMPS\$MODCOMPS &
-                               MOD\[$HEADHEAD]),
-  only_optional($MODCOMPS),
-  only_optional($MODSPR),
-  noun_mod_order($LEFT, $RIGHT, $HEAD, $MOD),
-  agree($HEAD, $MOD),
-  $MOTHER = SYNSEM\LOCAL\CAT\VAL\(SPR\$SPEC &
-                                  COMPS\$COMPS &
-                                  MOD\$HEADMOD &
-                                  SUBJ\$SUBJ) &
-            DTRS\(HEAD_DTR\$HEAD &
-                  MOD_DTR\$MOD).
+head_mod_schema_rule($left, $right, $head, $mod, $mother) :- % nominal
+  noun_mod_order($left, $right, $head, $mod),
+  $head
+    = SYNSEM\
+      ( $headsynsem
+      & LOCAL\CAT\VAL\
+        ( SPR\$headspec
+        & COMPS\$headcomps
+        & MOD\$headmod
+        & SUBJ\$headsubj
+        )
+      ),
+  $mod
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( SPR\$modspr
+      & COMPS\$modcomps
+      & MOD\[$headsynsem]
+      ),
+  only_optional($modcomps),
+  only_optional($modspr),
+  $mother
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( SPR\$headspec
+      & COMPS\$headcomps
+      & MOD\$headmod
+      & SUBJ\$headsubj 
+      )
+    & DTRS\
+      ( HEAD_DTR\$head
+      & MOD_DTR\$mod
+      ).
 
 % Immediate Dominance: collects other principles
 id_principle <- [pred].
-id_principle(head_comp_schema, $LEFT, $RIGHT, $HEAD, $COMP, $MOTHER) :-
-  head_comp_schema_rule($LEFT, $RIGHT, $HEAD, $COMP, $MOTHER).
-id_principle(head_mod_schema, $LEFT, $RIGHT, $HEAD, $MOD, $MOTHER) :-
-  head_mod_schema_rule($LEFT, $RIGHT, $HEAD, $MOD, $MOTHER).
+id_principle(head_comp_schema, $left, $right, $head, $comp, $mother) :-
+  head_comp_schema_rule($left, $right, $head, $comp, $mother).
+id_principle(head_mod_schema, $left, $right, $head, $mod, $mother) :-
+  head_mod_schema_rule($left, $right, $head, $mod, $mother).
 
 % HFP: Mother and Head share head features.
 head_feature_principle <- [pred].
-head_feature_principle($HEAD, $MOTHER) :-
-  $MOTHER = (SYNSEM\LOCAL\CAT\HEAD\$X),
-  $HEAD = (SYNSEM\LOCAL\CAT\HEAD\$X).
+head_feature_principle($head, $mother) :-
+  $mother = (SYNSEM\LOCAL\CAT\HEAD\$x),
+  $head = (SYNSEM\LOCAL\CAT\HEAD\$x).
 
 phonology_principle_binary <- [pred].
-phonology_principle_binary($LEFT, $RIGHT, $MOTHER) :-
-  $LEFT = (PHONOLOGY\$LEFTPHON & LEXICON\$LEFTLEX),
-  $RIGHT = (PHONOLOGY\$RIGHTPHON & LEXICON\$RIGHTLEX),
-  $MOTHER = (PHONOLOGY\$MOTHERPHON & LEXICON\$MOTHERLEX),
-  append($LEFTPHON, $RIGHTPHON, $MOTHERPHON),
-  append($LEFTLEX, $RIGHTLEX, $MOTHERLEX).
+phonology_principle_binary($left, $right, $mother) :-
+  $left = (PHONOLOGY\$leftphon & LEXICON\$leftlex),
+  $right = (PHONOLOGY\$rightphon & LEXICON\$rightlex),
+  $mother = (PHONOLOGY\$motherphon & LEXICON\$motherlex),
+  append($leftphon, $rightphon, $motherphon),
+  append($leftlex, $rightlex, $motherlex).
 
 phonology_principle_unary <- [pred].
-phonology_principle_unary($DTR, $MOTHER) :-
-  $DTR = (PHONOLOGY\$PHON & LEXICON\$LEX),
-  $MOTHER = (PHONOLOGY\$PHON & LEXICON\$LEX).
+phonology_principle_unary($dtr, $mother) :-
+  $dtr = (PHONOLOGY\$phon & LEXICON\$lex),
+  $mother = (PHONOLOGY\$phon & LEXICON\$lex).
 
 principles <- [pred].
-principles($SCHEMA, $LEFT, $RIGHT, $MOTHER) :-
-  id_principle($SCHEMA, $LEFT, $RIGHT, $HEAD, _, $MOTHER),
-  head_feature_principle($HEAD, $MOTHER).
+principles($schema, $left, $right, $mother) :-
+  id_principle($schema, $left, $right, $head, _, $mother),
+  head_feature_principle($head, $mother).
 
 
 
 default <- [pred].
-default($FS, $FEATURE, $DEFAULT, $OTHER) :-
-  (follow($FS, $FEATURE, $VALUE),
-      unifiable($VALUE, $OTHER),
-      $VALUE = $DEFAULT, !)
+default($fs, $feature, $default, $other) :-
+  (follow($fs, $feature, $value),
+      unifiable($value, $other),
+      $value = $default, !)
     ; true.
 
 fill_defaults <- [pred].
-fill_defaults(S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\$HEAD & VAL\$VAL),
-  default($HEAD, [FL\, OPT\], minus, plus),
-  default($VAL, SPR\, [], [_]),
-  default($VAL, COMPS\, [], [_]),
-  default($VAL, MOD\, [], [_]),
-  default($HEAD, PERSON\, third, first),
-  default($HEAD, NUMBER\, singular, plural),
-  default($HEAD, PREDICATE\, minus, plus),
-  % verbs normally have 1st arg as subject
-  (($VAL = COMPS\[$SUBJ | _], $HEAD = verb) -> % FIXME verb -> verbal (including verb and participle)
-      default($VAL, SUBJ\, [$SUBJ], []) ; % verbs default to having a subject
-      default($VAL, SUBJ\, [], [_])),     % other POS default to not having it
-  (($VAL = SUBJ\[FL\OPT\plus]) -> true ; true).
-  % DEBUG why doesn't it work with the OPT subject? $!$
+fill_defaults($sign) :-
+  $sign
+    = SYNSEM\
+      ( LOCAL\CAT\
+        ( HEAD\$head
+        & VAL\$val
+        )
+      ),
+  default($val, SPR\, [], [_]),
+  default($val, COMPS\, [], [_]),
+  default($val, MOD\, [], [_]),
+  (($head = verb) ->
+      default($head, PREDICATE\, plus, minus) ;
+      default($head, PREDICATE\, minus, plus)).
 
 % interface for UP
 % ================
 
-% binary branching licence (+$SCHEMA, +$LEFT, +$RIGHT, -$MOTHER, -$DCP)
-id_schema_binary($SCHEMA, $LEFT, $RIGHT, $MOTHER, $DCP) :-
-  principles($SCHEMA, $LEFT, $RIGHT, $MOTHER),
-  $DCP = phonology_principle_binary($LEFT, $RIGHT, $MOTHER).
+% binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
+id_schema_binary($schema, $left, $right, $mother, $dcp) :-
+  principles($schema, $left, $right, $mother),
+  $dcp = phonology_principle_binary($left, $right, $mother).
 
-% unary branching licence (+$SCHEMA, +$DTR, -$MOTHER, -$DCP)
+% unary branching licence (+$schema, +$dtr, -$mother, -$dcp)
 id_schema_unary(_, _, _, _) :- fail.
 
 % translate [he runs] into [[0 1 "he"] [1 2 "runs"]]...
 make_word_lattice <- [pred].
 make_word_lattice([], _, []).
-make_word_lattice([$WORD | $WORDLIST],
-      $LEFT,
-      [left_position\$LEFT & right_position\$RIGHT & word\$WORD | $LATTICE]) :-
-  $RIGHT is $LEFT + 1,
-  make_word_lattice($WORDLIST, $RIGHT, $LATTICE).
+make_word_lattice([$word | $wordlist],
+      $left,
+      [left_position\$left & right_position\$right & word\$word | $lattice]) :-
+  $right is $left + 1,
+  make_word_lattice($wordlist, $right, $lattice).
 
 % translate "he runs" into [[0 1 "he"] [1 2 "runs"]]...
-sentence_to_word_lattice($SENTENCE, $LATTICE) :-
-  split($SENTENCE, " ", $WORDLIST),
-  make_word_lattice($WORDLIST, 0, $LATTICE).
+sentence_to_word_lattice($sentence, $lattice) :-
+  split($sentence, " ", $wordlist),
+  make_word_lattice($wordlist, 0, $lattice).
 
 % translates "runs" into RUNS; unifies morphological data and lexical data.
-lexical_entry($WORD, LEX_WORD\$WORD & LEX_TEMPLATE\$SIGN) :-
-  $SIGN = word & PHONOLOGY\[$WORD] & LEXICON\[$LEMMA],
-  word_to_sign($WORD, $LEMMA, $SIGN),
-  fill_defaults($SIGN).
+lexical_entry($word, LEX_WORD\$word & LEX_TEMPLATE\$sign) :-
+  $sign = word & PHONOLOGY\[$word] & LEXICON\[$lemma],
+  word_to_sign($word, $lemma, $sign),
+  fill_defaults($sign).
 
 % fetches the sign from the lexical template
-lexical_entry_sign(LEX_TEMPLATE\$SIGN, $SIGN).
+lexical_entry_sign(LEX_TEMPLATE\$sign, $sign).
 
 %　Valid root sign: no unfilled dependencies
-root_sign(SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & VAL\(SPR\$SPEC & COMPS\$COMPS & MOD\$MOD))) :-
-  only_optional($SPEC),
-  only_optional($COMPS),
-  only_optional($MOD).
+root_sign(SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & VAL\(SPR\$spec & COMPS\$comps & MOD\$mod))) :-
+  only_optional($spec),
+  only_optional($comps),
+  only_optional($mod).
 
-reduce_sign($SIGN, $SIGN, _) :-
-  restriction($SIGN, DTRS\).
+reduce_sign($sign, $sign, _) :-
+  % TODO not sure if this is needed / advisable
+  % restriction($sign, DTRS\).
+  true.
 
 word_to_lookup_keys(_, _) :- fail.
 lex_template_to_string(_, _) :- fail.
@@ -217,134 +224,3 @@ parser_init :-
   set_limit_sentence_length(40),
   set_limit_edge_number(20000).
 
-
-% LEXICON - TODO remove
-% =======
-lexicon <- [pred].
-slexicon <- [pred].
-
-% Leo
-lexicon("Leo", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\plus).
-
-% John
-lexicon("Ivan", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\plus).
-
-% Joan
-lexicon("Ivana", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\plus).
-
-% Joseph
-lexicon("Josip", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\plus).
-
-% Mary
-lexicon("Marija", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\plus).
-
-% book
-lexicon("knjiga", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\minus).
-
-% bank
-lexicon("banka", S) :-
-  S = SYNSEM\LOCAL\CAT\HEAD\(noun & ANIMATE\minus).
-
-% to sleep
-lexicon("spavati",
-  SYNSEM\LOCAL\CAT\(HEAD\verb &
-                    VAL\COMPS\[LOCAL\CAT\HEAD\(noun & CASE\nom)])).
-
-% to love
-lexicon("voljeti",
-  SYNSEM\LOCAL\CAT\(HEAD\verb &
-                    VAL\COMPS\[LOCAL\CAT\HEAD\(noun & CASE\nom & ANIMATE\plus),
-                               LOCAL\CAT\HEAD\(noun & CASE\acc)])).
-
-% to give
-lexicon("dati",
-  SYNSEM\LOCAL\CAT\(HEAD\verb &
-                    VAL\COMPS\[LOCAL\CAT\HEAD\(noun & CASE\nom),
-                               LOCAL\CAT\HEAD\(noun & CASE\dat),
-                               LOCAL\CAT\HEAD\(noun & CASE\acc)])).
-
-% to go - DEBUG reformulate prepositions
-%lexicon("ići",
-%  SYNSEM\LOCAL\CAT\(HEAD\verb &
-%                    VAL\COMPS\[LOCAL\CAT\HEAD\(noun & CASE\nom & ANIMATE\plus) |
-%                               $OBJS])) :-
-%  $OBJS = [LOCAL\CAT\HEAD\(noun & CASE\dat & ANIMATE\plus),
-%           FORM\prep_iz &
-%           LOCAL\CAT\HEAD\(prep & CASE\gen) &
-%           FL\OPT\plus];
-%  $OBJS = [FORM\prep_u &
-%           LOCAL\CAT\HEAD\(prep & CASE\acc) &
-%           FL\OPT\plus,
-%           FORM\prep_iz &
-%           LOCAL\CAT\HEAD\(prep & CASE\gen) &
-%           FL\OPT\plus].
-
-% good
-lexicon("dobar", S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\adjective &
-                        VAL\MOD\[LOCAL\CAT\HEAD\noun]).
-
-% pretty
-lexicon("lijep", S) :-
-  S = SYNSEM\LOCAL\CAT\(HEAD\adjective &
-                        VAL\MOD\[LOCAL\CAT\HEAD\noun]).
-
-
-lexicon("poput", S) :-
-  % can modify anything?
-  S = SYNSEM\LOCAL\CAT\(HEAD\prep &
-                        VAL\(SPR\[] &
-                             COMPS\[LOCAL\CAT\HEAD\(noun & CASE\gen)] &
-                             MOD\[LOCAL\CAT\HEAD\$HEAD])),
-  ($HEAD = noun; $HEAD = verb; $HEAD = adjective; $HEAD = adverb).
-
-% from
-lexicon("iz", S) :-
-  % can modify nouns
-  S = SYNSEM\LOCAL\CAT\(HEAD\prep &
-                        VAL\(COMPS\[LOCAL\CAT\HEAD\noun] &
-                             MOD\[LOCAL\CAT\HEAD\noun])).
-
-% very
-lexicon("vrlo", SYNSEM\LOCAL\CAT\(HEAD\adverb &
-                                  VAL\MOD\[LOCAL\CAT\HEAD\$HEAD])) :-
-  $HEAD = adjective; $HEAD = adverb.
-
-
-% PRONOUNS
-
-lexicon("ja", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % I
-lexicon("ti", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % you(sg)
-lexicon("on", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % he
-lexicon("mi", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % we
-lexicon("vi", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % you(pl)
-lexicon("oni", SYNSEM\LOCAL\CAT\HEAD\ANIMATE\plus). % they
-
-
-% to be - so far, only N and Adj predicates; TODO: compound verbal forms
-lexicon("biti1", S) :-
-  S = SYNSEM\LOCAL\CAT\VAL\COMPS\$COMPS,
-  (($COMPS = [
-        LOCAL\CAT\HEAD\(noun & CASE\nom),
-        LOCAL\CAT\HEAD\(noun & CASE\nom)]
-  ); ($COMPS = [
-        LOCAL\CAT\HEAD\$NHEAD,
-        LOCAL\CAT\HEAD\$AHEAD],
-      $NHEAD = noun & CASE\nom,
-      $AHEAD = adjective,
-      headagree($NHEAD, $AHEAD)
-  ); ($COMPS = [ % TODO! TODO a LOT!
-        LOCAL\CAT\HEAD\(noun & CASE\nom),
-        LOCAL\CAT\HEAD\participle]
-  )).
-
-% SPECIAL LEXICON (circumventing HML):
-% slexicon("word", S) :- S = full_sign_with_morph_already_included.
-
-slexicon(_, _, _) :- fail.

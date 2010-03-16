@@ -5,19 +5,19 @@ bool <- [bot].
 plus <- [bool].
 minus <- [bool].
 
-flags <- [bot] + [OPT\bool].
-
 slash <- [bot]. % TODO add here!
 
 % phrase
 
-head <- [bot] + [PREDICATE\bool, CLITIC\bool, FL\flags].
-val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list].
-cat <- [bot] + [HEAD\head, VAL\val].
-local <- [bot] + [CAT\cat]. % CONT, CTX
+head <- [bot] + [PREDICATE\bool].
+val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
+cat <- [bot] + [HEAD\head, VAL\val, CLITIC\bool].
+cont <- [bot] + [RELS\list, HCONS\list].
+local <- [bot] + [CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list]. % QSTORE
 nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
-synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
+synsem <- [bot] + [MAND\bool, LOCAL\local, NONLOCAL\nonlocal]. % EXPR
+aux <- [bot] + [FOR\synsem, PROD\synsem].
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
 schema <- [bot].
@@ -53,18 +53,15 @@ gender <- [bot].
 masculine <- [gender].
 feminine <- [gender].
 neuter <- [gender].
-has_gender <- [head] + [GENDER\gender].
 
 number <- [bot].
 singular <- [number].
 plural <- [number].
-has_number <- [head] + [NUMBER\number].
 
 person <- [bot].
 first <- [person].
 second <- [person].
 third <- [person].
-has_person <- [head] + [PERSON\person].
 
 degree <- [bot].
 pos <- [degree].
@@ -88,6 +85,7 @@ indicative <- [mood].
 imperative <- [mood].
 conditional <- [mood].
 infinitive <- [mood].
+participle <- [mood].
 % participle is a different category.
 
 ptype <- [bot].
@@ -112,16 +110,15 @@ ref_poss <- [reftype].
 tense <- [bot].
 present <- [tense].
 imperfect <- [tense].
-future <- [tense].
+future1 <- [tense].
+future2 <- [tense].
 perfect <- [tense].
 pluperfect <- [tense].
 aorist <- [tense].
-has_tense <- [head] + [TENSE\tense].
 
 voice <- [bot].
 active <- [voice].
 passive <- [voice].
-has_voice <- [head] + [VOICE\voice].
 
 % CLITIC GROUP ORDER
 clitic <- [bot].
@@ -132,45 +129,49 @@ cl_accgen <- [cl_dat].
 cl_self <- [cl_accgen].
 cl_aux3 <- [cl_self].
 
-has_def <- [head] + [DEFINITE\bool].
 has_anim <- [head] + [ANIMATE\bool].
+has_def <- [head] + [DEFINITE\bool].
 has_pol <- [head] + [POLAR\bool].
-has_finite <- [head] + [FINITE\bool].
 
-has_np <- [head, has_number, has_person].
-has_gnp <- [head, has_gender, has_np].
-has_cgnp <- [head, has_case, has_gnp].
-has_dcgnp <- [head, has_def, has_cgnp].
-has_ddcgnp <- [head, has_degree, has_dcgnp].
+has_cd <- [head, has_case, has_def]. % case, def
+has_cdd <- [head, has_degree, has_cd]. % case, def, degree
 
-noun_like <- [head, has_dcgnp, has_anim].
-adj_like <- [head, has_ddcgnp].
+noun_like <- [head, has_case, has_anim]. % case, anim
+adj_like <- [head, has_cdd].
 adv_like <- [head, has_degree, has_pol].
-verb_like <- [head, has_tense, has_finite, has_voice, has_np].
-
-verb_gnp <- [verb_like, has_gnp].
 
 % TODO add more preposition forms, together with lexicon
 pform <- [bot].
 do_gen <- [pform].
-od_gen <- [pform].
+u_loc <- [pform].
+u_acc <- [pform].
+u_gen <- [pform].
+k_loc <- [pform].
+
+
+
+
+tam <- [bot] + [TENSE\tense, MOOD\mood, VOICE\voice, FINITE\bool].
+index <- [bot] + [PERSON\person, NUMBER\number, GENDER\gender].
+event <- [cont] + [TAM\tam].
+objref <- [cont] + [INDEX\index].
 
 % POS
 
-noun <- [noun_like].
-adjective <- [adj_like].
-adverb <- [adv_like].
-verb <- [verb_like, has_pol] + [MOOD\mood].
-compound_verb <- [verb, verb_gnp].
-participle <- [verb_gnp, has_cgnp].
+noun <- [head, noun_like].
+adjective <- [head, adj_like].
+adverb <- [head, adv_like].
+verb <- [head].
+sverb <- [verb]. % subject is the first complement - subject agreement
+nsverb <- [verb]. % subject is not the first complement - no agreement
 prep <- [head] + [PFORM\pform]. % there might be more :)
 particle <- [head] + [RTYPE\rtype]. % TODO check for RTYPE...
 
-pro <- [head] + [PTYPE\ptype, REFTYPE\reftype]. % TODO check for PTYPE, REFTYPE
-pro_degree <- [pro, has_degree].
-pro_dcgnp <- [pro_degree, has_ddcgnp].
-pro_noun <- [head, pro_dcgnp, noun_like].
-pro_adj <- [head, pro_dcgnp, adj_like].
-pro_adv <- [head, pro_degree, adv_like].
+%pro <- [head] + [PTYPE\ptype, REFTYPE\reftype]. % TODO check for PTYPE, REFTYPE
+%pro_degree <- [pro, has_degree].
+%pro_cd <- [pro_degree, has_cd]. % case, def
+%pro_noun <- [head, pro_dcgnp, noun_like].
+%pro_adj <- [head, adj_like].
+%pro_adv <- [head, adv_like].
 
 :- module_implementation.
