@@ -1,0 +1,125 @@
+:- module("lexv").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+lexv <- [pred].
+
+:- module_implementation.
+
+
+% eat
+lexv("jesti",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\sverb
+    & VAL\COMPS\
+      [ LOCAL\CAT\HEAD\CASE\nom
+      , LOCAL\CAT\HEAD\CASE\acc
+      ]
+    )
+).
+
+% love
+lexv("voljeti",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\sverb
+    & VAL\COMPS\
+      [ LOCAL\CAT\HEAD\CASE\nom
+      , LOCAL\CAT\HEAD\CASE\acc
+      ]
+    )
+).
+
+% lead to
+lexv("dovesti",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\sverb
+    & VAL\COMPS\
+      [ LOCAL\CAT\HEAD\CASE\nom
+      , LOCAL\CAT\HEAD\CASE\acc
+      , $DESTINATION
+      ]
+    )
+) :-
+  member($DESTINATION,
+    [ LOCAL\CAT\HEAD\CASE\dat
+    , LOCAL\CAT\HEAD\PFORM\do_gen
+    , LOCAL\CAT\HEAD\PFORM\u_acc
+    , LOCAL\CAT\HEAD\PFORM\k_loc % TODO other preps
+    ]
+  ).
+
+% be
+% (generates a LOT of possibilities for AUX-VERB schema)
+lexv("biti",
+  SYNSEM\LOCAL\
+    ( CAT\VAL\$thisval
+    & CONT\$thiscont
+    )
+) :-
+  (
+    $thisval
+      = AUX\
+        [ FOR\$for
+        & PROD\$prod
+        ]
+      & COMPS\
+        [ _ ],
+    $thiscont = TAM\$thistam,
+    $for
+      = LOCAL\
+        ( CAT\HEAD\verb
+        & CONT\TAM\$parttam
+        ),
+    $prod
+      = LOCAL\
+        ( CAT\HEAD\verb
+        & CONT\TAM\$prodtam
+        ),
+    member([$thistam, $choices], [
+      [MOOD\imperative & VOICE\active, [
+        [TENSE\present & VOICE\passive,
+          MOOD\imperative & VOICE\passive]]],
+      [MOOD\participle & TENSE\present & VOICE\active, [
+        [MOOD\participle & TENSE\present & VOICE\passive,
+          MOOD\participle & TENSE\perfect & VOICE\passive],
+        [MOOD\participle & TENSE\perfect & VOICE\$voice1,
+          MOOD\participle & TENSE\pluperfect & VOICE\$voice1]]],
+      [MOOD\indicative & FINITE\plus & TENSE\present & VOICE\active, [
+        [MOOD\participle & TENSE\perfect & VOICE\$voice2,
+          MOOD\indicative & TENSE\future2 & VOICE\$voice2]]],
+      [MOOD\indicative & FINITE\minus & TENSE\present & VOICE\active, [
+        % passive present participle does not exist and cannot be generated
+        [MOOD\participle & TENSE\$tense1 & VOICE\$voice3,
+          MOOD\indicative & TENSE\$tense1 & VOICE\$voice3]]],
+      [MOOD\indicative & FINITE\minus & TENSE\aorist & VOICE\active, [
+        [MOOD\participle & TENSE\present & VOICE\passive,
+          MOOD\indicative & TENSE\aorist & VOICE\passive],
+        [MOOD\participle & TENSE\perfect & VOICE\$voice4,
+          MOOD\conditional & TENSE\present & VOICE\$voice4],
+        [MOOD\participle & TENSE\pluperfect & VOICE\$voice5,
+          MOOD\conditional & TENSE\perfect & VOICE\$voice5]]],
+      [MOOD\indicative & FINITE\minus & TENSE\imperfect & VOICE\active, [
+        [MOOD\participle & TENSE\present & VOICE\passive,
+          MOOD\indicative & TENSE\imperfect & VOICE\passive],
+        [MOOD\participle & TENSE\perfect & VOICE\passive,
+          MOOD\indicative & TENSE\pluperfect & VOICE\passive]]]]),
+    member([$parttam, $prodtam], $choices)
+  ); (
+    $thisval
+      = COMPS\
+        [ LOCAL\
+          ( CAT\HEAD\
+            ( noun
+            & CASE\nom
+            )
+          )
+        , LOCAL\
+          ( CAT\HEAD\
+            ( noun
+            & CASE\nom
+            )
+          )
+        ]
+  ). % TODO: handle other uses of copula (prepositions, adjectives, infinitives)

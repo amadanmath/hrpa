@@ -1,0 +1,140 @@
+:- module("morph_tag").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("lillib/lists").
+:- ensure_loaded("lillib/strings").
+
+lemmatise <- [pred].
+
+:- module_implementation.
+
+match_sub <- [pred].
+match_sub($wlist, [], $wlist).
+match_sub([$same | $wlistr], [$same | $slistr], $rest) :-
+  match_sub($wlistr, $slistr, $rest).
+match <- [pred].
+match($wlist, $suffix, $rest) :-
+  strtolist($suffix, $sslist),
+  reverse($sslist, $slist),
+  match_sub($wlist, $slist, $rest).
+
+morph_number <- [pred].
+morph_number($wlist, singular, $rest) :- match($wlist, "sg", $rest).
+morph_number($wlist, plural, $rest) :- match($wlist, "pl", $rest).
+morph_case <- [pred].
+morph_case($wlist, nom, $rest) :- match($wlist, "n", $rest).
+morph_case($wlist, gen, $rest) :- match($wlist, "g", $rest).
+morph_case($wlist, dat, $rest) :- match($wlist, "d", $rest).
+morph_case($wlist, acc, $rest) :- match($wlist, "a", $rest).
+morph_case($wlist, voc, $rest) :- match($wlist, "v", $rest).
+morph_case($wlist, loc, $rest) :- match($wlist, "l", $rest).
+morph_case($wlist, ins, $rest) :- match($wlist, "i", $rest).
+morph_voice <- [pred].
+morph_voice($wlist, active, $rest) :- match($wlist, "a", $rest).
+morph_voice($wlist, passive, $rest) :- match($wlist, "p", $rest).
+morph_gender <- [pred].
+morph_gender($wlist, masculine, $rest) :- match($wlist, "m", $rest).
+morph_gender($wlist, feminine, $rest) :- match($wlist, "f", $rest).
+morph_gender($wlist, neuter, $rest) :- match($wlist, "n", $rest).
+morph_tense <- [pred].
+morph_tense($wlist, present, $rest) :- match($wlist, "p", $rest).
+morph_tense($wlist, aorist, $rest) :- match($wlist, "a", $rest).
+morph_tense($wlist, imperfect, $rest) :- match($wlist, "i", $rest).
+morph_definite <- [pred].
+morph_definite($wlist, plus, $rest) :- match($wlist, "d", $rest).
+morph_definite($wlist, minus, $rest) :- match($wlist, "i", $rest).
+morph_finite <- [pred].
+morph_finite($wlist, plus, $rest) :- match($wlist, "f", $rest).
+morph_finite($wlist, minus, $rest) :- match($wlist, "i", $rest).
+morph_person <- [pred].
+morph_person($wlist, first, $rest) :- match($wlist, "1", $rest).
+morph_person($wlist, second, $rest) :- match($wlist, "2", $rest).
+morph_person($wlist, third, $rest) :- match($wlist, "3", $rest).
+
+% NOUN: jabuku: jabuka-asg
+% (3rd person, for all nouns)
+recognise <- [pred].
+recognise($wlist,
+    SYNSEM\LOCAL\
+      ( CAT\HEAD\
+        ( noun
+        & CASE\$case
+        )
+      & CONT\INDEX\
+        ( NUMBER\$number
+        & PERSON\third
+        )
+      ),
+    $lemma) :-
+  morph_number($wlist, $number, $wlist1),
+  morph_case($wlist1, $case, $wlist2),
+  match($wlist2, "-", $lemma).
+
+% ADJECTIVE: bijela: bijel-apln; zeleni: zelen-nsgmd
+recognise($wlist,
+    SYNSEM\LOCAL\(CAT\(HEAD\(adjective
+                           & DEFINITE\$definite)
+                     & VAL\MOD\[LOCAL\(CONT\INDEX\(GENDER\$gender
+                                                 & NUMBER\$number)
+                                     & CAT\HEAD\CASE\$case)])),
+    $lemma) :-
+  (morph_definite($wlist, $definite, $wlist1); $wlist = $wlist1),
+  morph_gender($wlist1, $gender, $wlist2),
+  morph_number($wlist2, $number, $wlist3),
+  morph_case($wlist3, $case, $wlist4),
+  match($wlist4, "-", $lemma).
+
+% VERB-INF: raditi: raditi-inf
+recognise($wlist,
+    SYNSEM\LOCAL\(CAT\HEAD\verb
+                & CONT\TAM\MOOD\infinitive),
+    $lemma) :-
+  match($wlist, "-inf", $lemma).
+
+% VERB-PARTICIPLE: bila: biti-nsgfa; pretucenog: pretuci-asgmp
+recognise($wlist,
+    SYNSEM\LOCAL\(CAT\(HEAD\verb
+                     & VAL\SUBJ\[LOCAL\(CONT\INDEX\(GENDER\$gender
+                                                  & NUMBER\$number)
+                                      & CAT\HEAD\CASE\$case)])
+                & CONT\TAM\(VOICE\$voice
+                          & TENSE\$tense
+                          & MOOD\participle)),
+    $lemma) :-
+  morph_voice($wlist, $voice, $wlist1),
+  morph_gender($wlist1, $gender, $wlist2),
+  morph_number($wlist2, $number, $wlist3),
+  morph_case($wlist3, $case, $wlist4),
+  match($wlist4, "-", $lemma),
+  % two primitive participle forms:
+  % active present participle, or passive perfect participle
+  ($voice = active -> $tense = perfect ; $tense = present).
+
+% VERB: je: biti-cl3sgp; jedoh: jesti-1sga
+recognise($wlist,
+    SYNSEM\LOCAL\(CAT\(HEAD\verb
+                     & CLITIC\$clitic
+                     & VAL\SUBJ\[LOCAL\CONT\INDEX\(NUMBER\$number
+                                                 & PERSON\$person)])
+                & CONT\TAM\(TENSE\$tense
+                          & FINITE\$finite
+                          & MOOD\indicative
+                          & VOICE\active)),
+    $lemma) :-
+  (morph_finite($wlist, $finite, $wlist1) -> true ; $wlist = $wlist1),
+  morph_tense($wlist1, $tense, $wlist2),
+  morph_number($wlist2, $number, $wlist3),
+  morph_person($wlist3, $person, $wlist4),
+  (match($wlist4, "cl", $wlist5)
+    -> $clitic = plus
+    ; ($clitic = minus, $wlist4 = $wlist5)),
+  match($wlist5, "-", $lemma).
+
+
+lemmatise($word, $lemma, $sign) :-
+  strtolist($word, $swlist),
+  reverse($swlist, $wlist),
+  recognise($wlist, $sign, $wllist),
+  reverse($wllist, $swllist),
+  listtostr($swllist, $lemma).

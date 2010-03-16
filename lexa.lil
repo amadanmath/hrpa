@@ -1,0 +1,12 @@
+:- module("lexa").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+lexa <- [pred].
+
+:- module_implementation.
+
+
+lexa("lijep", sign).

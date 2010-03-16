@@ -1,0 +1,13 @@
+:- module("lexn").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+lexn <- [pred].
+
+:- module_implementation.
+
+lexn("dječak", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
+lexn("Ivana", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
+lexn("Ivan", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).

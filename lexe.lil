@@ -1,0 +1,39 @@
+:- module("lexe").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+lexe <- [pred].
+
+:- module_implementation.
+
+
+lexe("do",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\PFORM\do_gen
+    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\gen ]
+    )
+).
+
+lexe("u",
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\PFORM\$pform
+    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\$case ]
+    )
+) :-
+  member([$pform, $case],
+    [ [u_loc, loc]
+    , [u_acc, acc]
+    , [u_gen, gen]
+    ]).
+
+lexe($phon,
+  SYNSEM\LOCAL\CAT\
+    ( HEAD\PFORM\k_loc
+    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\loc ]
+    )
+) :-
+  % TODO rules for selection
+  $phon = "k";
+  $phon = "ka".
