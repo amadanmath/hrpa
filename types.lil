@@ -21,6 +21,7 @@ sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
 schema <- [bot].
 head_comp_schema <- [schema].
+comp_head_schema <- [schema].
 head_mod_schema <- [schema].
 head_verb_schema <- [schema].
 head_cl_schema <- [schema].
