@@ -17,20 +17,19 @@ local <- [bot] + [CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list]. % QSTORE
 nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
 synsem <- [bot] + [MAND\bool, LOCAL\local, NONLOCAL\nonlocal]. % EXPR
-aux <- [bot] + [FOR\synsem, PROD\synsem].
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
 schema <- [bot].
 head_comp_schema <- [schema].
 head_mod_schema <- [schema].
-head_aux_schema <- [schema].
+head_verb_schema <- [schema].
 head_cl_schema <- [schema].
 head_mark_schema <- [schema].
 
 head_str <- [bot] + [HEAD_DTR\sign].
 head_comp_str <- [head_str] + [COMP_DTR\sign].
 head_mod_str <- [head_str] + [MOD_DTR\sign].
-head_aux_str <- [head_str] + [AUX_DTR\sign].
+head_verb_str <- [head_str] + [VERB_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
 head_mark_str <- [head_str] + [MARK_DTR\sign].
 

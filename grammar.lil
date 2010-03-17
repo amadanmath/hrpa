@@ -7,6 +7,7 @@
 :- ensure_loaded("display").
 :- ensure_loaded("types").
 :- ensure_loaded("word").
+:- ensure_loaded("trees").
 
 lex_entry <- [bot] + [LEX_WORD\bot, LEX_TEMPLATE\bot].
 
@@ -49,6 +50,7 @@ head_comp_schema_rule($left, $right, $head, $comp, $mother) :-
   $head
     = SYNSEM\LOCAL\CAT\VAL\
       ( COMPS\$headcomps
+      & AUX\[]
       & SPR\$headspr
       & MOD\$headmod
       & SUBJ\$headsubj
@@ -67,6 +69,7 @@ head_comp_schema_rule($left, $right, $head, $comp, $mother) :-
   $mother
     = SYNSEM\LOCAL\CAT\VAL\
       ( COMPS\$mothercomps
+      & AUX\[]
       & SPR\$headspr
       & MOD\$headmod
       & SUBJ\$headsubj
@@ -83,13 +86,14 @@ noun_mod_order($left, $right, $head, $mod) :-
   $right = $head, $left = $mod.
 
 head_mod_schema_rule <- [pred].
-head_mod_schema_rule($left, $right, $head, $mod, $mother) :- % nominal
+head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
   noun_mod_order($left, $right, $head, $mod),
   $head
     = SYNSEM\
       ( $headsynsem
       & LOCAL\CAT\VAL\
         ( SPR\$headspec
+        & AUX\[]
         & COMPS\$headcomps
         & MOD\$headmod
         & SUBJ\$headsubj
@@ -106,6 +110,7 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :- % nominal
   $mother
     = SYNSEM\LOCAL\CAT\VAL\
       ( SPR\$headspec
+      & AUX\[]
       & COMPS\$headcomps
       & MOD\$headmod
       & SUBJ\$headsubj 
@@ -115,12 +120,47 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :- % nominal
       & MOD_DTR\$mod
       ).
 
+head_verb_schema_rule <- [pred].
+head_verb_schema_rule($head, $verb, $head, $verb, $mother) :-
+  $head
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( AUX\$headaux
+      & SPR\$headspr
+      & MOD\$headmod
+      & SUBJ\$subj
+      ),
+  $verb
+    = SYNSEM\
+      ( $verbsynsem
+      & LOCAL\CAT\VAL\
+        ( COMPS\$verbcomps
+        & AUX\[] % aux is always left
+        & SUBJ\$subj
+        )
+      ),
+  member([$verbsynsem, $mothersynsem], $headaux),
+  $mother = SYNSEM\$mothersynsem,
+  $mother
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( COMPS\$verbcomps
+      & AUX\[] % aux is always left
+      & SPR\$headspr % TODO check when writing SPR rules!
+      & MOD\$headmod % TODO verify!
+      & SUBJ\$subj
+      )
+    & DTRS\
+      ( HEAD_DTR\$head
+      & VERB_DTR\$verb
+      ).
+
 % Immediate Dominance: collects other principles
 id_principle <- [pred].
 id_principle(head_comp_schema, $left, $right, $head, $comp, $mother) :-
   head_comp_schema_rule($left, $right, $head, $comp, $mother).
 id_principle(head_mod_schema, $left, $right, $head, $mod, $mother) :-
   head_mod_schema_rule($left, $right, $head, $mod, $mother).
+id_principle(head_verb_schema, $left, $right, $head, $verb, $mother) :-
+  head_verb_schema_rule($left, $right, $head, $verb, $mother).
 
 % HFP: Mother and Head share head features.
 head_feature_principle <- [pred].
@@ -167,6 +207,7 @@ fill_defaults($sign) :-
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
+  default($val, AUX\, [], [_]),
   (($head = verb) ->
       default($head, PREDICATE\, plus, minus) ;
       default($head, PREDICATE\, minus, plus)).
@@ -177,7 +218,11 @@ fill_defaults($sign) :-
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   principles($schema, $left, $right, $mother),
-  $dcp = phonology_principle_binary($left, $right, $mother).
+  $dcp = phonology_principle_binary($left, $right, $mother)
+      % DEBUG ,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
+      % DEBUG ,print(["LEFT",$left]),print(["RIGHT",$right])
+      % DEBUG ,print(["MOTHER",$mother])
+.
 
 % unary branching licence (+$schema, +$dtr, -$mother, -$dcp)
 id_schema_unary(_, _, _, _) :- fail.

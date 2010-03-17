@@ -54,60 +54,53 @@ lexv("dovesti",
 % (generates a LOT of possibilities for AUX-VERB schema)
 lexv("biti",
   SYNSEM\LOCAL\
-    ( CAT\VAL\$thisval
-    & CONT\$thiscont
+    ( CAT\
+      ( HEAD\$head
+      & VAL\$val
+      )
+    & CONT\$cont
     )
 ) :-
   (
-    $thisval
-      = AUX\
-        [ FOR\$for
-        & PROD\$prod
-        ]
-      & COMPS\
-        [ _ ],
-    $thiscont = TAM\$thistam,
-    $for
-      = LOCAL\
-        ( CAT\HEAD\verb
-        & CONT\TAM\$parttam
-        ),
-    $prod
-      = LOCAL\
-        ( CAT\HEAD\verb
-        & CONT\TAM\$prodtam
-        ),
-    member([$thistam, $choices], [
+    $subj = [ LOCAL\CAT\HEAD\CASE\nom ],
+    $val
+      = AUX\$aux
+      & SUBJ\$subj,
+    $cont = TAM\$tam,
+    $head = nsverb,
+    member([$tam, $aux], [
       [MOOD\imperative & VOICE\active, [
-        [TENSE\present & VOICE\passive,
-          MOOD\imperative & VOICE\passive]]],
-      [MOOD\participle & TENSE\present & VOICE\active, [
-        [MOOD\participle & TENSE\present & VOICE\passive,
-          MOOD\participle & TENSE\perfect & VOICE\passive],
-        [MOOD\participle & TENSE\perfect & VOICE\$voice1,
-          MOOD\participle & TENSE\pluperfect & VOICE\$voice1]]],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\imperative & VOICE\passive)]]],
+      [MOOD\infinitive & VOICE\active, [
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\infinitive & VOICE\passive)]]],
+      [MOOD\participle & TENSE\perfect & VOICE\active, [
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\passive)],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice1),
+          LOCAL\CONT\TAM\(MOOD\participle & TENSE\pluperfect & VOICE\$voice1)]]],
       [MOOD\indicative & FINITE\plus & TENSE\present & VOICE\active, [
-        [MOOD\participle & TENSE\perfect & VOICE\$voice2,
-          MOOD\indicative & TENSE\future2 & VOICE\$voice2]]],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice2),
+          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\future2 & VOICE\$voice2)]]],
       [MOOD\indicative & FINITE\minus & TENSE\present & VOICE\active, [
         % passive present participle does not exist and cannot be generated
-        [MOOD\participle & TENSE\$tense1 & VOICE\$voice3,
-          MOOD\indicative & TENSE\$tense1 & VOICE\$voice3]]],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\$tense1 & VOICE\$voice3),
+          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\$tense1 & VOICE\$voice3)]]],
       [MOOD\indicative & FINITE\minus & TENSE\aorist & VOICE\active, [
-        [MOOD\participle & TENSE\present & VOICE\passive,
-          MOOD\indicative & TENSE\aorist & VOICE\passive],
-        [MOOD\participle & TENSE\perfect & VOICE\$voice4,
-          MOOD\conditional & TENSE\present & VOICE\$voice4],
-        [MOOD\participle & TENSE\pluperfect & VOICE\$voice5,
-          MOOD\conditional & TENSE\perfect & VOICE\$voice5]]],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\aorist & VOICE\passive)],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice4),
+          LOCAL\CONT\TAM\(MOOD\conditional & TENSE\present & VOICE\$voice4)],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\pluperfect & VOICE\$voice5),
+          LOCAL\CONT\TAM\(MOOD\conditional & TENSE\perfect & VOICE\$voice5)]]],
       [MOOD\indicative & FINITE\minus & TENSE\imperfect & VOICE\active, [
-        [MOOD\participle & TENSE\present & VOICE\passive,
-          MOOD\indicative & TENSE\imperfect & VOICE\passive],
-        [MOOD\participle & TENSE\perfect & VOICE\passive,
-          MOOD\indicative & TENSE\pluperfect & VOICE\passive]]]]),
-    member([$parttam, $prodtam], $choices)
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\imperfect & VOICE\passive)],
+        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\passive),
+          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
   ); (
-    $thisval
+    $val
       = COMPS\
         [ LOCAL\
           ( CAT\HEAD\
@@ -121,5 +114,6 @@ lexv("biti",
             & CASE\nom
             )
           )
-        ]
+        ],
+    $head = sverb
   ). % TODO: handle other uses of copula (prepositions, adjectives, infinitives)
