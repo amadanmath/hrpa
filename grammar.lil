@@ -48,12 +48,15 @@ head_comp_schema_rule <- [pred].
 head_comp_schema_rule($left, $right, $head, $comp, $mother) :-
   scrambling_order($left, $right, $head, $comp),
   $head
-    = SYNSEM\LOCAL\CAT\VAL\
-      ( COMPS\$headcomps
-      & AUX\[]
-      & SPR\$headspr
-      & MOD\$headmod
-      & SUBJ\$headsubj
+    = SYNSEM\LOCAL\
+      ( CAT\VAL\
+        ( COMPS\$headcomps
+        & AUX\[]
+        & SPR\$headspr
+        & MOD\$headmod
+        & SUBJ\$headsubj
+        )
+      & CONT\$cont
       ),
   $comp
     = SYNSEM\
@@ -67,12 +70,15 @@ head_comp_schema_rule($left, $right, $head, $comp, $mother) :-
   only_optional($compspr),
   find_and_delete($headcomps, $compsynsem, $mothercomps),
   $mother
-    = SYNSEM\LOCAL\CAT\VAL\
-      ( COMPS\$mothercomps
-      & AUX\[]
-      & SPR\$headspr
-      & MOD\$headmod
-      & SUBJ\$headsubj
+    = SYNSEM\LOCAL\
+      ( CAT\VAL\
+        ( COMPS\$mothercomps
+        & AUX\[]
+        & SPR\$headspr
+        & MOD\$headmod
+        & SUBJ\$headsubj
+        )
+      & CONT\$cont
       )
     & DTRS\
       ( HEAD_DTR\$head
@@ -91,12 +97,15 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
   $head
     = SYNSEM\
       ( $headsynsem
-      & LOCAL\CAT\VAL\
-        ( SPR\$headspec
-        & AUX\[]
-        & COMPS\$headcomps
-        & MOD\$headmod
-        & SUBJ\$headsubj
+      & LOCAL\
+        ( CAT\VAL\
+          ( SPR\$headspec
+          & AUX\[]
+          & COMPS\$headcomps
+          & MOD\$headmod
+          & SUBJ\$headsubj
+          )
+        & CONT\$cont
         )
       ),
   $mod
@@ -108,12 +117,15 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
   only_optional($modcomps),
   only_optional($modspr),
   $mother
-    = SYNSEM\LOCAL\CAT\VAL\
-      ( SPR\$headspec
-      & AUX\[]
-      & COMPS\$headcomps
-      & MOD\$headmod
-      & SUBJ\$headsubj 
+    = SYNSEM\LOCAL\
+      ( CAT\VAL\
+        ( SPR\$headspec
+        & AUX\[]
+        & COMPS\$headcomps
+        & MOD\$headmod
+        & SUBJ\$headsubj 
+        )
+      & CONT\$cont
       )
     & DTRS\
       ( HEAD_DTR\$head
@@ -219,9 +231,15 @@ fill_defaults($sign) :-
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   principles($schema, $left, $right, $mother),
   $dcp = phonology_principle_binary($left, $right, $mother)
-      % DEBUG ,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
-      % DEBUG ,print(["LEFT",$left]),print(["RIGHT",$right])
-      % DEBUG ,print(["MOTHER",$mother])
+      %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
+      %,(($left=SYNSEM\LOCAL\CAT\VAL\AUX\$la,
+        %$right=SYNSEM\$rs
+        %,$mother=SYNSEM\LOCAL\CONT\TAM\$mt
+        %,printAVM($la),printAVM(["rsynsem",$rs])
+        %,printAVM(["mtam",$mt])
+         %)->true;true)
+      %DEBUG ,print(["LEFT",$left]),print(["RIGHT",$right])
+      %DEBUG ,print(["MOTHER",$mother])
 .
 
 % unary branching licence (+$schema, +$dtr, -$mother, -$dcp)

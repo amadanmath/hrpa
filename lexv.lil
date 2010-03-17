@@ -11,29 +11,36 @@ lexv <- [pred].
 
 % eat
 lexv("jesti",
-  SYNSEM\LOCAL\CAT\
+  SYNSEM\LOCAL\
+  ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
       [ LOCAL\CAT\HEAD\CASE\nom
       , LOCAL\CAT\HEAD\CASE\acc
       ]
     )
+  & CONT\TAM\FINITE\minus
+  )
 ).
 
 % love
 lexv("voljeti",
-  SYNSEM\LOCAL\CAT\
+  SYNSEM\LOCAL\
+  ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
       [ LOCAL\CAT\HEAD\CASE\nom
       , LOCAL\CAT\HEAD\CASE\acc
       ]
     )
+  & CONT\TAM\FINITE\minus
+  )
 ).
 
 % lead to
 lexv("dovesti",
-  SYNSEM\LOCAL\CAT\
+  SYNSEM\LOCAL\
+  ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
       [ LOCAL\CAT\HEAD\CASE\nom
@@ -41,6 +48,8 @@ lexv("dovesti",
       , $DESTINATION
       ]
     )
+  & CONT\TAM\FINITE\plus
+  )
 ) :-
   member($DESTINATION,
     [ LOCAL\CAT\HEAD\CASE\dat
@@ -52,22 +61,19 @@ lexv("dovesti",
 
 % be
 % (generates a LOT of possibilities for AUX-VERB schema)
-lexv("biti",
-  SYNSEM\LOCAL\
-    ( CAT\
-      ( HEAD\$head
-      & VAL\$val
-      )
-    & CONT\$cont
-    )
-) :-
+lexv("biti", $sign) :-
   (
-    $subj = [ LOCAL\CAT\HEAD\CASE\nom ],
-    $val
-      = AUX\$aux
-      & SUBJ\$subj,
-    $cont = TAM\$tam,
-    $head = nsverb,
+    $sign
+      = SYNSEM\LOCAL\
+        ( CAT\
+          ( HEAD\nsverb
+          & VAL\
+            ( AUX\$aux
+            & SUBJ\[ LOCAL\CAT\HEAD\CASE\nom ]
+            )
+          )
+        & CONT\TAM\$tam
+        ),
     member([$tam, $aux], [
       [MOOD\imperative & VOICE\active, [
         [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
@@ -100,20 +106,24 @@ lexv("biti",
         [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\passive),
           LOCAL\CONT\TAM\(MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
   ); (
-    $val
-      = COMPS\
-        [ LOCAL\
-          ( CAT\HEAD\
-            ( noun
-            & CASE\nom
+    $sign
+      = SYNSEM\LOCAL\CAT\
+        ( VAL\COMPS\
+          [ LOCAL\
+            ( CAT\HEAD\
+              ( noun
+              & CASE\nom
+              )
             )
-          )
-        , LOCAL\
-          ( CAT\HEAD\
-            ( noun
-            & CASE\nom
+          , LOCAL\
+            ( CAT\HEAD\
+              ( noun
+              & CASE\nom
+              )
             )
-          )
-        ],
-    $head = sverb
+          ]
+        & HEAD\sverb
+        )
   ). % TODO: handle other uses of copula (prepositions, adjectives, infinitives)
+
+
