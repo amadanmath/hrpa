@@ -135,8 +135,6 @@ recognise($wlist,
 lemmatise($word, $lemma, $sign) :-
   strtolist($word, $swlist),
   reverse($swlist, $wlist),
-  (recognise($wlist, $sign, $wllist) ->
-    true ;
-    ( printAVM(["Error: lemmatise:", $word]), fail )),
+  recognise($wlist, $sign, $wllist),
   reverse($wllist, $swllist),
   listtostr($swllist, $lemma).

@@ -9,18 +9,22 @@ lexe <- [pred].
 :- module_implementation.
 
 
+% PREPOSITIONS
+
+% up to, to
 lexe("do",
   SYNSEM\LOCAL\CAT\
-    ( HEAD\PFORM\do_gen
-    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\gen ]
-    )
+  ( HEAD\PFORM\do_gen
+  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\gen ]
+  )
 ).
 
+% in, inside
 lexe("u",
   SYNSEM\LOCAL\CAT\
-    ( HEAD\PFORM\$pform
-    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\$case ]
-    )
+  ( HEAD\PFORM\$pform
+  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\$case ]
+  )
 ) :-
   member([$pform, $case],
     [ [u_loc, loc]
@@ -28,12 +32,21 @@ lexe("u",
     , [u_gen, gen]
     ]).
 
+% towards
 lexe($phon,
   SYNSEM\LOCAL\CAT\
-    ( HEAD\PFORM\k_loc
-    & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\loc ]
-    )
+  ( HEAD\PFORM\k_loc
+  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\loc ]
+  )
 ) :-
   % TODO rules for selection
   $phon = "k";
   $phon = "ka".
+
+
+% ADVERBS
+
+% today
+lexe("danas",
+  SYNSEM\LOCAL\CAT\VAL\MOD\[ LOCAL\CAT\HEAD\verb ]
+).
