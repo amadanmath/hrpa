@@ -76,35 +76,35 @@ lexv("biti", $sign) :-
         ),
     member([$tam, $aux], [
       [MOOD\imperative & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\imperative & VOICE\passive)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\imperative & VOICE\passive)]]],
       [MOOD\infinitive & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\infinitive & VOICE\passive)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\passive)]]],
       [MOOD\participle & TENSE\perfect & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\passive)],
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice1),
-          LOCAL\CONT\TAM\(MOOD\participle & TENSE\pluperfect & VOICE\$voice1)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive)],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\plus & TENSE\present & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice2),
-          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\future2 & VOICE\$voice2)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future2 & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\present & VOICE\active, [
         % passive present participle does not exist and cannot be generated
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\$tense1 & VOICE\$voice3),
-          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\$tense1 & VOICE\$voice3)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\$tense & VOICE\$voice),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\$tense & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\aorist & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\aorist & VOICE\passive)],
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\$voice4),
-          LOCAL\CONT\TAM\(MOOD\conditional & TENSE\present & VOICE\$voice4)],
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\pluperfect & VOICE\$voice5),
-          LOCAL\CONT\TAM\(MOOD\conditional & TENSE\perfect & VOICE\$voice5)]]],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\aorist & VOICE\passive)],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\present & VOICE\$voice)],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\perfect & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\imperfect & VOICE\active, [
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\imperfect & VOICE\passive)],
-        [LOCAL\CONT\TAM\(MOOD\participle & TENSE\perfect & VOICE\passive),
-          LOCAL\CONT\TAM\(MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\imperfect & VOICE\passive)],
+        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive),
+          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
   ); (
     $sign
       = SYNSEM\LOCAL\CAT\
