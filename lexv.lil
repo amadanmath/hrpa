@@ -59,8 +59,7 @@ lexv("dovesti",
     ]
   ).
 
-% be
-% (generates a LOT of possibilities for AUX-VERB schema)
+% be (auxiliary, copula)
 lexv("biti", $sign) :-
   (
     $sign
@@ -126,4 +125,39 @@ lexv("biti", $sign) :-
         )
   ). % TODO: handle other uses of copula (prepositions, adjectives, infinitives)
 
-
+% want (auxiliary, regular)
+lexv("htjeti", $sign) :-
+  (
+    $sign
+      = SYNSEM\LOCAL\
+        ( CAT\
+          ( HEAD\nsverb
+          & CLITIC\plus % only clitic form acts as auxiliary
+          & VAL\
+            ( AUX\
+              [ [ LOCAL\CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\$voice)
+                , LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future1 & VOICE\$voice)]
+              ]
+            & SUBJ\[ LOCAL\CAT\HEAD\CASE\nom ]
+            )
+          )
+        & CONT\TAM\
+          ( MOOD\indicative
+          & TENSE\present
+          & VOICE\active
+          )
+        )
+  ); (
+    $sign
+      = SYNSEM\LOCAL\
+        ( CAT\
+          ( HEAD\sverb
+          & VAL\COMPS\
+            [ LOCAL\CAT\HEAD\CASE\nom
+            , $object
+            ]
+          )
+        & CONT\TAM\FINITE\minus
+        ),
+    $object = LOCAL\CAT\HEAD\CASE\acc % TODO clauses "ja hocu ici na more" "ja hocu da ti ides na more"
+  ).
