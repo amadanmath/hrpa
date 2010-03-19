@@ -33,8 +33,9 @@ find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\adjective) :-
 transform <- [pred].
 transform($sign) :-
   % delete the actor from the passive participles; obligatory
-  ( $sign = SYNSEM\LOCAL\CONT\TAM\VOICE\passive ->
+  ( $sign = SYNSEM\LOCAL\(CAT\HEAD\verb & CONT\TAM\VOICE\passive) ->
     (
+      % fail if not a classic nom/acc transitive verb
       $sign
         = SYNSEM\LOCAL\CAT\VAL\
           ( $val
