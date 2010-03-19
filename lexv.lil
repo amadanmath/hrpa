@@ -9,6 +9,19 @@ lexv <- [pred].
 :- module_implementation.
 
 
+% fall down
+lexv("pasti",
+  SYNSEM\LOCAL\
+  ( CAT\
+    ( HEAD\sverb
+    & VAL\COMPS\
+      [ LOCAL\CAT\HEAD\CASE\nom
+      ]
+    )
+  & CONT\TAM\FINITE\plus
+  )
+).
+
 % eat
 lexv("jesti",
   SYNSEM\LOCAL\
