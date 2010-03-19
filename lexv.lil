@@ -120,23 +120,38 @@ lexv("biti", $sign) :-
   ); (
     $sign
       = SYNSEM\LOCAL\CAT\
-        ( VAL\COMPS\
-          [ LOCAL\
-            ( CAT\HEAD\
+        ( HEAD\sverb
+        & VAL\
+          ( COMPS\
+            [ LOCAL\CAT\HEAD\
               ( noun
               & CASE\nom
               )
+            , $pred
+            ]
+          & SUBJ\[$subj]
+          )
+        ),
+    ( $pred
+        = LOCAL\CAT\HEAD\
+          ( noun
+          & CASE\nom
+          )
+    ; $pred
+        = LOCAL\CAT\
+          ( HEAD\
+            ( adjective
+            & CASE\nom
             )
-          , LOCAL\
-            ( CAT\HEAD\
-              ( noun
-              & CASE\nom
-              )
-            )
-          ]
-        & HEAD\sverb
-        )
-  ). % TODO: handle other uses of copula (prepositions, adjectives, infinitives)
+          & VAL\MOD\[$subj]
+          )
+    ; $pred
+        = LOCAL\CAT\
+          ( HEAD\prep
+          & VAL\COMPS\[]
+          )
+    )
+  ).
 
 % want (auxiliary, regular)
 lexv("htjeti", $sign) :-
