@@ -151,10 +151,13 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother) :-
   $verb
     = SYNSEM\
       ( $verbsynsem
-      & LOCAL\CAT\VAL\
-        ( COMPS\$verbcomps
-        & AUX\[] % aux is always left
-        & SUBJ\$subj
+      & LOCAL\CAT\
+        ( HEAD\verb
+        & VAL\
+          ( COMPS\$verbcomps
+          & AUX\[] % aux is always left
+          & SUBJ\$subj
+          )
         )
       ),
   member([$verbsynsem, $mothersynsem], $headaux),
