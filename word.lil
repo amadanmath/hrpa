@@ -30,9 +30,33 @@ find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\verb) :-
 find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\adjective) :-
   lexa($lemma, $sign).
 
+transform <- [pred].
+transform($sign) :-
+  % delete the actor from the passive participles; obligatory
+  ( $sign = SYNSEM\LOCAL\CONT\TAM\VOICE\passive ->
+    (
+      $sign
+        = SYNSEM\LOCAL\CAT\VAL\
+          ( $val
+            & COMPS\
+              [ LOCAL\CAT\HEAD\CASE\nom
+              | $comps
+                & [ LOCAL\CAT\HEAD\
+                    ( $head
+                    & CASE\acc
+                    )
+                  | _
+                  ]
+              ]
+          ),
+      overwrite($head, CASE\, nom),
+      overwrite($val, COMPS\, $comps)
+    ) ; true).
+
 word_to_sign($word, $lemma, $sign) :- % changeable words (morphology resolution)
   lemmatise($word, $lemma, $sign),
-  find_word($lemma, $sign).
+  find_word($lemma, $sign),
+  transform($sign).
 word_to_sign($word, $lemma, $sign) :- % unchangeable words (exact match)
   lexe($word, $sign),
   $lemma = $word.
