@@ -9,5 +9,8 @@ lexn <- [pred].
 :- module_implementation.
 
 lexn("dječak", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
-lexn("Ivana", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
+
+lexn("Davor", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
 lexn("Ivan", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
+lexn("Ivana", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
+lexn("Monika", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
