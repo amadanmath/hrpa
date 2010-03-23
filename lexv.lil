@@ -132,20 +132,20 @@ lexv("biti", $sign) :-
           & SUBJ\[$subj]
           )
         ),
-    ( $pred
+    ( $pred % copula + NP
         = LOCAL\CAT\HEAD\
           ( noun
           & CASE\nom
           )
-    ; $pred
+    ; $pred % copula + AP
         = LOCAL\CAT\
           ( HEAD\
             ( adjective
             & CASE\nom
             )
-          & VAL\MOD\[$subj]
+          & VAL\MOD\[$subj] % agreement!
           )
-    ; $pred
+    ; $pred % copula + PP
         = LOCAL\CAT\
           ( HEAD\prep
           & VAL\COMPS\[]
