@@ -6,6 +6,8 @@
 :- ensure_loaded("display").
 
 trees <- [pred].
+printAVMtofile <- [pred].
+treestofile <- [pred].
 
 :- module_implementation.
 
@@ -21,3 +23,13 @@ trees(TT) :-
   root_edge_id_list(RR),
   gettreesbyroots(RR, OO),
   remove_duplicates(OO, TT).
+
+printAVMtofile($avm, $filename) :-
+  open_file_stream($filename, "a", $handle),
+  printAVMtostr($avm, $content),
+  writeln_string($handle, $content),
+  close($handle).
+
+treestofile($filename) :-
+  trees($trees),
+  printAVMtofile($trees, $filename).
