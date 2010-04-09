@@ -33,6 +33,12 @@ find_and_delete <- [pred].
 find_and_delete([X | Xs], X, Xs).
 find_and_delete([X | Xs], Y, [X | Ys]) :- find_and_delete(Xs, Y, Ys).
 
+% do not allow a clitic unless in clitic resolution.
+assure_nocl <- [pred].
+assure_nocl(plus, SYNSEM\LOCAL\CAT\CLITIC\_).
+assure_nocl(_, SYNSEM\LOCAL\CAT\CLITIC\not_clitic).
+
+
 % on top level (PREDICATE\plus), allow either order
 % others are head-first (e.g. PREP-comp, NOUN-comp)
 scrambling_order <- [pred].
@@ -44,7 +50,9 @@ scrambling_order($first, $second, $head, $comp) :-
   $second = $comp.
 
 head_comp_schema_common_rule <- [pred].
-head_comp_schema_common_rule($head, $comp, $mother) :-
+head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
+  assure_nocl($clr, $comp),
+  assure_nocl(minus, $head), % head can't ever be a clitic
   $head
     = SYNSEM\LOCAL\
       ( CAT\VAL\
@@ -84,23 +92,25 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
       ).
 
 head_comp_schema_rule <- [pred].
-head_comp_schema_rule($head, $comp, $head, $comp, $mother) :-
-  head_comp_schema_common_rule($head, $comp, $mother).
+head_comp_schema_rule($head, $comp, $head, $comp, $mother, $clr) :-
+  head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
 comp_head_schema_rule <- [pred].
-comp_head_schema_rule($comp, $head, $head, $comp, $mother) :-
+comp_head_schema_rule($comp, $head, $head, $comp, $mother, $clr) :-
   $head = SYNSEM\LOCAL\CAT\HEAD\PREDICATE\plus,
-  head_comp_schema_common_rule($head, $comp, $mother).
+  head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
 % TODO change:
-% if $mod contains head_comp or head_mark, $mod right
+% if $mod contains head-left branching, branch head-left
 noun_mod_order <- [pred].
 noun_mod_order($left, $right, $head, $mod) :-
   $right = $head, $left = $mod.
 
 head_mod_schema_rule <- [pred].
-head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
+head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
   noun_mod_order($left, $right, $head, $mod),
+  assure_nocl($clr, $mod),
+  assure_nocl(minus, $head), % head can't ever be a clitic
   $head
     = SYNSEM\
       ( $headsynsem
@@ -140,7 +150,9 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
       ).
 
 head_verb_schema_rule <- [pred].
-head_verb_schema_rule($head, $verb, $head, $verb, $mother) :-
+head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
+  assure_nocl($clr, $head),
+  assure_nocl(minus, $verb), % verb can't ever be a clitic
   $head
     = SYNSEM\LOCAL\CAT\VAL\
       ( AUX\$headaux
@@ -175,16 +187,30 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother) :-
       & VERB_DTR\$verb
       ).
 
+head_cl_schema_rule <- [pred].
+head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
+  $head
+    = SYNSEM\
+      ( LOCAL\CAT\CLITIC\not_clitic
+      & NONLOCAL\INHER\CLSTORE\$clstore
+      ),
+  $cl = SYNSEM\LOCAL\CAT\CLITIC\($cltype & is_clitic),
+  \+ member($cltype, $clstore), % no two clitics of same type, no order violations!
+  copy($head, $mother),
+  overwrite($mother, [SYNSEM\, NONLOCAL\, INHER\, CLSTORE\], [$cl | $clstore]).
+
 % Immediate Dominance: collects other principles
 id_principle <- [pred].
-id_principle(head_comp_schema, $left, $right, $head, $comp, $mother) :-
-  head_comp_schema_rule($left, $right, $head, $comp, $mother).
-id_principle(comp_head_schema, $left, $right, $head, $comp, $mother) :-
-  comp_head_schema_rule($left, $right, $head, $comp, $mother).
-id_principle(head_mod_schema, $left, $right, $head, $mod, $mother) :-
-  head_mod_schema_rule($left, $right, $head, $mod, $mother).
-id_principle(head_verb_schema, $left, $right, $head, $verb, $mother) :-
-  head_verb_schema_rule($left, $right, $head, $verb, $mother).
+id_principle(head_comp_schema, $left, $right, $head, $comp, $mother, $clr) :-
+  head_comp_schema_rule($left, $right, $head, $comp, $mother, $clr).
+id_principle(comp_head_schema, $left, $right, $head, $comp, $mother, $clr) :-
+  comp_head_schema_rule($left, $right, $head, $comp, $mother, $clr).
+id_principle(head_mod_schema, $left, $right, $head, $mod, $mother, $clr) :-
+  head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr).
+id_principle(head_verb_schema, $left, $right, $head, $verb, $mother, $clr) :-
+  head_verb_schema_rule($left, $right, $head, $verb, $mother, $clr).
+id_principle(head_cl_schema, $left, $right, $head, $verb, $mother, minus) :-
+  head_cl_schema_rule($left, $right, $head, $verb, $mother).
 
 % HFP: Mother and Head share head features.
 head_feature_principle <- [pred].
@@ -205,9 +231,11 @@ phonology_principle_unary($dtr, $mother) :-
   $dtr = (PHONOLOGY\$phon & LEXICON\$lex),
   $mother = (PHONOLOGY\$phon & LEXICON\$lex).
 
+% clr = clitic resolution? (plus/minus)
 principles <- [pred].
-principles($schema, $left, $right, $mother) :-
-  id_principle($schema, $left, $right, $head, _, $mother),
+principles($schema, $left, $right, $mother, $clr) :-
+  id_principle($schema, $left, $right, $head, _, $mother, $clr),
+  % TODO cl_principle
   head_feature_principle($head, $mother).
 
 
@@ -241,7 +269,7 @@ fill_defaults($sign) :-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-  principles($schema, $left, $right, $mother),
+  principles($schema, $left, $right, $mother, minus),
   $dcp = phonology_principle_binary($left, $right, $mother)
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
       %,(($left=SYNSEM\LOCAL\CAT\VAL\AUX\$la,
