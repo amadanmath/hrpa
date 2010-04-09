@@ -179,6 +179,7 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
         )
       ),
   member([$verbsynsem, $mothersynsem], $headaux),
+  print($head),
   $mother = SYNSEM\$mothersynsem,
   $mother
     = SYNSEM\LOCAL\CAT\VAL\
@@ -193,6 +194,13 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
       & VERB_DTR\$verb
       ).
 
+cl_member <- [pred].
+cl_member($cl, [SYNSEM\LOCAL\CAT\CLITIC\$storecl | _]) :-
+  subsume($cl, $storecl),
+  !.
+cl_member($cl, [_ | $clstore]) :-
+  cl_member($cl, $clstore).
+
 head_cl_schema_rule <- [pred].
 head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
   $head
@@ -201,7 +209,7 @@ head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
       & NONLOCAL\INHER\CLSTORE\$clstore
       ),
   $cl = SYNSEM\LOCAL\CAT\CLITIC\($cltype & is_clitic),
-  \+ member($cltype, $clstore), % no two clitics of same type, no order violations!
+  \+ cl_member($cltype, $clstore), % no two clitics of same type, no order violations!
   copy_mother($head, $mother),
   overwrite($mother, [SYNSEM\, NONLOCAL\, INHER\, CLSTORE\], [$cl | $clstore]).
 
@@ -258,7 +266,8 @@ fill_defaults($sign) :-
   $sign
     = SYNSEM\
       ( LOCAL\CAT\
-        ( HEAD\$head
+        ( $cat
+        & HEAD\$head
         & VAL\$val
         )
       & NONLOCAL\
@@ -266,6 +275,7 @@ fill_defaults($sign) :-
         & TOBIND\$tobind
         )
       ),
+  default($cat, CLITIC\, not_clitic, is_clitic),
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),

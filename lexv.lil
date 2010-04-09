@@ -160,7 +160,7 @@ lexv("htjeti", $sign) :-
       = SYNSEM\LOCAL\
         ( CAT\
           ( HEAD\nsverb
-          & CLITIC\is_clitic % only clitic form acts as auxiliary
+          & CLITIC\cl_aux % only clitic form acts as auxiliary
           & VAL\
             ( AUX\
               [ [ LOCAL\CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\$voice)

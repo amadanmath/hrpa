@@ -127,7 +127,9 @@ recognise($wlist,
   morph_number($wlist2, $number, $wlist3),
   morph_person($wlist3, $person, $wlist4),
   (match($wlist4, "cl", $wlist5)
-    -> $clitic = is_clitic
+    -> (match($wlist1, "biti-cl3sgp", [])
+      -> $clitic = cl_aux3
+      ; $clitic = cl_aux)
     ; ($clitic = not_clitic, $wlist4 = $wlist5)),
   match($wlist5, "-", $lemma).
 
