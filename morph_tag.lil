@@ -52,9 +52,10 @@ morph_person($wlist, first, $rest) :- match($wlist, "1", $rest).
 morph_person($wlist, second, $rest) :- match($wlist, "2", $rest).
 morph_person($wlist, third, $rest) :- match($wlist, "3", $rest).
 
+recognise <- [pred].
+
 % NOUN: jabuku: jabuka-asg
 % (3rd person, for all nouns)
-recognise <- [pred].
 recognise($wlist,
     SYNSEM\LOCAL\
       ( CAT\HEAD\
@@ -70,6 +71,30 @@ recognise($wlist,
   morph_number($wlist, $number, $wlist1),
   morph_case($wlist1, $case, $wlist2),
   match($wlist2, "-", $lemma).
+
+% PERSONAL PRONOUN: njoj: on-asgf
+recognise($wlist,
+    SYNSEM\LOCAL\
+      ( CAT\
+        ( HEAD\
+          ( pronoun
+          & CASE\$case
+          )
+        & CLITIC\$clitic
+        )
+      & CONT\INDEX\NUMBER\$number
+      ),
+    $lemma) :-
+  morph_number($wlist, $number, $wlist1),
+  morph_case($wlist1, $case, $wlist2),
+  (match($wlist2, "cl", $wlist3)
+    -> member([$case, $clitic],
+        [ [dat, cl_dat]
+        , [gen, cl_accgen]
+        , [acc, cl_accgen]
+        ])
+    ; ($clitic = not_clitic, $wlist2 = $wlist3)),
+  match($wlist3, "-", $lemma).
 
 % ADJECTIVE: bijela: bijel-apln; zeleni: zelen-nsgmd
 recognise($wlist,

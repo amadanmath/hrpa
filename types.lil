@@ -161,6 +161,7 @@ objref <- [cont] + [INDEX\index].
 % POS
 
 noun <- [head, noun_like].
+pronoun <- [head, noun_like].
 adjective <- [head, adj_like].
 adverb <- [head, adv_like].
 verb <- [head].

@@ -15,6 +15,8 @@ word_to_sign <- [pred].
 :- module_implementation.
 
 find_word <- [pred].
+find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\pronoun) :-
+  lexpro($lemma, $sign).
 find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\noun) :-
   lexn($lemma, $sign).
 find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\verb) :-

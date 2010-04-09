@@ -5,6 +5,7 @@
 :- ensure_loaded("grammar").
 
 lexn <- [pred].
+lexpro <- [pred].
 
 :- module_implementation.
 
@@ -14,3 +15,10 @@ lexn("Davor", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
 lexn("Ivan", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
 lexn("Ivana", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
 lexn("Monika", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
+
+lexpro("ja", SYNSEM\LOCAL\CONT\INDEX\(PERSON\first & NUMBER\singular)).
+lexpro("ti", SYNSEM\LOCAL\CONT\INDEX\(PERSON\second & NUMBER\singular)).
+lexpro("on", SYNSEM\LOCAL\CONT\INDEX\(PERSON\third & NUMBER\singular)).
+lexpro("mi", SYNSEM\LOCAL\CONT\INDEX\(PERSON\first & NUMBER\plural)).
+lexpro("vi", SYNSEM\LOCAL\CONT\INDEX\(PERSON\second & NUMBER\plural)).
+lexpro("oni", SYNSEM\LOCAL\CONT\INDEX\(PERSON\third & NUMBER\plural)).
