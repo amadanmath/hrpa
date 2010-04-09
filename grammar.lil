@@ -38,6 +38,12 @@ assure_nocl <- [pred].
 assure_nocl(plus, SYNSEM\LOCAL\CAT\CLITIC\_).
 assure_nocl(_, SYNSEM\LOCAL\CAT\CLITIC\not_clitic).
 
+copy_mother <- [pred].
+copy_mother($dtr, $mother) :-
+  copy($dtr, $mother),
+  restriction($mother, LEXICON\),
+  restriction($mother, PHONOLOGY\).
+
 
 % on top level (PREDICATE\plus), allow either order
 % others are head-first (e.g. PREP-comp, NOUN-comp)
@@ -196,7 +202,7 @@ head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
       ),
   $cl = SYNSEM\LOCAL\CAT\CLITIC\($cltype & is_clitic),
   \+ member($cltype, $clstore), % no two clitics of same type, no order violations!
-  copy($head, $mother),
+  copy_mother($head, $mother),
   overwrite($mother, [SYNSEM\, NONLOCAL\, INHER\, CLSTORE\], [$cl | $clstore]).
 
 % Immediate Dominance: collects other principles
@@ -255,11 +261,17 @@ fill_defaults($sign) :-
         ( HEAD\$head
         & VAL\$val
         )
+      & NONLOCAL\
+        ( INHER\$inher
+        & TOBIND\$tobind
+        )
       ),
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
   default($val, AUX\, [], [_]),
+  default($inher, CLSTORE\, [], [_]),
+  default($tobind, CLSTORE\, [], [_]),
   (($head = verb) ->
       default($head, PREDICATE\, plus, minus) ;
       default($head, PREDICATE\, minus, plus)).
