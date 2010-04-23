@@ -1,0 +1,59 @@
+:- module("test").
+:- module_interface.
+
+:- ensure_loaded("types").
+:- ensure_loaded("grammar").
+
+test <- [pred].
+
+:- module_implementation.
+
+passed <- [pred].
+passed($line) :-
+  strcat("OK: ", $line, $str),
+  stdout_stream($out),
+  writeln_string($out, $str).
+
+failed <- [pred].
+failed($line) :-
+  strcat("NG: ", $line, $str),
+  stdout_stream($out),
+  writeln_string($out, $str).
+
+
+check_line_cases <- [pred].
+check_line_cases([], _) :- !. % empty line
+check_line_cases([35 | _], _) :- !. % comment
+check_line_cases([42 | $list], $line) :- % bad line
+  listtostr($list, $badline),
+  (
+    parse($badline)
+      -> failed($line)
+      ; passed($line)
+  ), !.
+check_line_cases(_, $line) :- % good line
+  ( parse($line)
+    -> passed($line)
+    ; failed($line)
+  ), !.
+
+
+check_line <- [pred].
+check_line($line) :-
+  strtolist($line, $list),
+  check_line_cases($list, $line).
+
+
+test_case <- [pred].
+test_case($handle) :-
+  readln_string($handle, $line)
+  -> (check_line($line), test_case($handle))
+  ; true.
+  
+
+test :-
+  open_file_stream("test.txt", "r", $handle),
+  test_case($handle),
+  close($handle).
+
+:- test.

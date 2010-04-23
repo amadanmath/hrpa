@@ -33,6 +33,13 @@ find_and_delete <- [pred].
 find_and_delete([X | Xs], X, Xs).
 find_and_delete([X | Xs], Y, [X | Ys]) :- find_and_delete(Xs, Y, Ys).
 
+% the difference from set_difference/3: fail if not found
+find_and_delete_all <- [pred].
+find_and_delete_all(X, [], X).
+find_and_delete_all(X, [Y | Ys], Z) :-
+  find_and_delete(X, Y, T),
+  find_and_delete_all(T, Ys, Z).
+
 % do not allow a clitic unless in clitic resolution.
 assure_nocl <- [pred].
 assure_nocl(plus, SYNSEM\LOCAL\CAT\CLITIC\_).
@@ -173,7 +180,6 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
         )
       ),
   member([$verbsynsem, $mothersynsem], $headaux),
-  print($head),
   $mother = SYNSEM\$mothersynsem,
   $mother
     = SYNSEM\LOCAL\CAT\VAL\
@@ -239,6 +245,37 @@ head_feature_principle($head, $mother) :-
   $mother = (SYNSEM\LOCAL\CAT\HEAD\$x),
   $head = (SYNSEM\LOCAL\CAT\HEAD\$x).
 
+nonlocal_bind <- [pred].
+nonlocal_bind($head, $mother, $bind, $inher) :-
+  append($head, $mother, $inhers),
+  find_and_delete_all($inhers, $bind, $inher).
+
+nonlocal_principle <- [pred].
+nonlocal_principle($head, $nonhead, $mother) :-
+  $head
+    = SYNSEM\NONLOCAL\
+      ( INHER\
+        ( CLSTORE\$h_inher_cl
+        )
+      & TOBIND\
+        ( CLSTORE\$h_bind_cl
+        )
+      ),
+  $nonhead
+    = SYNSEM\NONLOCAL\INHER\
+      ( CLSTORE\$n_inher_cl
+      ),
+  $mother
+    = SYNSEM\NONLOCAL\
+      ( INHER\
+        ( CLSTORE\$m_inher_cl
+        )
+      & TOBIND\
+        ( CLSTORE\[]
+        )
+      ),
+  nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $m_inher_cl).
+
 phonology_principle_binary <- [pred].
 phonology_principle_binary($left, $right, $mother) :-
   $left = (PHONOLOGY\$leftphon & LEXICON\$leftlex),
@@ -255,8 +292,9 @@ phonology_principle_unary($dtr, $mother) :-
 % clr = clitic resolution? (plus/minus)
 principles <- [pred].
 principles($schema, $left, $right, $mother, $clr) :-
-  id_principle($schema, $left, $right, $head, _, $mother, $clr),
+  id_principle($schema, $left, $right, $head, $nonhead, $mother, $clr),
   % TODO cl_principle
+  nonlocal_principle($head, $nonhead, $mother),
   head_feature_principle($head, $mother).
 
 

@@ -82,19 +82,23 @@ recognise($wlist,
           )
         & CLITIC\$clitic
         )
-      & CONT\INDEX\NUMBER\$number
+      & CONT\INDEX\
+        ( NUMBER\$number
+        & GENDER\$gender
+        )
       ),
     $lemma) :-
-  morph_number($wlist, $number, $wlist1),
-  morph_case($wlist1, $case, $wlist2),
-  (match($wlist2, "cl", $wlist3)
+  morph_gender($wlist, $gender, $wlist1),
+  morph_number($wlist1, $number, $wlist2),
+  morph_case($wlist2, $case, $wlist3),
+  (match($wlist3, "cl", $wlist4)
     -> member([$case, $clitic],
         [ [dat, cl_dat]
         , [gen, cl_accgen]
         , [acc, cl_accgen]
         ])
-    ; ($clitic = not_clitic, $wlist2 = $wlist3)),
-  match($wlist3, "-", $lemma).
+    ; ($clitic = not_clitic, $wlist3 = $wlist4)),
+  match($wlist4, "-", $lemma).
 
 % ADJECTIVE: bijela: bijel-apln; zeleni: zelen-nsgmd
 recognise($wlist,
