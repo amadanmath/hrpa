@@ -46,7 +46,8 @@ assure_nocl(plus, SYNSEM\LOCAL\CAT\CLITIC\_).
 assure_nocl(_, SYNSEM\LOCAL\CAT\CLITIC\not_clitic).
 
 
-% on top level (PREDICATE\plus), allow either order
+% if this is a predicate candidate with scrambling possibility,
+% allow either order
 % others are head-first (e.g. PREP-comp, NOUN-comp)
 scrambling_order <- [pred].
 scrambling_order($first, $second, $head, $comp) :-
@@ -104,7 +105,7 @@ head_comp_schema_rule($head, $comp, $head, $comp, $mother, $clr) :-
 
 comp_head_schema_rule <- [pred].
 comp_head_schema_rule($comp, $head, $head, $comp, $mother, $clr) :-
-  $head = SYNSEM\LOCAL\CAT\HEAD\PREDICATE\plus,
+  $head = SYNSEM\LOCAL\CAT\HEAD\SCRAMBLES\plus,
   head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
 % TODO change:
@@ -156,16 +157,19 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
       & MOD_DTR\$mod
       ).
 
-head_verb_schema_rule <- [pred].
-head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
-  assure_nocl($clr, $head),
+aux_verb_schema_rule <- [pred].
+aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother, $clr) :-
+  assure_nocl($clr, $aux),
   assure_nocl(minus, $verb), % verb can't ever be a clitic
-  $head
-    = SYNSEM\LOCAL\CAT\VAL\
-      ( AUX\$headaux
-      & SPR\$headspr
-      & MOD\$headmod
-      & SUBJ\$subj
+  $aux
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\$auxhead
+      & VAL\
+        ( AUX\$auxaux
+        & SPR\$auxspr
+        & MOD\$auxmod
+        & SUBJ\$subj
+        )
       ),
   $verb
     = SYNSEM\
@@ -179,18 +183,21 @@ head_verb_schema_rule($head, $verb, $head, $verb, $mother, $clr) :-
           )
         )
       ),
-  member([$verbsynsem, $mothersynsem], $headaux),
+  member([$verbsynsem, $mothersynsem], $auxaux),
   $mother = SYNSEM\$mothersynsem,
   $mother
-    = SYNSEM\LOCAL\CAT\VAL\
-      ( COMPS\$verbcomps
-      & AUX\[] % aux is always left
-      & SPR\$headspr % TODO check when writing SPR rules!
-      & MOD\$headmod % TODO verify!
-      & SUBJ\$subj
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\$auxhead
+      & VAL\
+        ( COMPS\$verbcomps
+        & AUX\[] % aux is always left
+        & SPR\$auxspr % TODO check when writing SPR rules!
+        & MOD\$auxmod % TODO verify!
+        & SUBJ\$subj
+        )
       )
     & DTRS\
-      ( HEAD_DTR\$head
+      ( AUX_DTR\$aux
       & VERB_DTR\$verb
       ).
 
@@ -213,14 +220,9 @@ head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
       ),
   $cl = SYNSEM\LOCAL\CAT\CLITIC\($cltype & is_clitic),
   \+ cl_member($cltype, $clstore), % no two clitics of same type, no order violations!
+  % NONLOCAL handled in nonlocal_bind, as usual
   $mother
-    = SYNSEM\
-      ( LOCAL\$local
-      & NONLOCAL\INHER\CLSTORE\
-        [ $cl
-        | $clstore
-        ]
-      )
+    = SYNSEM\LOCAL\$local
     & DTRS\
       ( HEAD_DTR\$head
       & CL_DTR\$cl
@@ -234,8 +236,8 @@ id_principle(comp_head_schema, $left, $right, $head, $comp, $mother, $clr) :-
   comp_head_schema_rule($left, $right, $head, $comp, $mother, $clr).
 id_principle(head_mod_schema, $left, $right, $head, $mod, $mother, $clr) :-
   head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr).
-id_principle(head_verb_schema, $left, $right, $head, $verb, $mother, $clr) :-
-  head_verb_schema_rule($left, $right, $head, $verb, $mother, $clr).
+id_principle(aux_verb_schema, $left, $right, $head, $verb, $mother, $clr) :-
+  aux_verb_schema_rule($left, $right, $head, $verb, $mother, $clr).
 id_principle(head_cl_schema, $left, $right, $head, $verb, $mother, minus) :-
   head_cl_schema_rule($left, $right, $head, $verb, $mother).
 
@@ -327,15 +329,15 @@ fill_defaults($sign) :-
   default($val, AUX\, [], [_]),
   default($inher, CLSTORE\, [], [_]),
   default($tobind, CLSTORE\, [], [_]),
-  (($head = verb) ->
-      default($head, PREDICATE\, plus, minus) ;
-      default($head, PREDICATE\, minus, plus)).
+  default($head, SCRAMBLES\, minus, plus),
+  default($head, PREDICATE\, cannot_pred, is_pred).
 
 % interface for UP
 % ================
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
+      %DEBUG print(["LEFT",$left]),print(["RIGHT",$right]),
   principles($schema, $left, $right, $mother, minus),
   $dcp = phonology_principle_binary($left, $right, $mother)
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
@@ -376,7 +378,15 @@ lexical_entry($word, LEX_WORD\$word & LEX_TEMPLATE\$sign) :-
 lexical_entry_sign(LEX_TEMPLATE\$sign, $sign).
 
 %　Valid root sign: no unfilled dependencies
-root_sign(SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & VAL\(SPR\$spec & COMPS\$comps & MOD\$mod))) :-
+root_sign(S) :-
+  S = SYNSEM\LOCAL\CAT\
+      ( HEAD\PREDICATE\$pred
+      & VAL\
+        ( SPR\$spec
+        & COMPS\$comps & MOD\$mod
+        )
+      ),
+  \+ $pred = isnot_pred,
   only_optional($spec),
   only_optional($comps),
   only_optional($mod).

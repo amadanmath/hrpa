@@ -5,6 +5,15 @@ bool <- [bot].
 plus <- [bool].
 minus <- [bool].
 
+predicate <- [bot].
+isnot_pred <- [predicate].
+knownif_pred <- [predicate].
+could_pred <- [predicate].
+must_pred <- [could_pred].
+didnot_pred <- [isnot_pred, could_pred].
+is_pred <- [knownif_pred].
+cannot_pred <- [isnot_pred, knownif_pred].
+
 slash <- [bot]. % TODO add here!
 
 % CLITIC GROUP ORDER
@@ -19,7 +28,7 @@ cl_self <- [cl_accgen].
 cl_aux3 <- [cl_self].
 
 % phrase
-head <- [bot] + [PREDICATE\bool].
+head <- [bot] + [PREDICATE\predicate, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
 cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic].
 cont <- [bot] + [RELS\list, HCONS\list].
@@ -33,19 +42,20 @@ schema <- [bot].
 head_comp_schema <- [schema].
 comp_head_schema <- [schema].
 head_mod_schema <- [schema].
-head_verb_schema <- [schema].
+aux_verb_schema <- [schema].
 head_cl_schema <- [schema].
 head_mark_schema <- [schema].
 
-head_str <- [bot] + [HEAD_DTR\sign].
+dtrs <- [bot].
+head_str <- [dtrs] + [HEAD_DTR\sign].
 head_comp_str <- [head_str] + [COMP_DTR\sign].
 head_mod_str <- [head_str] + [MOD_DTR\sign].
-head_verb_str <- [head_str] + [VERB_DTR\sign].
+aux_verb_str <- [dtrs] + [AUX_DTR\sign, VERB_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
 head_mark_str <- [head_str] + [MARK_DTR\sign].
 
 phrase <- [sign].
-binary_phrase <- [phrase] + [DTRS\head_str].
+binary_phrase <- [phrase] + [DTRS\dtrs].
 unary_phrase <- [phrase] + [DTR\sign].
 word <- [sign].
 

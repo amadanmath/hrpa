@@ -5,41 +5,50 @@
 :- ensure_loaded("grammar").
 
 test <- [pred].
+test_line <- [pred].
 
 :- module_implementation.
 
-passed <- [pred].
-passed($line) :-
-  strcat("OK: ", $line, $str),
+print_stdout <- [pred].
+print_stdout($str) :-
   stdout_stream($out),
   writeln_string($out, $str).
 
+passed <- [pred].
+passed($line, $passed) :-
+  strcat("  ", $passed, $str1),
+  strcat($str1, $line, $str),
+  print_stdout($str).
+
 failed <- [pred].
-failed($line) :-
-  strcat("NG: ", $line, $str),
-  stdout_stream($out),
-  writeln_string($out, $str).
+failed($line, $passed) :-
+  strcat("X ", $passed, $str1),
+  strcat($str1, $line, $str),
+  print_stdout($str).
 
 
 check_line_cases <- [pred].
 check_line_cases([], _) :- !. % empty line
-check_line_cases([35 | _], _) :- !. % comment
+check_line_cases([35, 35 | $line], _) :- % printable comment
+  !,
+  listtostr([45, 45, 45, 45 | $line], $str),
+  print_stdout($str).
+check_line_cases([35 | _], _). % non-printable comment
 check_line_cases([42 | $list], $line) :- % bad line
   listtostr($list, $badline),
   (
     parse($badline)
-      -> failed($line)
-      ; passed($line)
+      -> failed($line, "OK ")
+      ; passed($line, "NG ")
   ), !.
 check_line_cases(_, $line) :- % good line
   ( parse($line)
-    -> passed($line)
-    ; failed($line)
+    -> passed($line, "OK ")
+    ; failed($line, "NG ")
   ), !.
 
 
-check_line <- [pred].
-check_line($line) :-
+test_line($line) :-
   strtolist($line, $list),
   check_line_cases($list, $line).
 
@@ -47,7 +56,7 @@ check_line($line) :-
 test_case <- [pred].
 test_case($handle) :-
   readln_string($handle, $line)
-  -> (check_line($line), test_case($handle))
+  -> (test_line($line), test_case($handle))
   ; true.
   
 
@@ -56,4 +65,3 @@ test :-
   test_case($handle),
   close($handle).
 
-:- test.
