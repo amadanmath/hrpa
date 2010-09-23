@@ -157,10 +157,10 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
       & MOD_DTR\$mod
       ).
 
-aux_verb_schema_rule <- [pred].
-aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother, $clr) :-
+aux_other_schema_rule <- [pred].
+aux_other_schema_rule($aux, $other, $aux, $other, $mother, $clr) :-
   assure_nocl($clr, $aux),
-  assure_nocl(minus, $verb), % verb can't ever be a clitic
+  assure_nocl(minus, $other), % other can't ever be a clitic
   $aux
     = SYNSEM\LOCAL\CAT\
       ( HEAD\$auxhead
@@ -171,25 +171,22 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother, $clr) :-
         & SUBJ\$subj
         )
       ),
-  $verb
+  $other
     = SYNSEM\
-      ( $verbsynsem
-      & LOCAL\CAT\
-        ( HEAD\verb
-        & VAL\
-          ( COMPS\$verbcomps
-          & AUX\[] % aux is always left
-          & SUBJ\$subj
-          )
+      ( $othersynsem
+      & LOCAL\CAT\VAL\
+        ( COMPS\$othercomps
+        & AUX\[] % aux is always left
+        & SUBJ\$subj
         )
       ),
-  member([$verbsynsem, $mothersynsem], $auxaux),
+  member([$othersynsem, $mothersynsem], $auxaux),
   $mother = SYNSEM\$mothersynsem,
   $mother
     = SYNSEM\LOCAL\CAT\
       ( HEAD\$auxhead
       & VAL\
-        ( COMPS\$verbcomps
+        ( COMPS\$othercomps
         & AUX\[] % aux is always left
         & SPR\$auxspr % TODO check when writing SPR rules!
         & MOD\$auxmod % TODO verify!
@@ -198,7 +195,7 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother, $clr) :-
       )
     & DTRS\
       ( AUX_DTR\$aux
-      & VERB_DTR\$verb
+      & OTHER_DTR\$other
       ).
 
 cl_member <- [pred].
@@ -236,8 +233,8 @@ id_principle(comp_head_schema, $left, $right, $head, $comp, $mother, $clr) :-
   comp_head_schema_rule($left, $right, $head, $comp, $mother, $clr).
 id_principle(head_mod_schema, $left, $right, $head, $mod, $mother, $clr) :-
   head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr).
-id_principle(aux_verb_schema, $left, $right, $head, $verb, $mother, $clr) :-
-  aux_verb_schema_rule($left, $right, $head, $verb, $mother, $clr).
+id_principle(aux_other_schema, $left, $right, $head, $verb, $mother, $clr) :-
+  aux_other_schema_rule($left, $right, $head, $verb, $mother, $clr).
 id_principle(head_cl_schema, $left, $right, $head, $verb, $mother, minus) :-
   head_cl_schema_rule($left, $right, $head, $verb, $mother).
 

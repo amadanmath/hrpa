@@ -42,7 +42,7 @@ schema <- [bot].
 head_comp_schema <- [schema].
 comp_head_schema <- [schema].
 head_mod_schema <- [schema].
-aux_verb_schema <- [schema].
+aux_other_schema <- [schema].
 head_cl_schema <- [schema].
 head_mark_schema <- [schema].
 
@@ -50,7 +50,7 @@ dtrs <- [bot].
 head_str <- [dtrs] + [HEAD_DTR\sign].
 head_comp_str <- [head_str] + [COMP_DTR\sign].
 head_mod_str <- [head_str] + [MOD_DTR\sign].
-aux_verb_str <- [dtrs] + [AUX_DTR\sign, VERB_DTR\sign].
+aux_other_str <- [dtrs] + [AUX_DTR\sign, OTHER_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
 head_mark_str <- [head_str] + [MARK_DTR\sign].
 

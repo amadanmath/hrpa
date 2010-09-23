@@ -29,7 +29,7 @@ Ivana-nsg biti-3sgp voljeti-nsgfp
 ## double nominative
 *Ivan-nsg on-nsgn jesti-3sga
 
-## locative not assigned
+## locative not assigned (TODO turn into modifier)
 *Ivan-lsg jesti-3sga
 
 ## person mismatch
