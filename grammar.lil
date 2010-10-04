@@ -327,7 +327,7 @@ fill_defaults($sign) :-
   default($inher, CLSTORE\, [], [_]),
   default($tobind, CLSTORE\, [], [_]),
   default($head, SCRAMBLES\, minus, plus),
-  default($head, PREDICATE\, cannot_pred, is_pred).
+  default($head, PREDICATE\, minus, plus).
 
 % interface for UP
 % ================
@@ -377,13 +377,12 @@ lexical_entry_sign(LEX_TEMPLATE\$sign, $sign).
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-
   S = SYNSEM\LOCAL\CAT\
-      ( HEAD\PREDICATE\$pred
+      ( HEAD\PREDICATE\plus
       & VAL\
         ( SPR\$spec
         & COMPS\$comps & MOD\$mod
         )
       ),
-  \+ $pred = isnot_pred,
   only_optional($spec),
   only_optional($comps),
   only_optional($mod).

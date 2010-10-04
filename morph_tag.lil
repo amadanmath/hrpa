@@ -104,7 +104,6 @@ recognise($wlist,
 recognise($wlist,
     SYNSEM\LOCAL\(CAT\(HEAD\(adjective
                            & DEFINITE\$definite
-                           & PREDICATE\could_pred
                            & SCRAMBLES\plus)
                      & VAL\MOD\[LOCAL\(CONT\INDEX\(GENDER\$gender
                                                  & NUMBER\$number)
@@ -119,7 +118,6 @@ recognise($wlist,
 % VERB-INF: raditi: raditi-inf
 recognise($wlist,
     SYNSEM\LOCAL\(CAT\HEAD\(verb
-                          & PREDICATE\could_pred
                           & SCRAMBLES\plus)
                 & CONT\TAM\MOOD\infinitive),
     $lemma) :-
@@ -128,7 +126,6 @@ recognise($wlist,
 % VERB-PARTICIPLE: bila: biti-nsgfa; pretucenog: pretuci-asgmp
 recognise($wlist,
     SYNSEM\LOCAL\(CAT\(HEAD\(verb
-                           & PREDICATE\could_pred
                            & SCRAMBLES\plus)
                      & VAL\SUBJ\[LOCAL\(CONT\INDEX\(GENDER\$gender
                                                   & NUMBER\$number)
@@ -149,7 +146,7 @@ recognise($wlist,
 % VERB: je: biti-cl3sgp; jedoh: jesti-1sga
 recognise($wlist,
     SYNSEM\LOCAL\(CAT\(HEAD\(verb
-                           & PREDICATE\is_pred
+                           & PREDICATE\plus
                            & SCRAMBLES\plus)
                      & CLITIC\$clitic
                      & VAL\SUBJ\[LOCAL\CONT\INDEX\(NUMBER\$number

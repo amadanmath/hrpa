@@ -1,40 +1,52 @@
+##
 ## scrambling
 Ivan-nsg jesti-3sgp
 Ivan-nsg on-asgn jesti-3sga
 Ivan-nsg jesti-3sga on-asgn
 jesti-3sga on-asgn Ivan-nsg
 
+##
 ## complex tense
-Ivan-nsg htjeti-3sgp jesti-inf
 Ivan-nsg biti-3sgp jesti-nsgma
+##   (future only works with clitics? TODO Emphatic?)
+*Ivan-nsg htjeti-3sgp jesti-inf
 
+##
 ## complex tense gender mismatch
 *Ivan-nsg biti-3sgp jesti-nsgfa
 
+##
 ## complex tense case mismatch
 *Ivan-nsg biti-3sgp jesti-dsgma
 
+##
 ## complex tense number mismatch
 *Ivan-nsg biti-3sgp jesti-nplma
 
+##
 ## the sentence must be finite
 *Ivan-nsg jesti-inf
 *Ivan-nsg jesti-nsgfa
 
+##
 ## passive
 Ivan-nsg biti-3sgp voljeti-nsgma Ivana-asg
 Ivana-nsg biti-3sgp voljeti-nsgfp
 *Ivana-nsg biti-3sgp voljeti-nsgfp Ivan-asg
 
+##
 ## double nominative
 *Ivan-nsg on-nsgn jesti-3sga
 
+##
 ## locative not assigned (TODO turn into modifier)
 *Ivan-lsg jesti-3sga
 
+##
 ## person mismatch
 *Ivan-nsg jesti-2sgp
 
+##
 ## complex tense with clitic AUX
 Ivan-nsg biti-cl3sgp voljeti-nsgma Ivana-asg
 Ivana-asg biti-cl3sgp voljeti-nsgma Ivan-nsg
@@ -44,12 +56,14 @@ voljeti-nsgma biti-cl3sgp Ivan-nsg Ivana-asg
 *voljeti-nsgma Ivan-nsg biti-cl3sgp Ivana-asg
 Ivan-nsg htjeti-cl3sgp jesti-inf
 
+##
 ## adjectives
 lijep-nsgf Ivana-nsg jesti-3sgp
 *lijep-nplf Ivana-nsg jesti-3sgp
 *lijep-nsgm Ivana-nsg jesti-3sgp
 *Ivana-nsg lijep-nsgf jesti-3sgp
 
+##
 ## adjectives with adverbs
 jako lijep-nsgf Ivana-nsg jesti-3sgp
 *lijep-nsgf jako Ivana-nsg jesti-3sgp
