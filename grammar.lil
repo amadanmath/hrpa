@@ -63,12 +63,15 @@ head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
   assure_nocl(minus, $head), % head can't ever be a clitic
   $head
     = SYNSEM\LOCAL\
-      ( CAT\VAL\
-        ( COMPS\$headcomps
-        & AUX\[]
-        & SPR\$headspr
-        & MOD\$headmod
-        & SUBJ\$headsubj
+      ( CAT\
+        ( VAL\
+          ( COMPS\$headcomps
+          & AUX\[]
+          & SPR\$headspr
+          & MOD\$headmod
+          & SUBJ\$headsubj
+          )
+        & CLITIC\$cl
         )
       & CONT\$cont
       ),
@@ -85,19 +88,23 @@ head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
   find_and_delete($headcomps, $compsynsem, $mothercomps),
   $mother
     = SYNSEM\LOCAL\
-      ( CAT\VAL\
-        ( COMPS\$mothercomps
-        & AUX\[]
-        & SPR\$headspr
-        & MOD\$headmod
-        & SUBJ\$headsubj
+      ( CAT\
+        ( VAL\
+          ( COMPS\$mothercomps
+          & AUX\[]
+          & SPR\$headspr
+          & MOD\$headmod
+          & SUBJ\$headsubj
+          )
+        & CLITIC\$cl
         )
       & CONT\$cont
       )
     & DTRS\
       ( HEAD_DTR\$head
       & COMP_DTR\$comp
-      ).
+      )
+  .
 
 head_comp_schema_rule <- [pred].
 head_comp_schema_rule($head, $comp, $head, $comp, $mother, $clr) :-
@@ -123,12 +130,15 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
     = SYNSEM\
       ( $headsynsem
       & LOCAL\
-        ( CAT\VAL\
-          ( SPR\$headspec
-          & AUX\[]
-          & COMPS\$headcomps
-          & MOD\$headmod
-          & SUBJ\$headsubj
+        ( CAT\
+          ( VAL\
+            ( SPR\$headspec
+            & AUX\[]
+            & COMPS\$headcomps
+            & MOD\$headmod
+            & SUBJ\$headsubj
+            )
+          & CLITIC\$cl
           )
         & CONT\$cont
         )
@@ -143,12 +153,15 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
   only_optional($modspr),
   $mother
     = SYNSEM\LOCAL\
-      ( CAT\VAL\
-        ( SPR\$headspec
-        & AUX\[]
-        & COMPS\$headcomps
-        & MOD\$headmod
-        & SUBJ\$headsubj 
+      ( CAT\
+        ( VAL\
+          ( SPR\$headspec
+          & AUX\[]
+          & COMPS\$headcomps
+          & MOD\$headmod
+          & SUBJ\$headsubj 
+          )
+        & CLITIC\$cl
         )
       & CONT\$cont
       )
@@ -170,6 +183,7 @@ aux_other_schema_rule($aux, $other, $aux, $other, $mother, $clr) :-
         & MOD\$auxmod
         & SUBJ\$subj
         )
+      & CLITIC\$cl
       ),
   $other
     = SYNSEM\
@@ -180,7 +194,12 @@ aux_other_schema_rule($aux, $other, $aux, $other, $mother, $clr) :-
         & SUBJ\$subj
         )
       ),
+%$aux=LEXICON\$lp,$other=LEXICON\$rp,printAVM([$lp, $rp]),
+%printAVM(["O",$othersynsem]),
+%printAVM(["M",$mothersynsem]),
+%printAVM(["A",$auxaux]),
   member([$othersynsem, $mothersynsem], $auxaux),
+%print(14),
   $mother = SYNSEM\$mothersynsem,
   $mother
     = SYNSEM\LOCAL\CAT\
@@ -192,6 +211,7 @@ aux_other_schema_rule($aux, $other, $aux, $other, $mother, $clr) :-
         & MOD\$auxmod % TODO verify!
         & SUBJ\$subj
         )
+      & CLITIC\$cl
       )
     & DTRS\
       ( AUX_DTR\$aux
@@ -245,9 +265,16 @@ head_feature_principle($head, $mother) :-
   $head = (SYNSEM\LOCAL\CAT\HEAD\$x).
 
 nonlocal_bind <- [pred].
-nonlocal_bind($head, $mother, $bind, $inher) :-
-  append($head, $mother, $inhers),
-  find_and_delete_all($inhers, $bind, $inher).
+nonlocal_bind($inher_head, $inher_nhead, $bind_head, $bind_nhead, $inher) :-
+  find_and_delete_all($inher_head, $bind_nhead, $head),
+  find_and_delete_all($inher_nhead, $bind_head, $nhead),
+  append($head, $nhead, $inher).
+
+cl_nonlocal_bind <- [pred].
+cl_nonlocal_bind($inher_head, $inher_nhead, $bind_head, $bind_nhead, $inher) :-
+  set_difference($inher_head, $bind_nhead, $head),
+  set_difference($inher_nhead, $bind_head, $nhead),
+  append($head, $nhead, $inher).
 
 nonlocal_principle <- [pred].
 nonlocal_principle($head, $nonhead, $mother) :-
@@ -261,8 +288,13 @@ nonlocal_principle($head, $nonhead, $mother) :-
         )
       ),
   $nonhead
-    = SYNSEM\NONLOCAL\INHER\
-      ( CLSTORE\$n_inher_cl
+    = SYNSEM\NONLOCAL\
+      ( INHER\
+        ( CLSTORE\$n_inher_cl
+        )
+      & TOBIND\
+        ( CLSTORE\$n_bind_cl
+        )
       ),
   $mother
     = SYNSEM\NONLOCAL\
@@ -273,7 +305,7 @@ nonlocal_principle($head, $nonhead, $mother) :-
         ( CLSTORE\[]
         )
       ),
-  nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $m_inher_cl).
+  cl_nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $n_bind_cl, $m_inher_cl).
 
 phonology_principle_binary <- [pred].
 phonology_principle_binary($left, $right, $mother) :-
@@ -292,11 +324,8 @@ phonology_principle_unary($dtr, $mother) :-
 principles <- [pred].
 principles($schema, $left, $right, $mother, $clr) :-
   id_principle($schema, $left, $right, $head, $nonhead, $mother, $clr),
-  % TODO cl_principle
   nonlocal_principle($head, $nonhead, $mother),
   head_feature_principle($head, $mother).
-
-
 
 default <- [pred].
 default($fs, $feature, $default, $other) :-
@@ -320,6 +349,11 @@ fill_defaults($sign) :-
         )
       ),
   default($cat, CLITIC\, not_clitic, is_clitic),
+  ($cat = CLITIC\is_clitic
+    -> (default($inher, CLSTORE\, [$sign], []),
+        default($tobind, CLSTORE\, [$sign], []))
+    ;  (default($inher, CLSTORE\, [], [_]),
+        default($tobind, CLSTORE\, [], [_]))),
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
@@ -332,23 +366,31 @@ fill_defaults($sign) :-
 % interface for UP
 % ================
 
+resolve_clitics <- [pred].
+resolve_clitics([], $dtr, $dtr).
+resolve_clitics([$cl | $clitics], $dtr, $mother) :-
+  resolve_clitics($clitics, $dtr, $mother_temp),
+%print("____"),
+  principles(_, $cl, $mother_temp, $mother, plus).
+
+
+
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
       %DEBUG print(["LEFT",$left]),print(["RIGHT",$right]),
-  principles($schema, $left, $right, $mother, minus),
-  $dcp = phonology_principle_binary($left, $right, $mother)
-      %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
-      %,(($left=SYNSEM\LOCAL\CAT\VAL\AUX\$la,
-        %$right=SYNSEM\$rs
-        %,$mother=SYNSEM\LOCAL\CONT\TAM\$mt
-        %,printAVM($la),printAVM(["rsynsem",$rs])
-        %,printAVM(["mtam",$mt])
-         %)->true;true)
-      %DEBUG ,print(["LEFT",$left]),print(["RIGHT",$right])
+  principles($schema, $left, $right, $mother_temp, minus),
+  $dcp = phonology_principle_binary($left, $right, $mother_temp),
+      %DEBUG $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp]),
+      %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
+      %DEBUG print(["MOTHER TEMP",$mother_temp]),
+ 
+  % TODO limit where this can happen
+  $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
+  resolve_clitics($clitics, $mother_temp, $mother)
       %DEBUG ,print(["MOTHER",$mother])
+      %DEBUG ,print(["SCHEMA",$schema])
 .
 
-% unary branching licence (+$schema, +$dtr, -$mother, -$dcp)
 id_schema_unary(_, _, _, _) :- fail.
 
 % translate [he runs] into [[0 1 "he"] [1 2 "runs"]]...

@@ -15,7 +15,7 @@ lexv("pasti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\CASE\nom
+      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
       ]
     )
   & CONT\TAM\FINITE\plus
@@ -28,8 +28,8 @@ lexv("jesti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\CASE\nom
-      , LOCAL\CAT\HEAD\CASE\acc
+      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
+      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
       ]
     )
   & CONT\TAM\FINITE\minus
@@ -42,8 +42,8 @@ lexv("voljeti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\CASE\nom
-      , LOCAL\CAT\HEAD\CASE\acc
+      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
+      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
       ]
     )
   & CONT\TAM\FINITE\minus
@@ -56,8 +56,8 @@ lexv("dovesti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\CASE\nom
-      , LOCAL\CAT\HEAD\CASE\acc
+      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
+      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
       , $DESTINATION
       ]
     )
@@ -65,10 +65,10 @@ lexv("dovesti",
   )
 ) :-
   member($DESTINATION,
-    [ LOCAL\CAT\HEAD\CASE\dat
-    , LOCAL\CAT\HEAD\PFORM\do_gen
-    , LOCAL\CAT\HEAD\PFORM\u_acc
-    , LOCAL\CAT\HEAD\PFORM\k_loc % TODO other preps
+    [ LOCAL\CAT\HEAD\(noun_like & CASE\dat)
+    , LOCAL\CAT\HEAD\(prep & PFORM\do_gen)
+    , LOCAL\CAT\HEAD\(prep & PFORM\u_acc)
+    , LOCAL\CAT\HEAD\(prep & PFORM\k_loc) % TODO other preps
     ]
   ).
 
@@ -81,7 +81,7 @@ lexv("biti", $sign) :-
           ( HEAD\nsverb
           & VAL\
             ( AUX\$aux
-            & SUBJ\[ LOCAL\CAT\HEAD\CASE\nom ]
+            & SUBJ\[ LOCAL\CAT\HEAD\(noun_like & CASE\nom) ]
             )
           )
         & CONT\TAM\$tam
@@ -124,7 +124,7 @@ lexv("biti", $sign) :-
         & VAL\
           ( COMPS\
             [ LOCAL\CAT\HEAD\
-              ( noun
+              ( noun_like
               & CASE\nom
               )
             , $pred
@@ -134,7 +134,7 @@ lexv("biti", $sign) :-
         ),
     ( $pred % copula + NP
         = LOCAL\CAT\HEAD\
-          ( noun
+          ( noun_like
           & CASE\nom
           )
     ; $pred % copula + AP

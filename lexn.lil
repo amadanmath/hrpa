@@ -9,13 +9,16 @@ lexpro <- [pred].
 
 :- module_implementation.
 
-lexn("dječak", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
+lexn("dječak", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine). % boy
+lexn("san", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine). % dream
 
+% names
 lexn("Davor", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
 lexn("Ivan", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
 lexn("Ivana", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
 lexn("Monika", SYNSEM\LOCAL\CONT\INDEX\GENDER\feminine).
 
+% personal pronouns
 lexpro("ja", SYNSEM\LOCAL\CONT\INDEX\(PERSON\first & NUMBER\singular)).
 lexpro("ti", SYNSEM\LOCAL\CONT\INDEX\(PERSON\second & NUMBER\singular)).
 lexpro("on", SYNSEM\LOCAL\CONT\INDEX\(PERSON\third & NUMBER\singular)).

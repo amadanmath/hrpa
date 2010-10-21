@@ -36,6 +36,7 @@ head_mod_schema <- [schema].
 aux_other_schema <- [schema].
 head_cl_schema <- [schema].
 head_mark_schema <- [schema].
+cl_resolution_schema <- [schema].
 
 dtrs <- [bot].
 head_str <- [dtrs] + [HEAD_DTR\sign].
@@ -44,6 +45,7 @@ head_mod_str <- [head_str] + [MOD_DTR\sign].
 aux_other_str <- [dtrs] + [AUX_DTR\sign, OTHER_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
 head_mark_str <- [head_str] + [MARK_DTR\sign].
+cl_resolution_str <- [dtrs] + [ONLY_DTR\sign].
 
 phrase <- [sign].
 binary_phrase <- [phrase] + [DTRS\dtrs].
@@ -150,6 +152,7 @@ u_loc <- [pform].
 u_acc <- [pform].
 u_gen <- [pform].
 k_loc <- [pform].
+poput_gen <- [pform].
 
 
 

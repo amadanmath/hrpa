@@ -36,17 +36,40 @@ lexe("u",
 lexe($phon,
   SYNSEM\LOCAL\CAT\
   ( HEAD\PFORM\k_loc
-  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\loc ]
+  & VAL\COMPS\[ LOCAL\CAT\HEAD\(noun_like & CASE\loc) ]
   )
 ) :-
   % TODO rules for selection
   $phon = "k";
   $phon = "ka".
 
+% like
+lexe("poput",
+  SYNSEM\LOCAL\CAT\
+  ( HEAD\PFORM\poput_gen
+  & VAL\
+    ( COMPS\[ LOCAL\CAT\HEAD\(noun_like & CASE\gen) ]
+    & MOD\[ LOCAL\CAT\HEAD\$mod ]
+    )
+  )
+) :-
+  member($mod, [adverb, adjective, noun_like, verb]).
+
 
 % ADVERBS
 
 % today
 lexe("danas",
-  SYNSEM\LOCAL\CAT\VAL\MOD\[ LOCAL\CAT\HEAD\verb ]
+  SYNSEM\LOCAL\CAT\
+  ( HEAD\adverb
+  & VAL\MOD\[ LOCAL\CAT\HEAD\verb ]
+  )
 ).
+
+lexe("jako",
+  SYNSEM\LOCAL\CAT\
+  ( HEAD\adverb
+  & VAL\MOD\[ LOCAL\CAT\HEAD\$mod ]
+  )
+) :-
+  member($mod, [adjective, verb]).
