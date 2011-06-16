@@ -52,6 +52,9 @@ to_pretty <- [pred].
 to_pretty($value, _, $str) :- % bot
   equivalent($value, bot), !,
   $str is "bot".
+to_pretty($value, _, $str) :- % bot list
+  equivalent($value, list), !,
+  $str = "list".
 to_pretty($value, _, $str) :- % integer
   is_integer($value), !,
   inttostr($value, $str).

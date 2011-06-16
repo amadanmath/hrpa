@@ -389,7 +389,7 @@ resolve_clitics([$cl | $clitics], $dtr, $mother) :-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-      print(["LEFT",$left]),print(["RIGHT",$right]),
+      % print(["LEFT",$left]),print(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
       %DEBUG $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp]),
@@ -399,8 +399,8 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
   resolve_clitics($clitics, $mother_temp, $mother)
-      , $mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright,
-      $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
+      , $mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
+      %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
       %DEBUG ,print(["SCHEMA",$schema])
 .
@@ -460,16 +460,12 @@ sentence_to_lattice($sentence, $lattice) :-
   split($sentence, " ", $wordlist),
   make_lattice($wordlist, 0, $lattice).
 
-% translates "runs" into RUNS; unifies morphological data and lexical data.
-lexical_entry <- [pred].
-lexical_entry($word, LEX_WORD\$word & LEX_TEMPLATE\$sign) :-
-  $sign = word & PHONOLOGY\[$word] & LEXICON\[$lemma],
-  word_to_sign($word, $lemma, $sign),
-  fill_defaults($sign).
-
 % fetches the sign from the lexical template
-lexical_entry_sign(LEX_WORD\$base & LEX_TEMPLATE\$template, $sign) :-
-  $sign = bot.
+lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base) & LEX_TEMPLATE\$template, $sign) :-
+  $sign = word & PHONOLOGY\[$word] & LEXICON\[$base],
+  base_and_template_to_sign($base, $template, $sign),
+  pretty([$base, $template, $sign]),
+  fill_defaults($sign).
 
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-

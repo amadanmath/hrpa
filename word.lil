@@ -10,7 +10,7 @@
 :- ensure_loaded("lillib/lists").
 :- ensure_loaded("lillib/strings").
 
-word_to_sign <- [pred].
+base_and_template_to_sign <- [pred].
 
 :- module_implementation.
 
@@ -56,10 +56,10 @@ transform($sign) :-
       overwrite($val, COMPS\, $comps)
     ) ; true).
 
-word_to_sign($word, $lemma, $sign) :- % changeable words (morphology resolution)
-  lemmatise($word, $lemma, $sign),
-  find_word($lemma, $sign),
+
+base_and_template_to_sign($base, $template, $sign) :- % changeable words (morphology resolution)
+  parse_morph($template, $sign),
+  find_word($base, $sign),
   transform($sign).
-word_to_sign($word, $lemma, $sign) :- % unchangeable words (exact match)
-  lexe($word, $sign),
-  $lemma = $word.
+base_and_template_to_sign($base, _, $sign) :- % unchangeable words (exact match)
+  lexe($base, $sign).
