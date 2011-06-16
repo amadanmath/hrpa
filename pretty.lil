@@ -1,0 +1,102 @@
+:- module("pretty").
+:- module_interface.
+
+:- ensure_loaded("lillib/lists").
+
+% pretty(-$value).
+%   pretty prints to standard output
+pretty <- [pred].
+
+% pretty_to(+$stream, -$value).
+%   pretty prints to a stream
+pretty_to <- [pred].
+
+:- module_implementation.
+
+indent <- [pred].
+indent(0, $newline) :- !,
+  listtostr([10], $newline).
+indent($indent, $spaces) :-
+  $subindent is $indent - 1,
+  indent($subindent, $subspaces),
+  strcat($subspaces, "  ", $spaces).
+
+format_line <- [pred].
+format_line($spaces, $line, $header, $str) :-
+  strcat($header, $line, $headered),
+  strcat($headered, $spaces, $str).
+
+format_lines <- [pred].
+format_lines(_, [], _, "").
+format_lines($spaces, [$line | $lines], $header, $str) :-
+  format_line($spaces, $line, $header, $formatted_first),
+  format_lines($spaces, $lines, $header, $formatted_rest),
+  strcat($formatted_first, $formatted_rest, $str).
+
+format_complex <- [pred].
+format_complex($lines, $indent, $head, $separator, $tail, $str) :-
+  $lines = [$first | $rest],
+  indent($indent, $spaces),
+  format_line($spaces, $first, $head, $indented_first),
+  format_lines($spaces, $rest, $separator, $indented_rest),
+  strcat($indented_first, $indented_rest, $unclosed),
+  strcat($unclosed, $tail, $str).
+
+newline_if_compound <- [pred].
+newline_if_compound($feature_value, $backslashed, $next_spaces, $newlined) :-
+  compound($feature_value), !,
+  strcat($backslashed, $next_spaces, $newlined).
+newline_if_compound(_, $backslashed, _, $backslashed).
+
+to_pretty <- [pred].
+to_pretty($value, _, $str) :- % bot
+  equivalent($value, bot), !,
+  $str is "bot".
+to_pretty($value, _, $str) :- % integer
+  is_integer($value), !,
+  inttostr($value, $str).
+to_pretty($value, _, $str) :- % float
+  is_float($value), !,
+  floattostr($value, $str).
+to_pretty($value, _, $str) :- % string
+  is_string($value), !,
+  listtostr([34], $quote),
+  strcat($quote, $value, $unclosed),
+  strcat($unclosed, $quote, $str).
+to_pretty($value, $indent, $str) :- % list
+  type_toptype($value, cons), !,
+  $next_indent is $indent + 1,
+  findall(
+    $line,
+    (
+      member($element, $value),
+      to_pretty($element, $next_indent, $line)
+    ),
+    $lines),
+  format_complex($lines, $indent, "[ ", ", ", "]", $str).
+to_pretty($value, $indent, $str) :- % feature structure
+  $next_indent is $indent + 1,
+  indent($next_indent, $next_spaces),
+  findall(
+    $line,
+    (
+      type_featurelist($value, $features),
+      member($feature, $features),
+      feattostr($feature, $feature_name),
+      follow($value, $feature, $feature_value),
+      to_pretty($feature_value, $next_indent, $feature_pretty),
+      strcat($feature_name, "\", $backslashed),
+      newline_if_compound($feature_value, $backslashed, $next_spaces, $newlined),
+      strcat($newlined, $feature_pretty, $line)
+    ),
+    $lines),
+  format_complex($lines, $indent, "( ", "& ", ")", $str).
+
+
+pretty_to($stream, $value) :-
+  to_pretty($value, 0, $str),
+  writeln_string($stream, $str).
+
+pretty($value) :-
+  stdout_stream($stdout),
+  pretty_to($stdout, $value).

@@ -3,16 +3,20 @@
 
 :- ensure_loaded("lillib/lists").
 :- ensure_loaded("lillib/strings").
+
 :- ensure_loaded("parser").
 :- ensure_loaded("display").
 :- ensure_loaded("no_fom").
+
 :- ensure_loaded("types").
 :- ensure_loaded("word").
 :- ensure_loaded("trees").
 
+:- ensure_loaded("pretty").
 
-% TYPE DECLARATIONS
-% =================
+
+
+
 
 
 :- module_implementation.
@@ -404,16 +408,21 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
 id_schema_unary(_, _, _, _) :- fail.
 
 make_lexent <- [pred].
-make_lexent($base, $template
+make_lexent($word, $base, $template
   , LEXENT\
     ( LEX_TEMPLATE\$template
-    & LEX_WORD\$base
+    & LEX_WORD\
+      ( SURF\$word
+      & BASE\$base
+      )
     )
   & LEXENT_FOM\0.0
   ).
 
 separate_word_and_template_lists <- [pred].
-separate_word_and_template_lists([47 | $template], $revbase, $base, $template) :- % slash
+separate_word_and_template_lists([], $revbase, $base, []) :- % no slash anywhere
+  reverse($revbase, $base), !.
+separate_word_and_template_lists([47 | $template], $revbase, $base, $template) :- % slash found
   reverse($revbase, $base), !.
 separate_word_and_template_lists([$char | $input], $revbase, $base, $template) :-
   separate_word_and_template_lists($input, [$char | $revbase], $base, $template).
@@ -435,7 +444,7 @@ make_lattice([$word | $wordlist],
       [$extent | $lattice]) :-
   $right is $left + 1,
   separate_word_and_template($word, $base, $template),
-  make_lexent($base, $template, $lexent),
+  make_lexent($word, $base, $template, $lexent),
   $extent
     = BEGIN_POSITION\$left
     & END_POSITION\$right
@@ -459,7 +468,8 @@ lexical_entry($word, LEX_WORD\$word & LEX_TEMPLATE\$sign) :-
   fill_defaults($sign).
 
 % fetches the sign from the lexical template
-lexical_entry_sign(LEX_TEMPLATE\$sign, $sign).
+lexical_entry_sign(LEX_WORD\$base & LEX_TEMPLATE\$template, $sign) :-
+  $sign = bot.
 
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-
