@@ -21,7 +21,7 @@ cl_aux3 <- [cl_self].
 % phrase
 head <- [bot] + [PREDICATE\bool, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
-cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic].
+cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic, HEADRIGHT\bool].
 cont <- [bot] + [RELS\list, HCONS\list].
 local <- [bot] + [CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list]. % QSTORE

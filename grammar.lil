@@ -108,22 +108,28 @@ head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
 
 head_comp_schema_rule <- [pred].
 head_comp_schema_rule($head, $comp, $head, $comp, $mother, $clr) :-
+  $mother = SYNSEM\LOCAL\CAT\HEADRIGHT\minus,
   head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
 comp_head_schema_rule <- [pred].
 comp_head_schema_rule($comp, $head, $head, $comp, $mother, $clr) :-
-  $head = SYNSEM\LOCAL\CAT\HEAD\SCRAMBLES\plus,
+  $head
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\SCRAMBLES\plus
+      & HEADRIGHT\$headright
+      ),
+  $mother = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright,
   head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
 % TODO change:
 % if $mod contains head-left branching, branch head-left
 noun_mod_order <- [pred].
-noun_mod_order($left, $right, $head, $mod) :-
-  $right = $head, $left = $mod.
+noun_mod_order($mod & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head, $head, $mod, plus) :- !.
+noun_mod_order($head, $mod, $head, $mod, minus).
 
 head_mod_schema_rule <- [pred].
 head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
-  noun_mod_order($left, $right, $head, $mod),
+  noun_mod_order($left, $right, $head, $mod, $headright),
   assure_nocl($clr, $mod),
   assure_nocl(minus, $head), % head can't ever be a clitic
   $head
@@ -162,6 +168,7 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother, $clr) :-
           & SUBJ\$headsubj 
           )
         & CLITIC\$cl
+        & HEADRIGHT\$headright
         )
       & CONT\$cont
       )
@@ -349,6 +356,7 @@ fill_defaults($sign) :-
         )
       ),
   default($cat, CLITIC\, not_clitic, is_clitic),
+  default($cat, HEADRIGHT\, plus, minus),
   ($cat = CLITIC\is_clitic
     -> (default($inher, CLSTORE\, [$sign], []),
         default($tobind, CLSTORE\, [$sign], []))
@@ -377,7 +385,7 @@ resolve_clitics([$cl | $clitics], $dtr, $mother) :-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-      %DEBUG print(["LEFT",$left]),print(["RIGHT",$right]),
+      print(["LEFT",$left]),print(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
       %DEBUG $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp]),
@@ -387,6 +395,8 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
   resolve_clitics($clitics, $mother_temp, $mother)
+      , $mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright,
+      $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
       %DEBUG ,print(["SCHEMA",$schema])
 .
