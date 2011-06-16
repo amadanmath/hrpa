@@ -11,7 +11,24 @@ pretty <- [pred].
 %   pretty prints to a stream
 pretty_to <- [pred].
 
+complex <- [pred].
+
 :- module_implementation.
+
+complex($value) :- is_integer($value), !, fail.
+complex($value) :- is_float($value), !, fail.
+complex($value) :- is_string($value), !, fail.
+complex($value) :- equivalent($value, bot), !, fail.
+complex($value) :- equivalent($value, list), !, fail.
+complex([$element]) :- \+ complex($element), !, fail.
+complex($value) :-
+  type_featurelist($value, $featurelist),
+  ( $featurelist = [ $feature ]
+    ->  follow($value, $feature, $feature_value), \+ complex($feature_value)
+    ;   $featurelist = []),
+  !, fail.
+complex(_).
+
 
 indent <- [pred].
 indent(0, $newline) :- !,
@@ -42,19 +59,16 @@ format_complex($lines, $indent, $head, $separator, $tail, $str) :-
   strcat($indented_first, $indented_rest, $unclosed),
   strcat($unclosed, $tail, $str).
 
-newline_if_compound <- [pred].
-newline_if_compound($feature_value, $backslashed, $next_spaces, $newlined) :-
-  compound($feature_value), !,
+newline_if_complex <- [pred].
+newline_if_complex($feature_value, $backslashed, $next_spaces, $newlined) :-
+  complex($feature_value), !,
   strcat($backslashed, $next_spaces, $newlined).
-newline_if_compound(_, $backslashed, _, $backslashed).
+newline_if_complex(_, $backslashed, _, $backslashed).
 
 to_pretty <- [pred].
 to_pretty($value, _, $str) :- % bot
   equivalent($value, bot), !,
   $str is "bot".
-to_pretty($value, _, $str) :- % bot list
-  equivalent($value, list), !,
-  $str = "list".
 to_pretty($value, _, $str) :- % integer
   is_integer($value), !,
   inttostr($value, $str).
@@ -66,6 +80,15 @@ to_pretty($value, _, $str) :- % string
   listtostr([34], $quote),
   strcat($quote, $value, $unclosed),
   strcat($unclosed, $quote, $str).
+to_pretty($value, _, $str) :- % list type
+  equivalent($value, list), !,
+  $str = "list".
+to_pretty($value, _, $str) :- % list, 1 simple element
+  $value = [$element],
+  \+ complex($element), !,
+  to_pretty($element, 0, $pretty),
+  strcat("[ ", $pretty, $unclosed),
+  strcat($unclosed, " ]", $str).
 to_pretty($value, $indent, $str) :- % list
   type_toptype($value, cons), !,
   $next_indent is $indent + 1,
@@ -77,9 +100,16 @@ to_pretty($value, $indent, $str) :- % list
     ),
     $lines),
   format_complex($lines, $indent, "[ ", ", ", "]", $str).
+to_pretty($value, $indent, $str) :- % feature structure, 1 feature
+  type_featurelist($value, [ $feature ]), !,
+  feattostr($feature, $feature_name),
+  follow($value, $feature, $feature_value),
+  to_pretty($feature_value, $indent, $feature_pretty),
+  strcat($feature_name, "\", $backslashed),
+  strcat($backslashed, $feature_pretty, $str).
 to_pretty($value, $indent, $str) :- % feature structure
   type_nfeature($value, $num_features),
-  $num_features > 0, !,
+  $num_features > 1, !,
   $next_indent is $indent + 1,
   indent($next_indent, $next_spaces),
   findall(
@@ -91,7 +121,7 @@ to_pretty($value, $indent, $str) :- % feature structure
       follow($value, $feature, $feature_value),
       to_pretty($feature_value, $next_indent, $feature_pretty),
       strcat($feature_name, "\", $backslashed),
-      newline_if_compound($feature_value, $backslashed, $next_spaces, $newlined),
+      newline_if_complex($feature_value, $backslashed, $next_spaces, $newlined),
       strcat($newlined, $feature_pretty, $line)
     ),
     $lines),
