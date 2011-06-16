@@ -2,8 +2,8 @@
   * @module    = mayz:display
   * @copyright = Copyright (c) 2005, Tsujii Laboratory, The University of Tokyo.
   * @copyright = All rights reserved.
-  * @cvs       = $Id: display.lil,v 1.1.1.1 2007/04/17 12:12:25 yusuke Exp $
-  * @version   = Time-stamp: <2005-06-21 19:37:54 yusuke>
+  * @cvs       = $Id: display.lil,v 1.2 2009/12/17 05:06:52 yusuke Exp $
+  * @version   = Time-stamp: <2009-12-17 12:24:58 yusuke>
   * @desc      = Interface for pretty printing
   **********************************************************************
 %*/
@@ -20,7 +20,8 @@
   * @param     = -$Label/string: string to express lexical entry template
   * @desc      = display a name of a lexical entry template in a string
 %*/
-lex_template_label <- [pred].
+%% OBSOLETE
+%%lex_template_label <- [pred].
 
 %/**
   * @interface = word_label(+$Word, -$Label)
@@ -36,7 +37,8 @@ word_label <- [pred].
   * @param     = -$Label/string: string to express lexicon key
   * @desc      = display a lexicon key in a string
 %*/
-lexicon_key_label <- [pred].
+%% OBSOLETE
+%%lexicon_key_label <- [pred].
 
 %% Interface to display parse results
 

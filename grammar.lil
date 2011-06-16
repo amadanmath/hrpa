@@ -5,11 +5,11 @@
 :- ensure_loaded("lillib/strings").
 :- ensure_loaded("parser").
 :- ensure_loaded("display").
+:- ensure_loaded("no_fom").
 :- ensure_loaded("types").
 :- ensure_loaded("word").
 :- ensure_loaded("trees").
 
-lex_entry <- [bot] + [LEX_WORD\bot, LEX_TEMPLATE\bot].
 
 % TYPE DECLARATIONS
 % =================
@@ -403,21 +403,56 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
 
 id_schema_unary(_, _, _, _) :- fail.
 
+make_lexent <- [pred].
+make_lexent($base, $template
+  , LEXENT\
+    ( LEX_TEMPLATE\$template
+    & LEX_WORD\$base
+    )
+  & LEXENT_FOM\0.0
+  ).
+
+separate_word_and_template_lists <- [pred].
+separate_word_and_template_lists([47 | $template], $revbase, $base, $template) :- % slash
+  reverse($revbase, $base), !.
+separate_word_and_template_lists([$char | $input], $revbase, $base, $template) :-
+  separate_word_and_template_lists($input, [$char | $revbase], $base, $template).
+
+% translate 'Ivan/Nnsgm' into 'Ivan', 'Nnsgm'
+separate_word_and_template <- [pred].
+separate_word_and_template($input, $base, $template) :-
+  strtolist($input, $inputlist),
+  separate_word_and_template_lists($inputlist, [], $baselist, $templatelist),
+  listtostr($baselist, $base),
+  listtostr($templatelist, $template).
+
 % translate [he runs] into [[0 1 "he"] [1 2 "runs"]]...
-make_word_lattice <- [pred].
-make_word_lattice([], _, []).
-make_word_lattice([$word | $wordlist],
+% hack (only one lexent per word)
+make_lattice <- [pred].
+make_lattice([], _, []).
+make_lattice([$word | $wordlist],
       $left,
-      [left_position\$left & right_position\$right & word\$word | $lattice]) :-
+      [$extent | $lattice]) :-
   $right is $left + 1,
-  make_word_lattice($wordlist, $right, $lattice).
+  separate_word_and_template($word, $base, $template),
+  make_lexent($base, $template, $lexent),
+  $extent
+    = BEGIN_POSITION\$left
+    & END_POSITION\$right
+    & LEXENT_LIST\[$lexent],
+  make_lattice($wordlist, $right, $lattice).
+
+strlist_to_word([$word, $base], _, _, SURF\$word & BASE\$base).
+word_to_strlist(SURF\$word & BASE\$base, [$word, $base]).
+
 
 % translate "he runs" into [[0 1 "he"] [1 2 "runs"]]...
-sentence_to_word_lattice($sentence, $lattice) :-
+sentence_to_lattice($sentence, $lattice) :-
   split($sentence, " ", $wordlist),
-  make_word_lattice($wordlist, 0, $lattice).
+  make_lattice($wordlist, 0, $lattice).
 
 % translates "runs" into RUNS; unifies morphological data and lexical data.
+lexical_entry <- [pred].
 lexical_entry($word, LEX_WORD\$word & LEX_TEMPLATE\$sign) :-
   $sign = word & PHONOLOGY\[$word] & LEXICON\[$lemma],
   word_to_sign($word, $lemma, $sign),
@@ -443,10 +478,6 @@ reduce_sign($sign, $sign, _) :-
   % TODO not sure if this is needed / advisable
   % restriction($sign, DTRS\).
   true.
-
-word_to_lookup_keys(_, _) :- fail.
-lex_template_to_string(_, _) :- fail.
-string_to_lex_template(_, _) :- fail.
 
 parser_init :-
   set_limit_sentence_length(40),

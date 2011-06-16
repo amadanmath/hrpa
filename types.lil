@@ -1,6 +1,8 @@
 :- module("types").
 :- module_interface.
 
+sample_word <- [bot] + [SURF\string, BASE\string].
+
 bool <- [bot].
 plus <- [bool].
 minus <- [bool].
