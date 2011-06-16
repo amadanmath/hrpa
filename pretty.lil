@@ -75,6 +75,8 @@ to_pretty($value, $indent, $str) :- % list
     $lines),
   format_complex($lines, $indent, "[ ", ", ", "]", $str).
 to_pretty($value, $indent, $str) :- % feature structure
+  type_nfeature($value, $num_features),
+  $num_features > 0, !,
   $next_indent is $indent + 1,
   indent($next_indent, $next_spaces),
   findall(
@@ -91,6 +93,10 @@ to_pretty($value, $indent, $str) :- % feature structure
     ),
     $lines),
   format_complex($lines, $indent, "( ", "& ", ")", $str).
+to_pretty($value, _, $str) :- % plain type
+  type_toptype($value, $type),
+  typetostr($type, $str).
+  
 
 
 pretty_to($stream, $value) :-
