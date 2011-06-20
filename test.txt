@@ -1,71 +1,76 @@
 ##
+## gender is optional in nouns
+Ivan/Nnsg jesti/V3sgp
+Ivan/Nnsgm jesti/V3sgp
+
+##
 ## scrambling
-Ivan/nsg jesti/3sgp
-Ivan/nsg on/asgn jesti/3sga
-Ivan/nsg jesti/3sga on/asgn
-jesti/3sga on/asgn Ivan/nsg
+Ivan/Nnsg jesti/V3sgp
+Ivan/Nnsg on/Sasgn jesti/V3sga
+Ivan/Nnsg jesti/V3sga on/Sasgn
+jesti/V3sga on/Sasgn Ivan/Nnsg
 
 ##
 ## complex tense
-Ivan/nsg biti/3sgp jesti/nsgma
+Ivan/Nnsg biti/V3sgp jesti/Vnsgma
 ##   (future only works with clitics? TODO Emphatic?)
-*Ivan/nsg htjeti/3sgp jesti/inf
+*Ivan/Nnsg htjeti/V3sgp jesti/Vinf
 
 ##
 ## complex tense gender mismatch
-*Ivan/nsg biti/3sgp jesti/nsgfa
+*Ivan/Nnsg biti/V3sgp jesti/Vnsgfa
 
 ##
 ## complex tense case mismatch
-*Ivan/nsg biti/3sgp jesti/dsgma
+*Ivan/Nnsg biti/V3sgp jesti/Vdsgma
 
 ##
 ## complex tense number mismatch
-*Ivan/nsg biti/3sgp jesti/nplma
+*Ivan/Nnsg biti/V3sgp jesti/Vnplma
 
 ##
 ## the sentence must be finite
-*Ivan/nsg jesti/inf
-*Ivan/nsg jesti/nsgfa
+*Ivan/Nnsg jesti/Vinf
+*Ivan/Nnsg jesti/Vnsgfa
 
 ##
 ## passive
-Ivan/nsg biti/3sgp voljeti/nsgma Ivana/asg
-Ivana/nsg biti/3sgp voljeti/nsgfp
-*Ivana/nsg biti/3sgp voljeti/nsgfp Ivan/asg
+Ivan/Nnsg biti/V3sgp voljeti/Vnsgma Ivana/Nasg
+Ivana/Nnsg biti/V3sgp voljeti/Vnsgfp
+*Ivana/Nnsg biti/V3sgp voljeti/Vnsgfp Ivan/Nasg
 
 ##
 ## double nominative
-*Ivan/nsg on/nsgn jesti/3sga
+*Ivan/Nnsg on/Snsgn jesti/V3sga
 
 ##
 ## locative not assigned (TODO turn into modifier)
-*Ivan/lsg jesti/3sga
+*Ivan/Nlsg jesti/V3sga
 
 ##
 ## person mismatch
-*Ivan/nsg jesti/2sgp
+*Ivan/Nnsg jesti/V2sgp
 
 ##
 ## complex tense with clitic AUX
-Ivan/nsg biti/cl3sgp voljeti/nsgma Ivana/asg
-Ivana/asg biti/cl3sgp voljeti/nsgma Ivan/nsg
-Ivana/asg biti/cl3sgp Ivan/nsg voljeti/nsgma
-voljeti/nsgma biti/cl3sgp Ivan/nsg Ivana/asg
-*biti/cl3sgp voljeti/nsgma Ivan/nsg Ivana/asg
-*voljeti/nsgma Ivan/nsg biti/cl3sgp Ivana/asg
-Ivan/nsg htjeti/cl3sgp jesti/inf
+Ivan/Nnsg biti/Vcl3sgp voljeti/Vnsgma Ivana/Nasg
+Ivana/Nasg biti/Vcl3sgp voljeti/Vnsgma Ivan/Nnsg
+Ivana/Nasg biti/Vcl3sgp Ivan/Nnsg voljeti/Vnsgma
+voljeti/Vnsgma biti/Vcl3sgp Ivan/Nnsg Ivana/Nasg
+*biti/Vcl3sgp voljeti/Vnsgma Ivan/Nnsg Ivana/Nasg
+*voljeti/Vnsgma Ivan/Nnsg biti/Vcl3sgp Ivana/Nasg
+Ivan/Nnsg htjeti/Vcl3sgp jesti/Vinf
 
 ##
 ## adjectives
-lijep/nsgf Ivana/nsg jesti/3sgp
-*lijep/nplf Ivana/nsg jesti/3sgp
-*lijep/nsgm Ivana/nsg jesti/3sgp
-*Ivana/nsg lijep/nsgf jesti/3sgp
+lijep/Ansgf Ivana/Nnsg jesti/V3sgp
+*lijep/Anplf Ivana/Nnsg jesti/V3sgp
+*lijep/Ansgm Ivana/Nnsg jesti/V3sgp
+*Ivana/Nnsg lijep/Ansgf jesti/V3sgp
 
 ##
 ## adjectives with adverbs
-jako lijep/nsgf Ivana/nsg jesti/3sgp
-*lijep/nsgf jako Ivana/nsg jesti/3sgp
-Ivana/nsg lijep/nsgf poput san/gsg jesti/3sgp
-*lijep/nsgf poput san/gsg Ivana/nsg jesti/3sgp
+jako lijep/Ansgf Ivana/Nnsg jesti/V3sgp
+*lijep/Ansgf jako Ivana/Nnsg jesti/V3sgp
+Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
+*lijep/Ansgf poput san/Ngsg Ivana/Nnsg jesti/V3sgp
