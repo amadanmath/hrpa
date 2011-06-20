@@ -11,10 +11,10 @@
 :- ensure_loaded("lillib/strings").
 
 base_and_template_to_sign <- [pred].
+find_word <- [pred]. % DEBUG
 
 :- module_implementation.
 
-find_word <- [pred].
 find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\pronoun) :-
   lexpro($lemma, $sign).
 find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\noun) :-

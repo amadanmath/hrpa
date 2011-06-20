@@ -462,9 +462,8 @@ sentence_to_lattice($sentence, $lattice) :-
 
 % fetches the sign from the lexical template
 lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base) & LEX_TEMPLATE\$template, $sign) :-
-  $sign = word & PHONOLOGY\[$word] & LEXICON\[$base],
   base_and_template_to_sign($base, $template, $sign),
-  pretty([$base, $template, $sign]),
+  $sign = LEXICON\[$base] & PHONOLOGY\[$word],
   fill_defaults($sign).
 
 %　Valid root sign: no unfilled dependencies

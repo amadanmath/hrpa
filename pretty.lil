@@ -29,6 +29,7 @@ complex($value) :- is_float($value), !, fail.
 complex($value) :- is_string($value), !, fail.
 complex($value) :- equivalent($value, bot), !, fail.
 complex($value) :- equivalent($value, list), !, fail.
+complex($value) :- equivalent($value, nil), !, fail.
 complex([$element]) :- \+ complex($element), !, fail.
 complex($value) :-
   type_featurelist($value, $featurelist),
@@ -92,6 +93,9 @@ to_pretty($value, _, $str) :- % string
 to_pretty($value, _, $str) :- % list type
   equivalent($value, list), !,
   $str = "list".
+to_pretty($value, _, $str) :- % nil (empty list)
+  equivalent($value, nil), !,
+  $str is "[]".
 to_pretty($value, _, $str) :- % list, 1 simple element
   $value = [$element],
   \+ complex($element), !,
