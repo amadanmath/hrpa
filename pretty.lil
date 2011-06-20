@@ -11,6 +11,15 @@ pretty <- [pred].
 %   pretty prints to a stream
 pretty_to <- [pred].
 
+% pretty_feat(+$feat, -$value).
+%   pretty prints a selected feature to standard output
+pretty_feat <- [pred].
+
+% pretty_feat_to(+$stream, +$feat, -$value).
+%   pretty prints a selected feature to a stream
+pretty_feat_to <- [pred].
+
+
 complex <- [pred].
 
 :- module_implementation.
@@ -139,3 +148,11 @@ pretty_to($stream, $value) :-
 pretty($value) :-
   stdout_stream($stdout),
   pretty_to($stdout, $value).
+
+pretty_feat_to($stream, $feat, $value) :-
+  follow($value, $feat, $feat_value),
+  pretty_to($stream, $feat_value).
+
+pretty_feat($feat, $value) :-
+  follow($value, $feat, $feat_value),
+  pretty($feat_value).
