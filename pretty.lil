@@ -19,8 +19,6 @@ pretty_feat <- [pred].
 %   pretty prints a selected feature to a stream
 pretty_feat_to <- [pred].
 
-shallow_complex <- [pred].
-deep_complex <- [pred].
 
 
 :- module_implementation.
@@ -52,12 +50,7 @@ base_complex($value) :- equivalent($value, bot), !, fail.
 base_complex($value) :- equivalent($value, list), !, fail.
 base_complex($value) :- equivalent($value, nil), !, fail.
 
-shallow_complex($value) :- base_complex($value).
-shallow_complex([$element]) :- \+ deep_complex($element), !, fail.
-shallow_complex($value) :- type_toptype($value, cons), !.
-shallow_complex($value) :-
-  non_default_features($value, [_, _ | _]).
-
+deep_complex <- [pred].
 deep_complex($value) :- base_complex($value).
 deep_complex([$element]) :- \+ deep_complex($element), !, fail.
 deep_complex($value) :- type_toptype($value, cons), !.
@@ -69,7 +62,13 @@ deep_complex($value) :-
       deep_complex($head_value)
     )
   ).
-% complex(_).
+
+shallow_complex <- [pred].
+shallow_complex($value) :- base_complex($value).
+shallow_complex([$element]) :- \+ deep_complex($element), !, fail.
+shallow_complex($value) :- type_toptype($value, cons), !.
+shallow_complex($value) :-
+  non_default_features($value, [_, _ | _]).
 
 
 indent <- [pred].
