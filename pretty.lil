@@ -19,25 +19,57 @@ pretty_feat <- [pred].
 %   pretty prints a selected feature to a stream
 pretty_feat_to <- [pred].
 
+shallow_complex <- [pred].
+deep_complex <- [pred].
 
-complex <- [pred].
 
 :- module_implementation.
 
-complex($value) :- is_integer($value), !, fail.
-complex($value) :- is_float($value), !, fail.
-complex($value) :- is_string($value), !, fail.
-complex($value) :- equivalent($value, bot), !, fail.
-complex($value) :- equivalent($value, list), !, fail.
-complex($value) :- equivalent($value, nil), !, fail.
-complex([$element]) :- \+ complex($element), !, fail.
-complex($value) :-
-  type_featurelist($value, $featurelist),
-  ( $featurelist = [ $feature ]
-    ->  follow($value, $feature, $feature_value), \+ complex($feature_value)
-    ;   $featurelist = []),
-  !, fail.
-complex(_).
+
+default <- [pred].
+default($value, $feature) :-
+  type_copy($value, $copy),
+  follow($copy, $feature, $default_type),
+  follow($value, $feature, $feature_value),
+  equivalent($feature_value, $default_type).
+
+non_default_features <- [pred].
+non_default_features($value, $features) :-
+  findall(
+    $feature,
+    (
+      type_featurelist($value, $features),
+      member($feature, $features),
+      \+ default($value, $feature)
+    ),
+    $features).
+
+base_complex <- [pred].
+base_complex($value) :- is_integer($value), !, fail.
+base_complex($value) :- is_float($value), !, fail.
+base_complex($value) :- is_string($value), !, fail.
+base_complex($value) :- equivalent($value, bot), !, fail.
+base_complex($value) :- equivalent($value, list), !, fail.
+base_complex($value) :- equivalent($value, nil), !, fail.
+
+shallow_complex($value) :- base_complex($value).
+shallow_complex([$element]) :- \+ deep_complex($element), !, fail.
+shallow_complex($value) :- type_toptype($value, cons), !.
+shallow_complex($value) :-
+  non_default_features($value, [_, _ | _]).
+
+deep_complex($value) :- base_complex($value).
+deep_complex([$element]) :- \+ deep_complex($element), !, fail.
+deep_complex($value) :- type_toptype($value, cons), !.
+deep_complex($value) :-
+  non_default_features($value, [$head | $tail]),
+  ( $tail = [_ | _]
+  ; (
+      follow($value, $head, $head_value),
+      deep_complex($head_value)
+    )
+  ).
+% complex(_).
 
 
 indent <- [pred].
@@ -70,10 +102,11 @@ format_complex($lines, $indent, $head, $separator, $tail, $str) :-
   strcat($unclosed, $tail, $str).
 
 newline_if_complex <- [pred].
-newline_if_complex($feature_value, $backslashed, $next_spaces, $newlined) :-
-  complex($feature_value), !,
+newline_if_complex($feature_value, $backslashed, $indent, $next_spaces, $newlined, $next_indent) :-
+  shallow_complex($feature_value), !,
+  $next_indent is $indent + 1,
   strcat($backslashed, $next_spaces, $newlined).
-newline_if_complex(_, $backslashed, _, $backslashed).
+newline_if_complex(_, $backslashed, $indent, _, $backslashed, $indent).
 
 to_pretty <- [pred].
 to_pretty($value, _, $str) :- % bot
@@ -98,7 +131,7 @@ to_pretty($value, _, $str) :- % nil (empty list)
   $str is "[]".
 to_pretty($value, _, $str) :- % list, 1 simple element
   $value = [$element],
-  \+ complex($element), !,
+  \+ deep_complex($element), !,
   to_pretty($element, 0, $pretty),
   strcat("[ ", $pretty, $unclosed),
   strcat($unclosed, " ]", $str).
@@ -130,15 +163,25 @@ to_pretty($value, $indent, $str) :- % feature structure
     (
       type_featurelist($value, $features),
       member($feature, $features),
+      \+ default($value, $feature),
       feattostr($feature, $feature_name),
       follow($value, $feature, $feature_value),
-      to_pretty($feature_value, $next_indent, $feature_pretty),
       strcat($feature_name, "\", $backslashed),
-      newline_if_complex($feature_value, $backslashed, $next_spaces, $newlined),
+      newline_if_complex($feature_value, $backslashed, $indent, $next_spaces, $newlined, $indent_to_use),
+      to_pretty($feature_value, $indent_to_use, $feature_pretty),
       strcat($newlined, $feature_pretty, $line)
     ),
     $lines),
-  format_complex($lines, $indent, "( ", "& ", ")", $str).
+  ($lines = []
+    ->  (
+          type_toptype($value, $type),
+          to_pretty($type, $indent, $str)
+        )
+    ;   ($lines = [$line]
+          ->  $str is $line
+          ;   format_complex($lines, $indent, "( ", "& ", ")", $str)
+        )
+  ).
 to_pretty($value, _, $str) :- % plain type
   type_toptype($value, $type),
   typetostr($type, $str).
