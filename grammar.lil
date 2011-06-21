@@ -389,6 +389,8 @@ resolve_clitics([$cl | $clitics], $dtr, $mother) :-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
+  (equivalent($left, bot) -> print("id_schema_binary left BOT!"); print("id_schema_binary left not bot")),
+  (equivalent($right, bot) -> print("id_schema_binary right BOT!"); print("id_schema_binary right not bot")),
       % print(["LEFT",$left]),print(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
@@ -464,7 +466,9 @@ sentence_to_lattice($sentence, $lattice) :-
 lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base) & LEX_TEMPLATE\$template, $sign) :-
   base_and_template_to_sign($base, $template, $sign),
   $sign = LEXICON\[$base] & PHONOLOGY\[$word],
-  fill_defaults($sign).
+  fill_defaults($sign),
+  (equivalent($sign, bot) -> print("lexical_entry_sign BOT!"); print("lexical_entry_sign not bot"))
+  .
 
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-
