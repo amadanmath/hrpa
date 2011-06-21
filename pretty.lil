@@ -23,6 +23,7 @@ pretty_feat_to <- [pred].
 
 :- module_implementation.
 
+to_pretty <- [pred].
 
 default <- [pred].
 default($value, $feature) :-
@@ -71,6 +72,11 @@ shallow_complex($value) :-
   non_default_features($value, [_, _ | _]).
 
 
+get_index <- [pred].
+get_index($shared, $value, $index) :-
+  member([$shared_value, $index], $shared),
+  identical($shared_value, $value), !.
+
 indent <- [pred].
 indent(0, $newline) :- !,
   listtostr([10], $newline).
@@ -78,6 +84,13 @@ indent($indent, $spaces) :-
   $subindent is $indent - 1,
   indent($subindent, $subspaces),
   strcat($subspaces, "  ", $spaces).
+
+add_index <- [pred].
+add_index($shared, $value, $str, $indexed) :-
+  get_index($shared, $value, $index), !,
+  strcat($index, " & ", $spaced),
+  strcat($spaced, $str, $indexed).
+add_index(_, _, $str, $str).
 
 format_line <- [pred].
 format_line($spaces, $line, $header, $str) :-
@@ -100,59 +113,81 @@ format_complex($lines, $indent, $head, $separator, $tail, $str) :-
   strcat($indented_first, $indented_rest, $unclosed),
   strcat($unclosed, $tail, $str).
 
-newline_if_complex <- [pred].
-newline_if_complex($feature_value, $backslashed, $indent, $next_spaces, $newlined, $next_indent) :-
-  shallow_complex($feature_value), !,
-  $next_indent is $indent + 1,
-  strcat($backslashed, $next_spaces, $newlined).
-newline_if_complex(_, $backslashed, $indent, _, $backslashed, $indent).
-
-to_pretty <- [pred].
-to_pretty($value, _, $str) :- % bot
-  equivalent($value, bot), !,
-  $str is "bot".
-to_pretty($value, _, $str) :- % integer
-  is_integer($value), !,
-  inttostr($value, $str).
-to_pretty($value, _, $str) :- % float
-  is_float($value), !,
-  floattostr($value, $str).
-to_pretty($value, _, $str) :- % string
-  is_string($value), !,
-  listtostr([34], $quote),
-  strcat($quote, $value, $unclosed),
-  strcat($unclosed, $quote, $str).
-to_pretty($value, _, $str) :- % list type
-  equivalent($value, list), !,
-  $str = "list".
-to_pretty($value, _, $str) :- % nil (empty list)
-  equivalent($value, nil), !,
-  $str is "[]".
-to_pretty($value, _, $str) :- % list, 1 simple element
-  $value = [$element],
-  \+ deep_complex($element), !,
-  to_pretty($element, 0, $pretty),
-  strcat("[ ", $pretty, $unclosed),
-  strcat($unclosed, " ]", $str).
-to_pretty($value, $indent, $str) :- % list
-  type_toptype($value, cons), !,
+pretty_list <- [pred].
+pretty_list($shared, $value, $indent, $str) :-
   $next_indent is $indent + 1,
   findall(
     $line,
     (
       member($element, $value),
-      to_pretty($element, $next_indent, $line)
+      to_pretty($element, $next_indent, $line, $shared)
     ),
     $lines),
   format_complex($lines, $indent, "[ ", ", ", "]", $str).
-to_pretty($value, $indent, $str) :- % feature structure, 1 feature
+
+add_index_list <- [pred].
+add_index_list($shared, $value, $indent, $str) :-
+  get_index($shared, $value, $index), !,
+  $next_indent is $indent + 1,
+  pretty_list($shared, $value, $next_indent, $stringified),
+  (shallow_complex($value)
+    ->  format_complex([$index, $stringified], $indent, "( ", "& ", ")", $str)
+    ;   (
+          strcat($index, " & ", $ampersanded),
+          strcat($ampersanded, $stringified, $str)
+        )
+  ).
+add_index_list($shared, $value, $indent, $str) :-
+  pretty_list($shared, $value, $indent, $str).
+
+newline_if_complex <- [pred].
+newline_if_complex($value, $str, $indent, $next_spaces, $newlined, $next_indent) :-
+  shallow_complex($value), !,
+  $next_indent is $indent + 1,
+  strcat($str, $next_spaces, $newlined).
+newline_if_complex(_, $str, $indent, _, $str, $indent).
+
+to_pretty($value, _, $str, $shared) :- % bot
+  equivalent($value, bot), !,
+  add_index($shared, $value, "bot", $str).
+to_pretty($value, _, $str, $shared) :- % integer
+  is_integer($value), !,
+  inttostr($value, $stringified),
+  add_index($shared, $value, $stringified, $str).
+to_pretty($value, _, $str, $shared) :- % float
+  is_float($value), !,
+  floattostr($value, $stringified),
+  add_index($shared, $value, $stringified, $str).
+to_pretty($value, _, $str, $shared) :- % string
+  is_string($value), !,
+  listtostr([34], $quote),
+  strcat($quote, $value, $unclosed),
+  strcat($unclosed, $quote, $stringified),
+  add_index($shared, $value, $stringified, $str).
+to_pretty($value, _, $str, $shared) :- % list type
+  equivalent($value, list), !,
+  add_index($shared, $value, "list", $str).
+to_pretty($value, _, $str, $shared) :- % nil (empty list)
+  equivalent($value, nil), !,
+  add_index($shared, $value, "[]", $str).
+to_pretty($value, _, $str, $shared) :- % list, 1 simple element
+  $value = [$element],
+  \+ deep_complex($element), !,
+  to_pretty($element, 0, $pretty, $shared),
+  strcat("[ ", $pretty, $unclosed),
+  strcat($unclosed, " ]", $stringified),
+  add_index($shared, $value, $stringified, $str).
+to_pretty($value, $indent, $str, $shared) :- % list
+  type_toptype($value, cons), !,
+  add_index_list($shared, $value, $indent, $str).
+to_pretty($value, $indent, $str, $shared) :- % feature structure, 1 feature
   type_featurelist($value, [ $feature ]), !,
   feattostr($feature, $feature_name),
   follow($value, $feature, $feature_value),
-  to_pretty($feature_value, $indent, $feature_pretty),
+  to_pretty($feature_value, $indent, $feature_pretty, $shared),
   strcat($feature_name, "\", $backslashed),
   strcat($backslashed, $feature_pretty, $str).
-to_pretty($value, $indent, $str) :- % feature structure
+to_pretty($value, $indent, $str, $shared) :- % feature structure
   type_nfeature($value, $num_features),
   $num_features > 1, !,
   $next_indent is $indent + 1,
@@ -167,28 +202,44 @@ to_pretty($value, $indent, $str) :- % feature structure
       follow($value, $feature, $feature_value),
       strcat($feature_name, "\", $backslashed),
       newline_if_complex($feature_value, $backslashed, $indent, $next_spaces, $newlined, $indent_to_use),
-      to_pretty($feature_value, $indent_to_use, $feature_pretty),
+      to_pretty($feature_value, $indent_to_use, $feature_pretty, $shared),
       strcat($newlined, $feature_pretty, $line)
     ),
     $lines),
   ($lines = []
     ->  (
           type_toptype($value, $type),
-          typetostr($type, $str)
+          typetostr($type, $stringified),
+          add_index($shared, $value, $stringified, $str)
         )
-    ;   ($lines = [$line]
-          ->  $str is $line
-          ;   format_complex($lines, $indent, "( ", "& ", ")", $str)
+    ;   ($lines = [$stringified]
+          ->  add_index($shared, $value, $stringified, $str)
+          ;   ( get_index($shared, $value, $index)
+                ->  $indexed_lines = [$index | $lines]
+                ;   $indexed_lines = $lines
+              ),
+              format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
         )
   ).
-to_pretty($value, _, $str) :- % plain type
+to_pretty($value, _, $str, $shared) :- % plain type
   type_toptype($value, $type),
-  typetostr($type, $str).
+  typetostr($type, $stringified),
+  add_index($shared, $value, $stringified, $str).
   
 
 
+string_index_list <- [pred].
+string_index_list([], _, []).
+string_index_list([$head | $tail], $index, [[$head, $dollared] | $indexed_tail]) :-
+  inttostr($index, $stringified),
+  strcat("$", $stringified, $dollared),
+  $next_index is $index + 1,
+  string_index_list($tail, $next_index, $indexed_tail).
+
 pretty_to($stream, $value) :-
-  to_pretty($value, 0, $str),
+  sharednodelist($value, $shared),
+  string_index_list($shared, 0, $indexed),
+  to_pretty($value, 0, $str, $indexed),
   writeln_string($stream, $str).
 
 pretty($value) :-
