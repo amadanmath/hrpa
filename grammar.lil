@@ -389,8 +389,8 @@ resolve_clitics([$cl | $clitics], $dtr, $mother) :-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-  (equivalent($left, bot) -> print("id_schema_binary left BOT!"); (print("id_schema_binary left not bot"), pretty_feat($left, PHONOLOGY\))),
-  (equivalent($right, bot) -> print("id_schema_binary right BOT!"); (print("id_schema_binary right not bot"), pretty_feat($right, PHONOLOGY\))),
+  % (equivalent($left, bot) -> print("id_schema_binary left BOT!"); (print("id_schema_binary left not bot"), pretty_feat($left, PHONOLOGY\))),
+  % (equivalent($right, bot) -> print("id_schema_binary right BOT!"); (print("id_schema_binary right not bot"), pretty_feat($right, PHONOLOGY\))),
       % print(["LEFT",$left]),print(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
@@ -410,32 +410,33 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
 id_schema_unary(_, _, _, _) :- fail.
 
 make_lexent <- [pred].
-make_lexent($word, $base, $template
+make_lexent($word, $base, $alt, $template
   , LEXENT\
     ( LEX_TEMPLATE\$template
     & LEX_WORD\
       ( SURF\$word
       & BASE\$base
+      & ALT\$alt
       )
     )
   & LEXENT_FOM\0.0
   ).
 
-separate_word_and_template_lists <- [pred].
-separate_word_and_template_lists([], $revbase, $base, []) :- % no slash anywhere
-  reverse($revbase, $base), !.
-separate_word_and_template_lists([47 | $template], $revbase, $base, $template) :- % slash found
-  reverse($revbase, $base), !.
-separate_word_and_template_lists([$char | $input], $revbase, $base, $template) :-
-  separate_word_and_template_lists($input, [$char | $revbase], $base, $template).
+separate_by_slash_lists <- [pred].
+separate_by_slash_lists([], $revleft, $left, []) :- % no slash anywhere
+  reverse($revleft, $left), !.
+separate_by_slash_lists([47 | $right], $revleft, $left, $right) :- % slash found
+  reverse($revleft, $left), !.
+separate_by_slash_lists([$char | $input], $revleft, $left, $right) :-
+  separate_by_slash_lists($input, [$char | $revleft], $left, $right).
 
 % translate 'Ivan/Nnsgm' into 'Ivan', 'Nnsgm'
-separate_word_and_template <- [pred].
-separate_word_and_template($input, $base, $template) :-
+separate_by_slash <- [pred].
+separate_by_slash($input, $left, $right) :-
   strtolist($input, $inputlist),
-  separate_word_and_template_lists($inputlist, [], $baselist, $templatelist),
-  listtostr($baselist, $base),
-  listtostr($templatelist, $template).
+  separate_by_slash_lists($inputlist, [], $leftlist, $rightlist),
+  listtostr($leftlist, $left),
+  listtostr($rightlist, $right).
 
 % translate [he runs] into [[0 1 "he"] [1 2 "runs"]]...
 % hack (only one lexent per word)
@@ -445,16 +446,33 @@ make_lattice([$word | $wordlist],
       $left,
       [$extent | $lattice]) :-
   $right is $left + 1,
-  separate_word_and_template($word, $base, $template),
-  make_lexent($word, $base, $template, $lexent),
+  separate_by_slash($word, $base, $template),
+  findall(
+    $sign,
+    base_and_template_to_sign($base, $template, $sign),
+    $signs),
+  length($signs, $num_signs),
+  make_num_list(0, $num_signs, $alts),
+  findall(
+    $lexent,
+    (
+      member($alt, $alts),
+      make_lexent($word, $base, $alt, $template, $lexent)
+    ),
+    $lexents),
   $extent
     = BEGIN_POSITION\$left
     & END_POSITION\$right
-    & LEXENT_LIST\[$lexent],
+    & LEXENT_LIST\$lexents,
   make_lattice($wordlist, $right, $lattice).
 
-strlist_to_word([$word, $base], _, _, SURF\$word & BASE\$base).
-word_to_strlist(SURF\$word & BASE\$base, [$word, $base]).
+strlist_to_word([$wordalt, $base], _, _, SURF\$word & BASE\$base & ALT\$alt) :-
+  separate_by_slash($wordalt, $word, $altstr),
+  strtoint($altstr, $alt).
+word_to_strlist(SURF\$word & BASE\$base & ALT\$alt, [$wordalt, $base]) :-
+  inttostr($alt, $altstr),
+  strcat($base, "/", $slashed),
+  strcat($slashed, $altstr, $wordalt).
 
 
 % translate "he runs" into [[0 1 "he"] [1 2 "runs"]]...
@@ -463,12 +481,14 @@ sentence_to_lattice($sentence, $lattice) :-
   make_lattice($wordlist, 0, $lattice).
 
 % fetches the sign from the lexical template
-lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base) & LEX_TEMPLATE\$template, $sign) :-
-  base_and_template_to_sign($base, $template, $sign),
+lexical_entry_sign($l & LEX_WORD\(SURF\$word & BASE\$base & ALT\$alt) & LEX_TEMPLATE\$template, $sign) :-
+  findall(
+    $sign,
+    base_and_template_to_sign($base, $template, $sign),
+    $signs),
+  nth($signs, $alt, $sign),
   $sign = LEXICON\[$base] & PHONOLOGY\[$word],
-  fill_defaults($sign),
-  (equivalent($sign, bot) -> print("lexical_entry_sign BOT!"); (print("lexical_entry_sign not bot"), pretty_feat($sign, PHONOLOGY\)))
-  .
+  fill_defaults($sign).
 
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-
