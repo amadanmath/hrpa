@@ -401,7 +401,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
   resolve_clitics($clitics, $mother_temp, $mother)
-      , $mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
+      %,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
       %DEBUG ,print(["SCHEMA",$schema])

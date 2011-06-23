@@ -13,8 +13,6 @@ jesti/V3sga on/Sasgn Ivan/Nnsg
 ##
 ## complex tense
 Ivan/Nnsg biti/V3sgp jesti/Vnsgma
-##   (future only works with clitics? TODO Emphatic?)
-*Ivan/Nnsg htjeti/V3sgp jesti/Vinf
 
 ##
 ## complex tense gender mismatch
