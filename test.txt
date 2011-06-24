@@ -1,3 +1,7 @@
+*Ivan/Nnsg biti/V3sgp jesti/Vdsgma
+__END__
+
+
 ##
 ## gender is optional in nouns
 Ivan/Nnsg jesti/V3sgp

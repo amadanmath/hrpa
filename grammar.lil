@@ -401,6 +401,10 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
   resolve_clitics($clitics, $mother_temp, $mother)
+  ,pretty_feat($left, PHONOLOGY\)
+  ,pretty_feat($right, PHONOLOGY\)
+  %,pretty($mother)
+  ,pretty("---------------------")
       %,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
@@ -466,13 +470,13 @@ make_lattice([$word | $wordlist],
     & LEXENT_LIST\$lexents,
   make_lattice($wordlist, $right, $lattice).
 
-strlist_to_word([$wordalt, $base], _, _, SURF\$word & BASE\$base & ALT\$alt) :-
-  separate_by_slash($wordalt, $word, $altstr),
+strlist_to_word([$word, $basealt], _, _, SURF\$word & BASE\$base & ALT\$alt) :-
+  separate_by_slash($basealt, $base, $altstr),
   strtoint($altstr, $alt).
-word_to_strlist(SURF\$word & BASE\$base & ALT\$alt, [$wordalt, $base]) :-
+word_to_strlist(SURF\$word & BASE\$base & ALT\$alt, [$word, $basealt]) :-
   inttostr($alt, $altstr),
   strcat($base, "/", $slashed),
-  strcat($slashed, $altstr, $wordalt).
+  strcat($slashed, $altstr, $basealt).
 
 
 % translate "he runs" into [[0 1 "he"] [1 2 "runs"]]...
@@ -481,7 +485,7 @@ sentence_to_lattice($sentence, $lattice) :-
   make_lattice($wordlist, 0, $lattice).
 
 % fetches the sign from the lexical template
-lexical_entry_sign($l & LEX_WORD\(SURF\$word & BASE\$base & ALT\$alt) & LEX_TEMPLATE\$template, $sign) :-
+lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base & ALT\$alt) & LEX_TEMPLATE\$template, $sign) :-
   findall(
     $sign,
     base_and_template_to_sign($base, $template, $sign),
