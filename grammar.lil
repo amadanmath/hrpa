@@ -401,10 +401,10 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
   resolve_clitics($clitics, $mother_temp, $mother)
-  ,pretty_feat($left, PHONOLOGY\)
-  ,pretty_feat($right, PHONOLOGY\)
+  %,pretty_feat($left, PHONOLOGY\)
+  %,pretty_feat($right, PHONOLOGY\)
   %,pretty($mother)
-  ,pretty("---------------------")
+  %,pretty("---------------------")
       %,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
@@ -456,6 +456,7 @@ make_lattice([$word | $wordlist],
     base_and_template_to_sign($base, $template, $sign),
     $signs),
   length($signs, $num_signs),
+  $num_signs \= 0,
   make_num_list(0, $num_signs, $alts),
   findall(
     $lexent,
