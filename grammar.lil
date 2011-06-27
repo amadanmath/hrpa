@@ -379,19 +379,17 @@ fill_defaults($sign) :-
 % ================
 
 resolve_clitics <- [pred].
-resolve_clitics([], $dtr, $dtr).
 resolve_clitics([$cl | $clitics], $dtr, $mother) :-
+  % TODO if it's time to resolve them
   resolve_clitics($clitics, $dtr, $mother_temp),
-%print("____"),
   principles(_, $cl, $mother_temp, $mother, plus).
+resolve_clitics(_, $dtr, $dtr). % TODO remove this crutch when "if it's time" is implemented
 
 
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-  % (equivalent($left, bot) -> print("id_schema_binary left BOT!"); (print("id_schema_binary left not bot"), pretty_feat($left, PHONOLOGY\))),
-  % (equivalent($right, bot) -> print("id_schema_binary right BOT!"); (print("id_schema_binary right not bot"), pretty_feat($right, PHONOLOGY\))),
-      % print(["LEFT",$left]),print(["RIGHT",$right]),
+  %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
       %DEBUG $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp]),
@@ -403,9 +401,10 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   resolve_clitics($clitics, $mother_temp, $mother)
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
-  %,pretty($mother)
+  %,pretty($mother_temp)
+  % ,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
+  %,pretty($mother_temp)
   %,pretty("---------------------")
-      %,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %DEBUG ,print(["MOTHER",$mother])
       %DEBUG ,print(["SCHEMA",$schema])

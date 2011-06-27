@@ -1,3 +1,6 @@
+
+
+
 ##
 ## gender is optional in nouns
 Ivan/Nnsg jesti/V3sgp
@@ -55,9 +58,12 @@ Ivan/Nnsg biti/Vcl3sgp voljeti/Vnsgma Ivana/Nasg
 Ivana/Nasg biti/Vcl3sgp voljeti/Vnsgma Ivan/Nnsg
 Ivana/Nasg biti/Vcl3sgp Ivan/Nnsg voljeti/Vnsgma
 voljeti/Vnsgma biti/Vcl3sgp Ivan/Nnsg Ivana/Nasg
+Ivan/Nnsg htjeti/Vcl3sgp jesti/Vinf
+
+##
+## complex tense, wrong order
 *biti/Vcl3sgp voljeti/Vnsgma Ivan/Nnsg Ivana/Nasg
 *voljeti/Vnsgma Ivan/Nnsg biti/Vcl3sgp Ivana/Nasg
-Ivan/Nnsg htjeti/Vcl3sgp jesti/Vinf
 
 ##
 ## adjectives
@@ -65,6 +71,11 @@ lijep/Ansgf Ivana/Nnsg jesti/V3sgp
 *lijep/Anplf Ivana/Nnsg jesti/V3sgp
 *lijep/Ansgm Ivana/Nnsg jesti/V3sgp
 *Ivana/Nnsg lijep/Ansgf jesti/V3sgp
+
+##
+## 1W order
+lijep/Ansgf biti/Vcl3sgp Ivana/Nnsg jesti/Vnsgfa
+*lijep/Ansgf biti/V3sgp Ivana/Nnsg jesti/Vnsgfa
 
 ##
 ## adjectives with adverbs
