@@ -50,6 +50,7 @@ base_complex($value) :- is_string($value), !, fail.
 base_complex($value) :- equivalent($value, bot), !, fail.
 base_complex($value) :- equivalent($value, list), !, fail.
 base_complex($value) :- equivalent($value, nil), !, fail.
+base_complex($value) :- equivalent($value, nil), !, fail.
 
 deep_complex <- [pred].
 deep_complex($value) :- base_complex($value).
@@ -73,8 +74,8 @@ shallow_complex($value) :-
 
 
 get_index <- [pred].
-get_index($shared, $value, $index) :-
-  member([$shared_value, $index], $shared),
+get_index($shared, $value, $index, $visited) :-
+  member([$shared_value, $index, $visited], $shared),
   identical($shared_value, $value), !.
 
 indent <- [pred].
@@ -87,9 +88,14 @@ indent($indent, $spaces) :-
 
 add_index <- [pred].
 add_index($shared, $value, $str, $indexed) :-
-  get_index($shared, $value, $index), !,
-  strcat($index, " & ", $spaced),
-  strcat($spaced, $str, $indexed).
+  get_index($shared, $value, $index, $visited), !,
+  (equivalent($visited, bot)
+    ->  (
+          $visited = 1,
+          strcat($index, " & ", $spaced),
+          strcat($spaced, $str, $indexed)
+        )
+    ;   $indexed = $index).
 add_index(_, _, $str, $str).
 
 format_line <- [pred].
@@ -113,39 +119,58 @@ format_complex($lines, $indent, $head, $separator, $tail, $str) :-
   strcat($indented_first, $indented_rest, $unclosed),
   strcat($unclosed, $tail, $str).
 
-pretty_list <- [pred].
-pretty_list($shared, $value, $indent, $str) :-
-  $next_indent is $indent + 1,
-  findall(
-    $line,
-    (
-      member($element, $value),
-      to_pretty($element, $next_indent, $line, $shared)
-    ),
-    $lines),
-  format_complex($lines, $indent, "[ ", ", ", "]", $str).
-
-add_index_list <- [pred].
-add_index_list($shared, $value, $indent, $str) :-
-  get_index($shared, $value, $index), !,
-  $next_indent is $indent + 1,
-  pretty_list($shared, $value, $next_indent, $stringified),
-  (shallow_complex($value)
-    ->  format_complex([$index, $stringified], $indent, "( ", "& ", ")", $str)
-    ;   (
-          strcat($index, " & ", $ampersanded),
-          strcat($ampersanded, $stringified, $str)
-        )
-  ).
-add_index_list($shared, $value, $indent, $str) :-
-  pretty_list($shared, $value, $indent, $str).
-
 newline_if_complex <- [pred].
 newline_if_complex($value, $str, $indent, $next_spaces, $newlined, $next_indent) :-
   shallow_complex($value), !,
   $next_indent is $indent + 1,
   strcat($str, $next_spaces, $newlined).
 newline_if_complex(_, $str, $indent, _, $str, $indent).
+
+to_pretty_fs_inner <- [pred].
+to_pretty_fs_inner(_, [], _, _, _, []).
+to_pretty_fs_inner($value, [$feature | $features], $indent, $spaces, $shared, $lines) :-
+  default($value, $feature), !,
+  to_pretty_fs_inner($value, $features, $indent, $spaces, $shared, $lines).
+to_pretty_fs_inner($value, [$feature | $features], $indent, $spaces, $shared, [$line | $lines]) :-
+  feattostr($feature, $feature_name),
+  follow($value, $feature, $feature_value),
+  strcat($feature_name, "\", $backslashed),
+  newline_if_complex($feature_value, $backslashed, $indent, $spaces, $newlined, $indent_to_use),
+  to_pretty($feature_value, $indent_to_use, $feature_pretty, $shared),
+  strcat($newlined, $feature_pretty, $line),
+  to_pretty_fs_inner($value, $features, $indent, $spaces, $shared, $lines).
+
+pretty_list_inner <- [pred].
+pretty_list_inner([], _, _, []).
+pretty_list_inner([$head | $tail], $indent, $shared, [$linehead | $linetail]) :-
+  to_pretty($head, $indent, $linehead, $shared),
+  pretty_list_inner($tail, $indent, $shared, $linetail).
+
+pretty_list <- [pred].
+pretty_list($shared, $value, $indent, $str) :-
+  $next_indent is $indent + 1,
+  pretty_list_inner($value, $next_indent, $shared, $lines),
+  format_complex($lines, $indent, "[ ", ", ", "]", $str).
+
+add_index_to_list <- [pred].
+add_index_to_list($shared, $value, $indent, $str) :-
+  get_index($shared, $value, $index, $visited), !,
+  (equivalent($visited, bot)
+    ->  (
+          $visited = 1,
+          $next_indent is $indent + 1,
+          pretty_list($shared, $value, $next_indent, $stringified),
+          (shallow_complex($value)
+            ->  format_complex([$index, $stringified], $indent, "( ", "& ", ")", $str)
+            ;   (
+                  strcat($index, " & ", $ampersanded),
+                  strcat($ampersanded, $stringified, $str)
+                )
+          )
+        )
+    ;   $str = $index).
+add_index_to_list($shared, $value, $indent, $str) :-
+  pretty_list($shared, $value, $indent, $str).
 
 to_pretty($value, _, $str, $shared) :- % bot
   equivalent($value, bot), !,
@@ -179,7 +204,7 @@ to_pretty($value, _, $str, $shared) :- % list, 1 simple element
   add_index($shared, $value, $stringified, $str).
 to_pretty($value, $indent, $str, $shared) :- % list
   type_toptype($value, cons), !,
-  add_index_list($shared, $value, $indent, $str).
+  add_index_to_list($shared, $value, $indent, $str).
 to_pretty($value, $indent, $str, $shared) :- % feature structure, 1 feature
   type_featurelist($value, [ $feature ]), !,
   feattostr($feature, $feature_name),
@@ -192,33 +217,35 @@ to_pretty($value, $indent, $str, $shared) :- % feature structure
   $num_features > 1, !,
   $next_indent is $indent + 1,
   indent($next_indent, $next_spaces),
-  findall(
-    $line,
-    (
-      type_featurelist($value, $features),
-      member($feature, $features),
-      \+ default($value, $feature),
-      feattostr($feature, $feature_name),
-      follow($value, $feature, $feature_value),
-      strcat($feature_name, "\", $backslashed),
-      newline_if_complex($feature_value, $backslashed, $indent, $next_spaces, $newlined, $indent_to_use),
-      to_pretty($feature_value, $indent_to_use, $feature_pretty, $shared),
-      strcat($newlined, $feature_pretty, $line)
-    ),
-    $lines),
-  ($lines = []
+  type_featurelist($value, $features),
+  ($features = []
     ->  (
           type_toptype($value, $type),
           typetostr($type, $stringified),
           add_index($shared, $value, $stringified, $str)
         )
-    ;   ($lines = [$stringified]
-          ->  add_index($shared, $value, $stringified, $str)
-          ;   ( get_index($shared, $value, $index)
-                ->  $indexed_lines = [$index | $lines]
-                ;   $indexed_lines = $lines
-              ),
-              format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
+    ;   ($features = [_]
+          ->  (
+                print("A"),
+                to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, [$stringified]),
+                add_index($shared, $value, $stringified, $str)
+              )
+          ;   ( get_index($shared, $value, $index, $visited)
+                ->  (equivalent($visited, bot)
+                      ->  (
+                            $visited = 1,
+                            to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
+                            $indexed_lines = [$index | $lines],
+                            format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
+                          )
+                      ;   $str = $index
+                    )
+                ;   (
+                      to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
+                      $indexed_lines = $lines,
+                      format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
+                    )
+              )
         )
   ).
 to_pretty($value, _, $str, $shared) :- % plain type
@@ -230,7 +257,7 @@ to_pretty($value, _, $str, $shared) :- % plain type
 
 string_index_list <- [pred].
 string_index_list([], _, []).
-string_index_list([$head | $tail], $index, [[$head, $dollared] | $indexed_tail]) :-
+string_index_list([$head | $tail], $index, [[$head, $dollared, bot] | $indexed_tail]) :-
   inttostr($index, $stringified),
   strcat("$", $stringified, $dollared),
   $next_index is $index + 1,
