@@ -50,17 +50,6 @@ assure_nocl(plus, SYNSEM\LOCAL\CAT\CLITIC\_).
 assure_nocl(_, SYNSEM\LOCAL\CAT\CLITIC\not_clitic).
 
 
-% if this is a predicate candidate with scrambling possibility,
-% allow either order
-% others are head-first (e.g. PREP-comp, NOUN-comp)
-scrambling_order <- [pred].
-scrambling_order($first, $second, $head, $comp) :-
-  $first = $comp,
-  $second = $head.
-scrambling_order($first, $second, $head, $comp) :-
-  $first = $head,
-  $second = $comp.
-
 head_comp_schema_common_rule <- [pred].
 head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
   assure_nocl($clr, $comp),
@@ -125,10 +114,13 @@ comp_head_schema_rule($comp, $head, $head, $comp, $mother, $clr) :-
   $mother = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright,
   head_comp_schema_common_rule($head, $comp, $mother, $clr).
 
-% TODO change:
-% if $mod contains head-left branching, branch head-left
 noun_mod_order <- [pred].
-noun_mod_order($mod & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head, $head, $mod, plus) :- !.
+% for noun-likes, allow mod-head order ONLY if both are head-right
+noun_mod_order($mod & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head, $mod, plus) :- !.
+% for non-noun-likes, allow mod-head order
+noun_mod_order($mod, $head, $head, $mod, plus) :-
+  \+ $head = SYNSEM\LOCAL\CAT\HEAD\noun_like.
+% for all, also allow the head-mod order (unless cut in the first condition)
 noun_mod_order($head, $mod, $head, $mod, minus).
 
 head_mod_schema_rule <- [pred].
@@ -389,10 +381,10 @@ resolve_clitics(_, $dtr, $dtr). % TODO remove this crutch when "if it's time" is
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-  %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
+      %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   $dcp = phonology_principle_binary($left, $right, $mother_temp),
-      %DEBUG $left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp]),
+      %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
       %DEBUG print(["MOTHER TEMP",$mother_temp]),
  
