@@ -1,0 +1,30 @@
+:- module("pretty_test").
+:- module_interface.
+:- ensure_loaded("pretty").
+
+test <- [pred].
+
+:- module_implementation.
+
+kv <- [bot] + [K\string, V\].
+
+
+test :-
+  pretty("string"),
+  pretty(1),
+  pretty(3.14),
+  pretty(bot),
+  pretty(list),
+  pretty([[], [[]]]),
+  pretty(pretty),
+  pretty(kv),
+  pretty(K\"hello"),
+  pretty(V\1),
+  pretty(K\"hello" & V\1),
+  pretty($kv & K\"recursive" & V\$kv),
+  pretty([K\"kv in array" & V\1, "and a string"]),
+  pretty(K\"array in fs" & V\[1, 2, 3]),
+  pretty([$first & "structure sharing", $second & "in arrays", $first, $second]),
+  pretty(V\V\V\"deep simple value"),
+  pretty(V\V\V\[ "deep simple array value" ]),
+  pretty(V\V\V\[ "deep complex", "array value" ]).
