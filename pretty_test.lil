@@ -27,4 +27,8 @@ test :-
   pretty([$first & "structure sharing", $second & "in arrays", $first, $second]),
   pretty(V\V\V\"deep simple value"),
   pretty(V\V\V\[ "deep simple array value" ]),
-  pretty(V\V\V\[ "deep complex", "array value" ]).
+  pretty(V\V\V\[ "deep complex", "array value" ]),
+  pretty(V\V\V\(K\"deep complex" & V\"fs value" )),
+  pretty_feat(K\"key" & V\"pretty_feat feature", V\),
+  pretty_feat(V\K\"pretty_feat deep feature", [V\, K\]),
+  pretty_feat(kv, K\).
