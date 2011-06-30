@@ -218,34 +218,44 @@ to_pretty($value, $indent, $str, $shared) :- % feature structure
   $next_indent is $indent + 1,
   indent($next_indent, $next_spaces),
   type_featurelist($value, $features),
-  ($features = []
-    ->  (
-          type_toptype($value, $type),
-          typetostr($type, $stringified),
-          add_index($shared, $value, $stringified, $str)
-        )
-    ;   ($features = [_]
+  (get_index($shared, $value, $index, $visited)
+    % shared
+    ->  (equivalent($visited, bot)
           ->  (
-                print("A"),
-                to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, [$stringified]),
-                add_index($shared, $value, $stringified, $str)
+                $visited = 1,
+                to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
+                ($lines = []
+                  % default
+                  ->  (
+                        type_toptype($value, $type),
+                        typetostr($type, $stringified),
+                        add_index($shared, $value, $stringified, $str)
+                      )
+                  ;   ($lines = [$stringified]
+                        ->  add_index($shared, $value, $stringified, $str)
+                        ;   (
+                              $indexed_lines = [$index | $lines],
+                              format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
+                            )
+                      )
+                )
               )
-          ;   ( get_index($shared, $value, $index, $visited)
-                ->  (equivalent($visited, bot)
-                      ->  (
-                            $visited = 1,
-                            to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
-                            $indexed_lines = [$index | $lines],
-                            format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
-                          )
-                      ;   $str = $index
-                    )
-                ;   (
-                      to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
-                      $indexed_lines = $lines,
-                      format_complex($indexed_lines, $indent, "( ", "& ", ")", $str)
-                    )
-              )
+          ;   $str = $index
+        )
+    % not shared
+    ;   (
+          to_pretty_fs_inner($value, $features, $indent, $next_spaces, $shared, $lines),
+          ($lines = []
+            % default
+            ->  (
+                  type_toptype($value, $type),
+                  typetostr($type, $str)
+                )
+            ;   ($lines = [$str]
+                  ->  true
+                  ;   format_complex($lines, $indent, "( ", "& ", ")", $str)
+                )
+          )
         )
   ).
 to_pretty($value, _, $str, $shared) :- % plain type

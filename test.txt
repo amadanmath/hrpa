@@ -82,3 +82,9 @@ Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
 *lijep/Ansgf poput san/Ngsg Ivana/Nnsg jesti/V3sgp
 
 # TODO head-mod with non-nominal head
+
+# TODO questions and fronting
+
+# TODO complements
+
+# TODO conjunctions (particularly sentence-level)
