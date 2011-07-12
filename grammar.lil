@@ -16,6 +16,7 @@
 
 
 
+principles <- [pred].
 
 
 
@@ -53,7 +54,7 @@ assure_nocl(_, SYNSEM\LOCAL\CAT\CLITIC\not_clitic).
 head_comp_schema_common_rule <- [pred].
 head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
   assure_nocl($clr, $comp),
-  assure_nocl(minus, $head), % head can't ever be a clitic
+  assure_nocl($clr, $head),
   $head
     = SYNSEM\LOCAL\
       ( CAT\
@@ -280,14 +281,14 @@ cl_nonlocal_bind($inher_head, $inher_nhead, $bind_head, $bind_nhead, $inher) :-
   append($head, $nhead, $inher).
 
 nonlocal_principle <- [pred].
-nonlocal_principle($head, $nonhead, $mother) :-
+nonlocal_principle($head, $nonhead, $mother, $clr) :-
   $head
     = SYNSEM\NONLOCAL\
       ( INHER\
         ( CLSTORE\$h_inher_cl
         )
       & TOBIND\
-        ( CLSTORE\$h_bind_cl
+        ( bot
         )
       ),
   $nonhead
@@ -296,7 +297,7 @@ nonlocal_principle($head, $nonhead, $mother) :-
         ( CLSTORE\$n_inher_cl
         )
       & TOBIND\
-        ( CLSTORE\$n_bind_cl
+        ( bot
         )
       ),
   $mother
@@ -305,10 +306,18 @@ nonlocal_principle($head, $nonhead, $mother) :-
         ( CLSTORE\$m_inher_cl
         )
       & TOBIND\
-        ( CLSTORE\[]
+        ( bot
         )
       ),
-  cl_nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $n_bind_cl, $m_inher_cl).
+  % special case for clitic resolution: since the node is the same when
+  % a clitic enters the CLSTORE and when it is reattached to the tree,
+  % it cannot avoid bearing the INHER. Thus, a clitic's own INHER acts
+  % as TOBIND, during clitic resolution; there is no separate TOBIND for
+  % CLSTORE.
+  ($clr = plus
+    ->  nonlocal_bind($h_inher_cl, $n_inher_cl, $n_inher_cl, $h_inher_cl, $m_inher_cl)
+    ;   nonlocal_bind($h_inher_cl, $n_inher_cl, [], [], $m_inher_cl)
+  ).
 
 phonology_principle_binary <- [pred].
 phonology_principle_binary($left, $right, $mother) :-
@@ -324,10 +333,9 @@ phonology_principle_unary($dtr, $mother) :-
   $mother = (PHONOLOGY\$phon & LEXICON\$lex).
 
 % clr = clitic resolution? (plus/minus)
-principles <- [pred].
 principles($schema, $left, $right, $mother, $clr) :-
   id_principle($schema, $left, $right, $head, $nonhead, $mother, $clr),
-  nonlocal_principle($head, $nonhead, $mother),
+  nonlocal_principle($head, $nonhead, $mother, $clr),
   head_feature_principle($head, $mother).
 
 default <- [pred].
@@ -355,7 +363,7 @@ fill_defaults($sign) :-
   default($cat, HEADRIGHT\, plus, minus),
   ($cat = CLITIC\is_clitic
     -> (default($inher, CLSTORE\, [$sign], []),
-        default($tobind, CLSTORE\, [$sign], []))
+        default($tobind, CLSTORE\, [], [_]))
     ;  (default($inher, CLSTORE\, [], [_]),
         default($tobind, CLSTORE\, [], [_]))),
   default($val, SPR\, [], [_]),
@@ -374,31 +382,33 @@ resolve_clitics <- [pred].
 resolve_clitics([$cl | $clitics], $dtr, $mother) :-
   % TODO if it's time to resolve them
   resolve_clitics($clitics, $dtr, $mother_temp),
-  principles(_, $cl, $mother_temp, $mother, plus).
+  principles(_, $mother_temp, $cl, $mother, plus).
 resolve_clitics(_, $dtr, $dtr). % TODO remove this crutch when "if it's time" is implemented
 
 
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-      %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
+  %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
+  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$lp, $rp]),
   principles($schema, $left, $right, $mother_temp, minus),
-  $dcp = phonology_principle_binary($left, $right, $mother_temp),
-      %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
+  %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
       %DEBUG print(["MOTHER TEMP",$mother_temp]),
  
   % TODO limit where this can happen
   $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
-  resolve_clitics($clitics, $mother_temp, $mother)
+  resolve_clitics($clitics, $mother_temp, $mother),
+  $dcp = phonology_principle_binary($left, $right, $mother)
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
-  %,pretty($mother_temp)
+  %,pretty(["MOTHER_TEMP",$mother_temp])
   % ,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
   %,pretty($mother_temp)
   %,pretty("---------------------")
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
-      %DEBUG ,print(["MOTHER",$mother])
+      %,print(["MOTHER",$mother])
+      ,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$mothersynsem])
       %DEBUG ,print(["SCHEMA",$schema])
 .
 

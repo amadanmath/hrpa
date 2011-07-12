@@ -24,6 +24,7 @@ test :-
   pretty($kv & K\"recursive" & V\$kv),
   pretty([K\"kv in array" & V\1, "and a string"]),
   pretty(K\"array in fs" & V\[1, 2, 3]),
+  pretty([1, [2, [3, 4], [5, 6], 7], 8]),
   pretty([$first & "structure sharing", $second & "in arrays", $first, $second]),
   pretty(V\V\V\"deep simple value"),
   pretty(V\V\V\[ "deep simple array value" ]),

@@ -1,3 +1,6 @@
+Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
+__END__
+
 ##
 ## gender is optional in nouns
 Ivan/Nnsg jesti/V3sgp
@@ -87,4 +90,16 @@ Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
 
 # TODO complements
 
-# TODO conjunctions (particularly sentence-level)
+# TODO conjunctions (particularly sentence-level)]
+
+##
+## copula
+Ivana/Nnsg biti/V3sgp lijep/Ansgf
+Ivana/Nnsg biti/V3sgp san/Nnsg
+Ivana/Nnsg biti/V3sgp poput san/Ngsg
+
+##
+## copula as a clitic
+Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
+Ivana/Nnsg biti/Vcl3sgp san/Nnsg
+Ivana/Nnsg biti/Vcl3sgp poput san/Ngsg

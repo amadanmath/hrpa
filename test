@@ -1,4 +1,4 @@
 #!/bin/sh
 
-# echo ":- test." | up -i -nofom -l test.lil
-echo ":- test." | up -i -nofom -l test.lil 2>/dev/null
+echo ":- test." | up -i -nofom -l test.lil
+# echo ":- test." | up -i -nofom -l test.lil 2>/dev/null

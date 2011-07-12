@@ -4,10 +4,12 @@
 :- ensure_loaded("grammar").
 :- ensure_loaded("parser").
 :- ensure_loaded("display").
+:- ensure_loaded("pretty").
 
 trees <- [pred].
 printAVMtofile <- [pred].
 treestofile <- [pred].
+pretty_trees <- [pred].
 
 :- module_implementation.
 
@@ -23,6 +25,10 @@ trees(TT) :-
   root_edge_id_list(RR),
   gettreesbyroots(RR, OO),
   remove_duplicates(OO, TT).
+
+pretty_trees :-
+  trees(TT),
+  pretty(TT).
 
 printAVMtofile($avm, $filename) :-
   open_file_stream($filename, "a", $handle),

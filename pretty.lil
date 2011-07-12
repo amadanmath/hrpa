@@ -43,40 +43,15 @@ non_default_features($value, $features) :-
     ),
     $features).
 
-base_complex <- [pred].
-base_complex($value) :- is_integer($value), !, fail.
-base_complex($value) :- is_float($value), !, fail.
-base_complex($value) :- is_string($value), !, fail.
-base_complex($value) :- equivalent($value, bot), !, fail.
-base_complex($value) :- equivalent($value, list), !, fail.
-base_complex($value) :- equivalent($value, nil), !, fail.
-base_complex($value) :- equivalent($value, nil), !, fail.
-
-deep_complex <- [pred].
-deep_complex($value) :- base_complex($value).
-deep_complex([$element]) :- \+ deep_complex($element), !, fail.
-deep_complex($value) :- type_toptype($value, cons), !.
-deep_complex($value) :-
-  non_default_features($value, [$head | $tail]),
-  ( $tail = [_ | _]
-  ; (
-      follow($value, $head, $head_value),
-      deep_complex($head_value)
-    )
-  ).
-
-shallow_complex <- [pred].
-shallow_complex($value) :- base_complex($value).
-shallow_complex([$element]) :- \+ deep_complex($element), !, fail.
-shallow_complex($value) :- type_toptype($value, cons), !.
-shallow_complex($value) :-
-  non_default_features($value, [_, _ | _]).
-
-
 get_index <- [pred].
 get_index($shared, $value, $index, $visited) :-
   member([$shared_value, $index, $visited], $shared),
   identical($shared_value, $value), !.
+
+is_multiline <- [pred].
+is_multiline($str) :-
+  strtolist($str, $list),
+  member(10, $list).
 
 indent <- [pred].
 indent(0, $newline) :- !,
@@ -120,11 +95,10 @@ format_complex($lines, $indent, $head, $separator, $tail, $str) :-
   strcat($unclosed, $tail, $str).
 
 newline_if_complex <- [pred].
-newline_if_complex($value, $str, $indent, $next_spaces, $newlined, $next_indent) :-
-  shallow_complex($value), !,
-  $next_indent is $indent + 1,
+newline_if_complex($str, $next_spaces, $newlined) :-
+  is_multiline($str), !,
   strcat($str, $next_spaces, $newlined).
-newline_if_complex(_, $str, $indent, _, $str, $indent).
+newline_if_complex($str, _, $str).
 
 to_pretty_fs_inner <- [pred].
 to_pretty_fs_inner(_, [], _, _, _, []).
@@ -135,8 +109,9 @@ to_pretty_fs_inner($value, [$feature | $features], $indent, $spaces, $shared, [$
   feattostr($feature, $feature_name),
   follow($value, $feature, $feature_value),
   strcat($feature_name, "\", $backslashed),
-  newline_if_complex($feature_value, $backslashed, $indent, $spaces, $newlined, $indent_to_use),
-  to_pretty($feature_value, $indent_to_use, $feature_pretty, $shared),
+  $next_indent is $indent + 1,
+  to_pretty($feature_value, $next_indent, $feature_pretty, $shared),
+  newline_if_complex($backslashed, $spaces, $newlined),
   strcat($newlined, $feature_pretty, $line),
   to_pretty_fs_inner($value, $features, $indent, $spaces, $shared, $lines).
 
@@ -160,8 +135,9 @@ add_index_to_list($shared, $value, $indent, $str) :-
           $visited = 1,
           $next_indent is $indent + 1,
           pretty_list($shared, $value, $next_indent, $stringified),
-          (shallow_complex($value)
-            ->  format_complex([$index, $stringified], $indent, "( ", "& ", ")", $str)
+          format_complex([$index, $stringified], $indent, "( ", "& ", ")", $stringified),
+          (is_multiline($stringified)
+            ->  $str = $stringified
             ;   (
                   strcat($index, " & ", $ampersanded),
                   strcat($ampersanded, $stringified, $str)
@@ -197,8 +173,8 @@ to_pretty($value, _, $str, $shared) :- % nil (empty list)
   add_index($shared, $value, "[]", $str).
 to_pretty($value, _, $str, $shared) :- % list, 1 simple element
   $value = [$element],
-  \+ deep_complex($element), !,
   to_pretty($element, 0, $pretty, $shared),
+  \+ is_multiline($pretty),
   strcat("[ ", $pretty, $unclosed),
   strcat($unclosed, " ]", $stringified),
   add_index($shared, $value, $stringified, $str).
@@ -253,7 +229,11 @@ to_pretty($value, $indent, $str, $shared) :- % feature structure
                 )
             ;   ($lines = [$str]
                   ->  true
-                  ;   format_complex($lines, $indent, "( ", "& ", ")", $str)
+                  ;   (
+                        format_complex($lines, $indent, "( ", "& ", ")", $unindented),
+                        indent($indent, $spaces),
+                        strcat($spaces, $unindented, $str)
+                      )
                 )
           )
         )
