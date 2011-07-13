@@ -239,8 +239,9 @@ head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
         )
       & NONLOCAL\INHER\CLSTORE\$clstore
       ),
-  $cl = SYNSEM\LOCAL\CAT\CLITIC\($cltype & is_clitic),
+  $cl = SYNSEM\LOCAL\CAT\($clcat & CLITIC\($cltype & is_clitic)),
   \+ cl_member($cltype, $clstore), % no two clitics of same type, no order violations!
+  overwrite($clcat, CLITIC\, not_clitic),
   % NONLOCAL handled in nonlocal_bind, as usual
   $mother
     = SYNSEM\LOCAL\$local
@@ -389,8 +390,9 @@ resolve_clitics(_, $dtr, $dtr). % TODO remove this crutch when "if it's time" is
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
-  %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
-  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$lp, $rp]),
+  %print("--------"),
+  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["START", $lp, $rp]),
+  %printAVM(["LEFT",$left]),printAVM(["RIGHT",$right]),
   principles($schema, $left, $right, $mother_temp, minus),
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
@@ -407,8 +409,9 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %,pretty($mother_temp)
   %,pretty("---------------------")
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
-      %,print(["MOTHER",$mother])
-      ,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$mothersynsem])
+      %,printAVM(["MOTEMP",$mother_temp])
+      %,printAVM(["MOTHER",$mother])
+      %,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$schema,$mothersynsem])
       %DEBUG ,print(["SCHEMA",$schema])
 .
 
