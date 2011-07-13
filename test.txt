@@ -1,5 +1,5 @@
-Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
-__END__
+#Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
+#__END__
 
 ##
 ## gender is optional in nouns

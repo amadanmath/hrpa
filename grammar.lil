@@ -79,7 +79,10 @@ head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
       ),
   only_optional($compcomps),
   only_optional($compspr),
+  %$head = PHONOLOGY\$hp, $comp = PHONOLOGY\$np, print(["YOP", $head, $comp]),
+  %print(["YO", $headcomps, $compsynsem]),
   find_and_delete($headcomps, $compsynsem, $mothercomps),
+  %print("OYO"),
   $mother
     = SYNSEM\LOCAL\
       ( CAT\
@@ -98,6 +101,7 @@ head_comp_schema_common_rule($head, $comp, $mother, $clr) :-
       ( HEAD_DTR\$head
       & COMP_DTR\$comp
       )
+  %,print("YOYO")
   .
 
 head_comp_schema_rule <- [pred].
@@ -378,28 +382,19 @@ fill_defaults($sign) :-
 % interface for UP
 % ================
 
-resolve_clitics <- [pred].
-resolve_clitics([$cl | $clitics], $dtr, $mother) :-
-  % TODO if it's time to resolve them
-  resolve_clitics($clitics, $dtr, $mother_temp),
-  principles(_, $mother_temp, $cl, $mother, plus).
-resolve_clitics(_, $dtr, $dtr). % TODO remove this crutch when "if it's time" is implemented
-
-
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
   %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$lp, $rp]),
-  principles($schema, $left, $right, $mother_temp, minus),
+  principles($schema, $left, $right, $mother, minus),
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
       %DEBUG print(["MOTHER TEMP",$mother_temp]),
  
   % TODO limit where this can happen
-  $mother_temp = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
-  resolve_clitics($clitics, $mother_temp, $mother),
   $dcp = phonology_principle_binary($left, $right, $mother)
+  ,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$lp, $rp])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])
@@ -408,11 +403,22 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %,pretty("---------------------")
       %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
       %,print(["MOTHER",$mother])
-      ,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$mothersynsem])
+      %,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$mothersynsem])
       %DEBUG ,print(["SCHEMA",$schema])
 .
 
-id_schema_unary(_, _, _, _) :- fail.
+% NOTE: resolve each clitic as soon as it can be resolved, and only then.
+% this optimisation might be too strong - it might be cutting some
+% ambiguous parses (like, if there are two possible predicates in a
+% clause?)
+id_schema_unary($schema, $daughter, $mother, $dcp) :-
+  print("UNARY"),
+  $daughter = SYNSEM\NONLOCAL\INHER\CLSTORE\$clitics,
+  member($clitic, $clitics),
+  principles($schema, $daughter, $clitic, $mother, plus), !,
+  ,$daughter=LEXICON\$dp,printAVM(["UNARY",$dp])
+  $dcp = phonology_principle_unary($daughter, $mother).
+
 
 make_lexent <- [pred].
 make_lexent($word, $base, $alt, $template
