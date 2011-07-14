@@ -74,15 +74,12 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
       & LOCAL\CAT\VAL\
         ( SPR\$compspr
         & COMPS\$compcomps
-        & AUX\$compaux
         )
       ),
   only_optional($compcomps),
   only_optional($compspr),
   %$head = PHONOLOGY\$hp, $comp = PHONOLOGY\$np, print(["YOP", $head, $comp]),
-  %print(["YO", $headcomps, $compsynsem]),
   find_and_delete($headcomps, $compsynsem, $mothercomps),
-  %print("OYO"),
   $mother
     = SYNSEM\LOCAL\
       ( CAT\
@@ -101,7 +98,6 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
       ( HEAD_DTR\$head
       & COMP_DTR\$comp
       )
-  %,print("YOYO")
   .
 
 head_comp_schema_rule <- [pred].
@@ -393,7 +389,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$lp, $rp])
+  %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])

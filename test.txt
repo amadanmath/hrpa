@@ -84,6 +84,7 @@ jako lijep/Ansgf Ivana/Nnsg jesti/V3sgp
 Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
 *lijep/Ansgf poput san/Ngsg Ivana/Nnsg jesti/V3sgp
 
+
 # TODO head-mod with non-nominal head
 
 # TODO questions and fronting
@@ -103,3 +104,10 @@ Ivana/Nnsg biti/V3sgp poput san/Ngsg
 Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
 Ivana/Nnsg biti/Vcl3sgp san/Nnsg
 Ivana/Nnsg biti/Vcl3sgp poput san/Ngsg
+
+##
+## prepositions have obligatory complements
+*Ivana/Nnsg biti/V3sgp poput
+*lijep/Ansgf poput Ivana/Nnsg jesti/V3sgp
+*Ivana/Nnsg lijep/Ansgf poput jesti/V3sgp
+*Ivana/Nnsg lijep/Ansgf poput san/Lgsg jesti/V3sgp

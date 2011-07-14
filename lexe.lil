@@ -48,7 +48,14 @@ lexe("poput",
   SYNSEM\LOCAL\CAT\
   ( HEAD\PFORM\poput_gen
   & VAL\
-    ( COMPS\[ LOCAL\CAT\HEAD\(noun_like & CASE\gen) ]
+    ( COMPS\
+      [ ( MAND\plus
+        & LOCAL\CAT\HEAD\
+          ( noun_like
+          & CASE\gen
+          )
+        )
+      ]
     & MOD\[ LOCAL\CAT\HEAD\$mod ]
     )
   )
