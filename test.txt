@@ -78,6 +78,9 @@ lijep/Ansgf biti/Vcl3sgp Ivana/Nnsg jesti/Vnsgfa
 ## adjectives with adverbs
 jako lijep/Ansgf Ivana/Nnsg jesti/V3sgp
 *lijep/Ansgf jako Ivana/Nnsg jesti/V3sgp
+
+##
+## adjectives with non-head-right modifiers
 Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
 *lijep/Ansgf poput san/Ngsg Ivana/Nnsg jesti/V3sgp
 
