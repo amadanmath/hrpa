@@ -70,7 +70,7 @@ lijep/Ansgf Ivana/Nnsg jesti/V3sgp
 *Ivana/Nnsg lijep/Ansgf jesti/V3sgp
 
 ##
-## 1W order
+## 1W order only in clitics
 lijep/Ansgf biti/Vcl3sgp Ivana/Nnsg jesti/Vnsgfa
 *lijep/Ansgf biti/V3sgp Ivana/Nnsg jesti/Vnsgfa
 
@@ -83,9 +83,6 @@ jako lijep/Ansgf Ivana/Nnsg jesti/V3sgp
 ## adjectives with non-head-right modifiers
 Ivana/Nnsg lijep/Ansgf poput san/Ngsg jesti/V3sgp
 *lijep/Ansgf poput san/Ngsg Ivana/Nnsg jesti/V3sgp
-
-
-# TODO head-mod with non-nominal head
 
 # TODO questions and fronting
 
