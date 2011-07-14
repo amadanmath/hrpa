@@ -75,7 +75,6 @@ lexv("dovesti",
 % be (auxiliary, copula)
 lexv("biti", $sign) :-
   (
-%fail, % DEBUG
     $sign
       = SYNSEM\LOCAL\
         ( CAT\
@@ -138,7 +137,6 @@ lexv("biti", $sign) :-
           ( noun_like
           & CASE\nom
           )
-%,fail % DEBUG
     ; $pred % copula + AP
         = LOCAL\CAT\
           ( HEAD\
@@ -152,7 +150,6 @@ lexv("biti", $sign) :-
           ( HEAD\prep
           & VAL\COMPS\[]
           )
-%,fail % DEBUG
     )
   ).
 
