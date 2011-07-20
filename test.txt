@@ -4,11 +4,32 @@ Ivan/Nnsg jesti/V3sgp
 Ivan/Nnsgm jesti/V3sgp
 
 ##
-## scrambling
+## scrambling and pro-drop
+jesti/V3sgp
 Ivan/Nnsg jesti/V3sgp
 Ivan/Nnsg on/Sasgn jesti/V3sga
 Ivan/Nnsg jesti/V3sga on/Sasgn
 jesti/V3sga on/Sasgn Ivan/Nnsg
+
+##
+## nominatives and accusatives are limited
+*Ivan/Nnsg on/Snsgf voljeti/V3sgp
+*Ivan/Nasg on/Sasgf voljeti/V3sgp
+*Ivan/Nnsg on/Snsgf biti/V3sgp voljeti/Vnsgma
+*Ivan/Nasg on/Sasgf biti/V3sgp voljeti/Vnsgma
+
+##
+## locative can't bind to a verb
+*Ivan/Nlsg jesti/V3sga
+
+##
+## dative turns into a verb modifier
+# (Joanna to-him loves son = Joanna loves his son)
+Ivana/Nnsg on/Scldsgm voljeti/V3sga sin/Nasg
+
+##
+## genitive turns into a noun modifier
+Monika/Nnsg biti/Vcl3sga san/Nnsg dječak/Ngpl
 
 ##
 ## complex tense
@@ -36,14 +57,6 @@ Ivan/Nnsg biti/V3sgp jesti/Vnsgma
 Ivan/Nnsg biti/V3sgp voljeti/Vnsgma Ivana/Nasg
 Ivana/Nnsg biti/V3sgp voljeti/Vnsgfp
 *Ivana/Nnsg biti/V3sgp voljeti/Vnsgfp Ivan/Nasg
-
-##
-## double nominative
-*Ivan/Nnsg on/Snsgn jesti/V3sga
-
-##
-## locative not assigned (TODO turn into modifier)
-*Ivan/Nlsg jesti/V3sga
 
 ##
 ## person mismatch

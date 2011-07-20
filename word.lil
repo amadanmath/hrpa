@@ -42,9 +42,9 @@ transform($sign) :-
         = SYNSEM\LOCAL\CAT\VAL\
           ( $val
             & COMPS\
-              [ LOCAL\CAT\HEAD\CASE\nom
+              [ CAT\HEAD\CASE\nom
               | $comps
-                & [ LOCAL\CAT\HEAD\
+                & [ CAT\HEAD\
                     ( $head
                     & CASE\acc
                     )

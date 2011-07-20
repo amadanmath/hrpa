@@ -25,17 +25,17 @@ head <- [bot] + [PREDICATE\bool, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
 cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic, HEADRIGHT\bool].
 cont <- [bot] + [RELS\list, HCONS\list].
-local <- [bot] + [CAT\cat, CONT\cont]. % CONT, CTX
+local <- [bot] + [MAND\bool, CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list]. % QSTORE
 nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
-synsem <- [bot] + [MAND\bool, LOCAL\local, NONLOCAL\nonlocal]. % EXPR
+synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
 
 schema <- [bot].
 head_comp_schema <- [schema].
 comp_head_schema <- [schema].
 head_mod_schema <- [schema].
-aux_other_schema <- [schema].
+aux_verb_schema <- [schema].
 head_cl_schema <- [schema].
 head_mark_schema <- [schema].
 cl_resolution_schema <- [schema].
@@ -44,7 +44,7 @@ dtrs <- [bot].
 head_str <- [dtrs] + [HEAD_DTR\sign].
 head_comp_str <- [head_str] + [COMP_DTR\sign].
 head_mod_str <- [head_str] + [MOD_DTR\sign].
-aux_other_str <- [dtrs] + [AUX_DTR\sign, OTHER_DTR\sign].
+aux_verb_str <- [dtrs] + [AUX_DTR\sign, VERB_DTR\sign].
 head_cl_str <- [head_str] + [CL_DTR\sign].
 head_mark_str <- [head_str] + [MARK_DTR\sign].
 cl_resolution_str <- [dtrs] + [ONLY_DTR\sign].

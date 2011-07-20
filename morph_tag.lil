@@ -136,8 +136,7 @@ recognise($wlist,
         & SCRAMBLES\plus
         )
       & VAL\MOD\
-        [ LOCAL\
-          ( CONT\INDEX\
+        [ ( CONT\INDEX\
             ( GENDER\$gender
             & NUMBER\$number
             )
@@ -189,8 +188,7 @@ recognise($wlist,
         & SCRAMBLES\plus
         )
       & VAL\SUBJ\
-        [ LOCAL\
-          ( CONT\INDEX\
+        [ ( CONT\INDEX\
             ( GENDER\$gender
             & NUMBER\$number
             )
@@ -238,7 +236,7 @@ recognise($wlist,
         )
       & CLITIC\$clitic
       & VAL\SUBJ\
-        [ LOCAL\CONT\INDEX\
+        [ CONT\INDEX\
           ( NUMBER\$number
           & PERSON\$person
           )

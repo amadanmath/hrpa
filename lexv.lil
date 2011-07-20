@@ -15,7 +15,7 @@ lexv("pasti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
+      [ CAT\HEAD\(noun_like & CASE\nom)
       ]
     )
   & CONT\TAM\FINITE\plus
@@ -28,8 +28,8 @@ lexv("jesti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
-      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
+      [ CAT\HEAD\(noun_like & CASE\nom)
+      , CAT\HEAD\(noun_like & CASE\acc)
       ]
     )
   & CONT\TAM\FINITE\minus
@@ -42,8 +42,8 @@ lexv("voljeti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
-      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
+      [ CAT\HEAD\(noun_like & CASE\nom)
+      , CAT\HEAD\(noun_like & CASE\acc)
       ]
     )
   & CONT\TAM\FINITE\minus
@@ -56,8 +56,8 @@ lexv("dovesti",
   ( CAT\
     ( HEAD\sverb
     & VAL\COMPS\
-      [ LOCAL\CAT\HEAD\(noun_like & CASE\nom)
-      , LOCAL\CAT\HEAD\(noun_like & CASE\acc)
+      [ CAT\HEAD\(noun_like & CASE\nom)
+      , CAT\HEAD\(noun_like & CASE\acc)
       , $DESTINATION
       ]
     )
@@ -65,10 +65,10 @@ lexv("dovesti",
   )
 ) :-
   member($DESTINATION,
-    [ LOCAL\CAT\HEAD\(noun_like & CASE\dat)
-    , LOCAL\CAT\HEAD\(prep & PFORM\do_gen)
-    , LOCAL\CAT\HEAD\(prep & PFORM\u_acc)
-    , LOCAL\CAT\HEAD\(prep & PFORM\k_loc) % TODO other preps
+    [ CAT\HEAD\(noun_like & CASE\dat)
+    , CAT\HEAD\(prep & PFORM\do_gen)
+    , CAT\HEAD\(prep & PFORM\u_acc)
+    , CAT\HEAD\(prep & PFORM\k_loc) % TODO other preps
     ]
   ).
 
@@ -81,49 +81,50 @@ lexv("biti", $sign) :-
           ( HEAD\nsverb
           & VAL\
             ( AUX\$aux
-            & SUBJ\[ LOCAL\CAT\HEAD\(noun_like & CASE\nom) ]
+            & COMPS\[ $subj & CAT\HEAD\(noun_like & CASE\nom) ]
+            & SUBJ\[ $subj ]
             )
           )
         & CONT\TAM\$tam
         ),
     member([$tam, $aux], [
       [MOOD\imperative & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\imperative & VOICE\passive)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\imperative & VOICE\passive)]]],
       [MOOD\infinitive & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\passive)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\passive)]]],
       [MOOD\participle & TENSE\perfect & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive)],
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive)],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\plus & TENSE\present & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future2 & VOICE\$voice)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future2 & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\present & VOICE\active, [
         % passive present participle does not exist and cannot be generated
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\$tense & VOICE\$voice),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\$tense & VOICE\$voice)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\$tense & VOICE\$voice),
+          CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\$tense & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\aorist & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\aorist & VOICE\passive)],
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\present & VOICE\$voice)],
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\perfect & VOICE\$voice)]]],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\aorist & VOICE\passive)],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\$voice),
+          CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\present & VOICE\$voice)],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\pluperfect & VOICE\$voice),
+          CONT\TAM\(FINITE\$finite & MOOD\conditional & TENSE\perfect & VOICE\$voice)]]],
       [MOOD\indicative & FINITE\minus & TENSE\imperfect & VOICE\active, [
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\imperfect & VOICE\passive)],
-        [LOCAL\CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive),
-          LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\present & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\imperfect & VOICE\passive)],
+        [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive),
+          CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
   ); (
     $sign
       = SYNSEM\LOCAL\CAT\
         ( HEAD\sverb
         & VAL\
           ( COMPS\
-            [ LOCAL\CAT\HEAD\
+            [ CAT\HEAD\
               ( noun_like
               & CASE\nom
               )
@@ -133,12 +134,12 @@ lexv("biti", $sign) :-
           )
         ),
     ( $pred % copula + NP
-        = LOCAL\CAT\HEAD\
+        = CAT\HEAD\
           ( noun_like
           & CASE\nom
           )
     ; $pred % copula + AP
-        = LOCAL\CAT\
+        = CAT\
           ( HEAD\
             ( adjective
             & CASE\nom
@@ -146,7 +147,7 @@ lexv("biti", $sign) :-
           & VAL\MOD\[$subj] % agreement!
           )
     ; $pred % copula + PP
-        = LOCAL\CAT\
+        = CAT\
           ( HEAD\prep
           & VAL\COMPS\[]
           )
@@ -167,10 +168,11 @@ lexv("htjeti", $sign) :-
           % & CLITIC\cl_aux
           & VAL\
             ( AUX\
-              [ [ LOCAL\CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\$voice)
-                , LOCAL\CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future1 & VOICE\$voice)]
+              [ [ CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\$voice)
+                , CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\future1 & VOICE\$voice)]
               ]
-            & SUBJ\[ LOCAL\CAT\HEAD\CASE\nom ]
+            & COMPS\[ $subj & CAT\HEAD\CASE\nom ]
+            & SUBJ\[ $subj ]
             )
           )
         & CONT\TAM\
@@ -185,11 +187,12 @@ lexv("htjeti", $sign) :-
         ( CAT\
           ( HEAD\sverb
           & VAL\COMPS\
-            [ LOCAL\CAT\HEAD\CASE\nom
+            [ CAT\HEAD\CASE\nom
             , $object
             ]
           )
         & CONT\TAM\FINITE\minus
         ),
-    $object = LOCAL\CAT\HEAD\CASE\acc % TODO clauses "ja hocu ici na more" "ja hocu da ti ides na more"
+    $object = CAT\HEAD\CASE\acc % "ja hocu knjigu"
+    % TODO clauses "ja hocu ici na more" "ja hocu da ti ides na more"
   ).

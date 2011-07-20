@@ -15,7 +15,7 @@ lexe <- [pred].
 lexe("do",
   SYNSEM\LOCAL\CAT\
   ( HEAD\PFORM\do_gen
-  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\gen ]
+  & VAL\COMPS\[ CAT\HEAD\CASE\gen ]
   )
 ).
 
@@ -23,7 +23,7 @@ lexe("do",
 lexe("u",
   SYNSEM\LOCAL\CAT\
   ( HEAD\PFORM\$pform
-  & VAL\COMPS\[ LOCAL\CAT\HEAD\CASE\$case ]
+  & VAL\COMPS\[ CAT\HEAD\CASE\$case ]
   )
 ) :-
   member([$pform, $case],
@@ -36,7 +36,7 @@ lexe("u",
 lexe($phon,
   SYNSEM\LOCAL\CAT\
   ( HEAD\PFORM\k_loc
-  & VAL\COMPS\[ LOCAL\CAT\HEAD\(noun_like & CASE\loc) ]
+  & VAL\COMPS\[ CAT\HEAD\(noun_like & CASE\loc) ]
   )
 ) :-
   % TODO rules for selection
@@ -50,18 +50,17 @@ lexe("poput",
   & VAL\
     ( COMPS\
       [ ( MAND\plus
-        & LOCAL\CAT\HEAD\
+        & CAT\HEAD\
           ( noun_like
           & CASE\gen
           )
         )
       ]
-    & MOD\[ LOCAL\CAT\HEAD\$mod ]
+    & MOD\[ CAT\HEAD\$mod ]
     )
   )
 ) :-
   member($mod, [adverb, adjective, noun_like, verb]).
-
 
 % ADVERBS
 
@@ -69,14 +68,14 @@ lexe("poput",
 lexe("danas",
   SYNSEM\LOCAL\CAT\
   ( HEAD\adverb
-  & VAL\MOD\[ LOCAL\CAT\HEAD\verb ]
+  & VAL\MOD\[ CAT\HEAD\verb ]
   )
 ).
 
 lexe("jako",
   SYNSEM\LOCAL\CAT\
   ( HEAD\adverb
-  & VAL\MOD\[ LOCAL\CAT\HEAD\$mod ]
+  & VAL\MOD\[ CAT\HEAD\$mod ]
   )
 ) :-
   member($mod, [adjective, verb]).

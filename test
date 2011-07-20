@@ -1,4 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-echo ":- test." | up -i -nofom -l test.lil
+if [ "$1" == "-dd" ]; then
+  echo SUPERDEBUG
+  echo ":- type_subtypes(pred, X), trace(X), test." | up -i -nofom -l test.lil
+elif [ "$1" == "-d" ]; then
+  echo DEBUG
+  echo ":- trace(['id_schema_unary/4', 'id_schema_binary/5', 'nonlocal_bind/5']), test." | up -i -nofom -l test.lil
+else
+  echo ":- test." | up -i -nofom -l test.lil
+fi
 # echo ":- test." | up -i -nofom -l test.lil 2>/dev/null

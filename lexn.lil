@@ -11,6 +11,7 @@ lexpro <- [pred].
 
 lexn("dječak", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine). % boy
 lexn("san", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine). % dream
+lexn("sin", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine). % daughter
 
 % names
 lexn("Davor", SYNSEM\LOCAL\CONT\INDEX\GENDER\masculine).
