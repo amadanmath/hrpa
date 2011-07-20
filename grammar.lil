@@ -185,7 +185,8 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
         ( AUX\$auxaux
         & SPR\$auxspr
         & MOD\$auxmod
-        & SUBJ\$subj
+        & COMPS\$auxcomps
+        & SUBJ\$auxsubj
         )
       & CLITIC\$cl
       ),
@@ -197,7 +198,7 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
         & VAL\
           ( COMPS\$verbcomps
           & AUX\[] % aux is always left
-          & SUBJ\$subj
+          & SUBJ\$auxsubj
           )
         )
       ),
@@ -206,6 +207,10 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
 %printAVM(["M",$mothersynsem]),
 %printAVM(["A",$auxaux]),
   member([$verblocal, $motherlocal], $auxaux),
+  (($auxsubj = [$subj], $auxcomps = [])
+    -> find_and_delete($verbcomps, $subj, $mothercomps)
+    ;  $mothercomps = $verbcomps
+  ),
   $mother
     = SYNSEM\LOCAL\
       ( $motherlocal
@@ -216,7 +221,7 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
           & AUX\[] % aux is always left
           & SPR\$auxspr % TODO check when writing SPR rules!
           & MOD\$auxmod % TODO verify!
-          & SUBJ\$subj
+          & SUBJ\$auxsubj
           )
         & CLITIC\$cl
         )
