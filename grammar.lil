@@ -10,6 +10,7 @@
 
 :- ensure_loaded("types").
 :- ensure_loaded("word").
+:- ensure_loaded("wordorder").
 :- ensure_loaded("trees").
 
 :- ensure_loaded("pretty").
@@ -365,18 +366,27 @@ fill_defaults($sign) :-
           )
         )
       & NONLOCAL\INHER\$inher
-      ),
+      )
+    & WORDORDER\$wordorder,
   default($cat, CLITIC\, not_clitic, is_clitic),
   default($cat, HEADRIGHT\, plus, minus),
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
   default($val, AUX\, [], [_]),
+  default($head, PREDICATE\, minus, plus),
   ($cat = CLITIC\is_clitic
-    -> default($inher, CLSTORE\, [$local], [])
-    ;  default($inher, CLSTORE\, [], [_])),
+    ->  (default($inher, CLSTORE\, [$local], []),
+         default($wordorder, WO_CLITIC\, enclitic, nonclitic))
+    ;   (default($inher, CLSTORE\, [], [_])),
+         default($wordorder, WO_CLITIC\, nonclitic, enclitic)),
   default($head, SCRAMBLES\, minus, plus),
-  default($head, PREDICATE\, minus, plus).
+  ($head = PREDICATE\plus
+    -> default($wordorder, WO_PREDICATIVE\, plus, minus)
+    ;  default($wordorder, WO_PREDICATIVE\, minus, plus)),
+  default($wordorder, WO_CBLOCK\, no_cb, done_cb),
+  default($wordorder, WO_MULTIWORD\, minus, plus).
+
 
 % interface for UP
 % ================
@@ -387,6 +397,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
   %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["?", $lp, $rp]),
   principles($schema, $left, $right, $mother),
+  word_order($left, $right, $mother),
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
       %DEBUG print(["MOTHER TEMP",$mother_temp]),
@@ -400,7 +411,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   % ,$mother_temp = SYNSEM\LOCAL\CAT\HEADRIGHT\$headright
   %,pretty($mother_temp)
   %,pretty("---------------------")
-      %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $headright])
+  %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp])
       %,printAVM(["MOTEMP",$mother_temp])
       %,printAVM(["MOTHER",$mother])
       %,$mother=SYNSEM\$mothersynsem,printAVM(["MOTHER'S SYNSEM",$schema,$mothersynsem])
@@ -421,7 +432,8 @@ id_schema_unary($schema, $daughter, $mother, $dcp) :-
       & NONLOCAL\
         ( INHER\CLSTORE\$clitic_locals
         )
-      ),
+      )
+    & WORDORDER\$wordorder,
   member($clitic_local, $clitic_locals),
   % at the beginning, clitics contain their LOCAL in INHER, don't try to
   % join those (even though it would be disallowed by other rules)
@@ -432,6 +444,7 @@ id_schema_unary($schema, $daughter, $mother, $dcp) :-
       & NONLOCAL\TOBIND\CLSTORE\[$clitic_local]
       ),
   principles($schema, $clitic, $daughter, $mother),
+  $mother = WORDORDER\$wordorder,
   $dcp = phonology_principle_unary($daughter, $mother)
   %,$daughter=LEXICON\$rp,printAVM(["OK U", $schema, $rp])
 .

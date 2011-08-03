@@ -121,3 +121,26 @@ Ivana/Nnsg biti/Vcl3sgp poput san/Ngsg
 *lijep/Ansgf poput Ivana/Nnsg jesti/V3sgp
 *Ivana/Nnsg lijep/Ansgf poput jesti/V3sgp
 *Ivana/Nnsg lijep/Ansgf poput san/Lgsg jesti/V3sgp
+
+##
+## prepositional complements
+Ivan/Nnsg dovesti/V3sgp Monika/Nasg do Davor/Ngsg
+Ivan/Nnsg biti/Vcl3sgp dovesti/Vnsgma Monika/Nasg do Davor/Ngsg
+do Davor/Ngsg biti/Vcl3sgp dovesti/Vnsgma Monika/Nasg Ivan/Nnsg
+*do biti/Vcl3sgp Davor/Ngsg dovesti/Vnsgma Monika/Nasg Ivan/Nnsg
+*do Davor/Ngsg dovesti/Vnsgma biti/Vcl3sgp Monika/Nasg Ivan/Nnsg
+*do Davor/Ngsg Monika/Nasg biti/Vcl3sgp dovesti/Vnsgma Ivan/Nnsg
+*Monika/Nasg do Davor/Ngsg biti/Vcl3sgp dovesti/Vnsgma Ivan/Nnsg
+*Monika/Nasg Ivan/Nnsg biti/Vcl3sgp do Davor/Ngsg dovesti/Vnsgma
+
+##
+## nonverbal predicates
+Ivan/Nnsg biti/Vcl3sgp sin/Nnsg
+Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
+Monika/Nnsg biti/Vcl3sgp do Davor/Ngsg
+*Ivan/Nnsg sin/Nnsg biti/Vcl3sgp
+*Ivana/Nnsg lijep/Nnsgf biti/Vcl3sgp
+*Monika/Nnsg do Davor/Ngsg biti/Vcl3sgp
+lijep/Ansgm Ivan/Nnsg biti/Vcl3sgp sin/Nnsg
+lijep/Ansgf Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
+lijep/Ansgf Monika/Nnsg biti/Vcl3sgp do Davor/Ngsg

@@ -7,6 +7,7 @@ bool <- [bot].
 plus <- [bool].
 minus <- [bool].
 
+
 slash <- [bot]. % TODO add here!
 
 % CLITIC GROUP ORDER
@@ -20,6 +21,29 @@ cl_accgen <- [cl_dat].
 cl_self <- [cl_accgen].
 cl_aux3 <- [cl_self].
 
+% word order
+cliticblock <- [bot].
+combinable_cb <- [cliticblock].
+has_cb <- [cliticblock].
+in_cb <- [combinable_cb, has_cb].
+no_cb <- [combinable_cb].
+done_cb <- [has_cb].
+
+clitictype <- [bot].
+enclitic <- [clitictype].
+nonenclitic <- [clitictype].
+proclitic <- [nonenclitic].
+nonclitic <- [nonenclitic].
+
+wordorder <- [bot] +
+  [ WO_MULTIWORD\bool
+  , WO_PREDICATIVE\bool
+  %, WO_SUBORDINATOR\bool
+  %, WO_QUESTION\bool
+  , WO_CBLOCK\cliticblock
+  , WO_CLITIC\clitictype
+  ].
+
 % phrase
 head <- [bot] + [PREDICATE\bool, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
@@ -29,7 +53,7 @@ local <- [bot] + [MAND\bool, CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list]. % QSTORE
 nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
 synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
-sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem].
+sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem, WORDORDER\wordorder].
 
 schema <- [bot].
 head_comp_schema <- [schema].

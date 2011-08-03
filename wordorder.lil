@@ -1,0 +1,71 @@
+:- module("wordorder").
+:- module_interface.
+
+:- ensure_loaded("types").
+
+
+word_order <- [pred].
+
+:- module_implementation.
+
+
+or <- [pred].
+or(minus, minus, minus) :- !.
+or(_, _, plus).
+
+word_order_rule <- [pred].
+% skip over proclitics (don't count as words)
+word_order_rule(WO_CLITIC\proclitic, $right, $right) :-
+  !
+  %, printAVM(["procl + X", $right])
+  .
+% nonenclitics combine
+word_order_rule(
+    WO_CLITIC\nonenclitic & WO_CBLOCK\no_cb & WO_PREDICATIVE\$predleft,
+    WO_CLITIC\nonenclitic & WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
+    WO_CLITIC\nonclitic & WO_CBLOCK\no_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+  ) :-
+  or($predleft, $predright, $pred)
+  %, print("noncl + noncl")
+  .
+% enclitics enter clitic block
+word_order_rule(
+    WO_CBLOCK\combinable_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred,
+    WO_CLITIC\enclitic,
+    WO_CLITIC\nonclitic & WO_CBLOCK\in_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred
+  ) :-
+  ($pred = minus; $multi = minus)
+    %, print("X + encl")
+  .
+% single word current host + anything => finished host
+word_order_rule(
+    WO_MULTIWORD\minus & WO_CBLOCK\in_cb & WO_PREDICATIVE\$predleft,
+    WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
+    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+  ) :-
+  or($predleft, $predright, $pred)
+  %, print("single host + X")
+  .
+% multi word current host (not predicate) + anything => finished host
+word_order_rule(
+    WO_PREDICATIVE\minus & WO_MULTIWORD\plus & WO_CBLOCK\in_cb,
+    WO_CBLOCK\no_cb,
+    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\plus
+  ) :-
+  true % DEBUG
+  %, print("multi host + pred")
+  .
+% finished host + anything => finished host
+word_order_rule(
+    WO_CBLOCK\done_cb & WO_PREDICATIVE\$predleft,
+    WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
+    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+  ) :-
+  or($predleft, $predright, $pred)
+  %, print("done host + X")
+  .
+
+
+% word_order(WORDORDER\$left, WORDORDER\$right, WORDORDER\$mother) :-
+word_order(WORDORDER\$left, WORDORDER\$right, WORDORDER\$mother) :- % DEBUG
+  word_order_rule($left, $right, $mother).

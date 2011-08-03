@@ -17,6 +17,7 @@ lexe("do",
   ( HEAD\PFORM\do_gen
   & VAL\COMPS\[ CAT\HEAD\CASE\gen ]
   )
+& WORDORDER\WO_CLITIC\proclitic
 ).
 
 % in, inside
@@ -25,6 +26,7 @@ lexe("u",
   ( HEAD\PFORM\$pform
   & VAL\COMPS\[ CAT\HEAD\CASE\$case ]
   )
+& WORDORDER\WO_CLITIC\proclitic
 ) :-
   member([$pform, $case],
     [ [u_loc, loc]
@@ -38,6 +40,7 @@ lexe($phon,
   ( HEAD\PFORM\k_loc
   & VAL\COMPS\[ CAT\HEAD\(noun_like & CASE\loc) ]
   )
+& WORDORDER\WO_CLITIC\proclitic
 ) :-
   % TODO rules for selection
   $phon = "k";
@@ -59,6 +62,7 @@ lexe("poput",
     & MOD\[ CAT\HEAD\$mod ]
     )
   )
+& WORDORDER\WO_CLITIC\proclitic
 ) :-
   member($mod, [adverb, adjective, noun_like, verb]).
 

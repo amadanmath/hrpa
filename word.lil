@@ -35,26 +35,25 @@ find_word($lemma, $sign & SYNSEM\LOCAL\CAT\HEAD\adjective) :-
 transform <- [pred].
 transform($sign) :-
   % delete the actor from the passive participles; obligatory
-  ( $sign = SYNSEM\LOCAL\(CAT\HEAD\verb & CONT\TAM\VOICE\passive) ->
-    (
-      % fail if not a classic nom/acc transitive verb
-      $sign
-        = SYNSEM\LOCAL\CAT\VAL\
-          ( $val
-            & COMPS\
-              [ CAT\HEAD\CASE\nom
-              | $comps
-                & [ CAT\HEAD\
-                    ( $head
-                    & CASE\acc
-                    )
-                  | _
-                  ]
+  $sign = SYNSEM\LOCAL\(CAT\HEAD\verb & CONT\TAM\VOICE\passive), !,
+  % fail if not a classic nom/acc transitive verb
+  $sign
+    = SYNSEM\LOCAL\CAT\VAL\
+      ( $val
+        & COMPS\
+          [ CAT\HEAD\CASE\nom
+          | $comps
+            & [ CAT\HEAD\
+                ( $head
+                & CASE\acc
+                )
+              | _
               ]
-          ),
-      overwrite($head, CASE\, nom),
-      overwrite($val, COMPS\, $comps)
-    ) ; true).
+          ]
+      ),
+  overwrite($head, CASE\, nom),
+  overwrite($val, COMPS\, $comps).
+transform(_).
 
 
 base_and_template_to_sign($base, $template, $sign) :- % changeable words (morphology resolution)
