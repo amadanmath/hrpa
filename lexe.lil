@@ -72,10 +72,14 @@ lexe("poput",
 lexe("danas",
   SYNSEM\LOCAL\CAT\
   ( HEAD\adverb
-  & VAL\MOD\[ CAT\HEAD\verb ]
+  & VAL\MOD\[ CAT\HEAD\PREDICATE\plus ]
   )
 ).
 
+% very
+% TODO: replace MOD\adjective with MOD\gradable
+% because it can be certain adverbs too
+% and maybe kick verb out
 lexe("jako",
   SYNSEM\LOCAL\CAT\
   ( HEAD\adverb
@@ -83,3 +87,17 @@ lexe("jako",
   )
 ) :-
   member($mod, [adjective, verb]).
+
+% CONJUNCTIONS
+
+% because
+lexe("jer",
+  SYNSEM\LOCAL\CAT\
+  ( HEAD\conj
+  & VAL\
+    ( COMPS\[ CAT\CLAUSE\plus ]
+    & MOD\[ CAT\CLAUSE\plus ]
+    )
+  )
+& WORDORDER\WO_CBLOCK\in_cb
+).

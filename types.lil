@@ -35,22 +35,24 @@ nonenclitic <- [clitictype].
 proclitic <- [nonenclitic].
 nonclitic <- [nonenclitic].
 
+% proclitics: WO_CLITIC\proclitic
+% hosts:      WO_CBLOCK\in_cb
 wordorder <- [bot] +
   [ WO_MULTIWORD\bool
   , WO_PREDICATIVE\bool
-  %, WO_SUBORDINATOR\bool
   %, WO_QUESTION\bool
   , WO_CBLOCK\cliticblock
   , WO_CLITIC\clitictype
+  , WO_CANFOCUS\bool
   ].
 
 % phrase
 head <- [bot] + [PREDICATE\bool, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
-cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic, HEADRIGHT\bool].
+cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic, HEADRIGHT\bool, CLAUSE\bool].
 cont <- [bot] + [RELS\list, HCONS\list].
 local <- [bot] + [MAND\bool, CAT\cat, CONT\cont]. % CONT, CTX
-stores <- [bot] + [CLSTORE\list]. % QSTORE
+stores <- [bot] + [CLSTORE\list, RELSTORE\list]. % QSTORE
 nonlocal <- [bot] + [INHER\stores, TOBIND\stores]. % TODO
 synsem <- [bot] + [LOCAL\local, NONLOCAL\nonlocal]. % EXPR
 sign <- [bot] + [PHONOLOGY\list, LEXICON\list, SYNSEM\synsem, WORDORDER\wordorder].
@@ -199,6 +201,7 @@ sverb <- [verb]. % subject is the first complement - subject agreement
 nsverb <- [verb]. % subject is not the first complement - no agreement
 prep <- [head] + [PFORM\pform]. % there might be more :)
 particle <- [head] + [RTYPE\rtype]. % TODO check for RTYPE...
+conj <- [head]. % conjunction
 
 %pro <- [head] + [PTYPE\ptype, REFTYPE\reftype]. % TODO check for PTYPE, REFTYPE
 %pro_degree <- [pro, has_degree].

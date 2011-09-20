@@ -311,29 +311,37 @@ nonlocal_principle($head, $nonhead, $mother) :-
     = SYNSEM\NONLOCAL\
       ( INHER\
         ( CLSTORE\$h_inher_cl
+        & RELSTORE\$h_inher_rel
         )
       & TOBIND\
         ( $h_bind
         & CLSTORE\$h_bind_cl
+        & RELSTORE\$h_bind_rel
         )
       ),
   default($h_bind, CLSTORE\, [], [_]),
+  default($h_bind, RELSTORE\, [], [_]),
   $nonhead
     = SYNSEM\NONLOCAL\
       ( INHER\
         ( CLSTORE\$n_inher_cl
+        & RELSTORE\$n_inher_rel
         )
       & TOBIND\
         ( $n_bind
         & CLSTORE\$n_bind_cl
+        & RELSTORE\$n_bind_rel
         )
       ),
   default($n_bind, CLSTORE\, [], [_]),
+  default($n_bind, RELSTORE\, [], [_]),
   $mother
     = SYNSEM\NONLOCAL\INHER\
       ( CLSTORE\$m_inher_cl
+      & RELSTORE\$m_inher_rel
       ),
-  nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $n_bind_cl, $m_inher_cl).
+  nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $n_bind_cl, $m_inher_cl),
+  nonlocal_bind($h_inher_rel, $n_inher_rel, $h_bind_rel, $n_bind_rel, $m_inher_rel).
 
 phonology_principle_binary <- [pred].
 phonology_principle_binary($left, $right, $mother) :-
@@ -375,6 +383,7 @@ fill_defaults($sign) :-
   default($val, MOD\, [], [_]),
   default($val, AUX\, [], [_]),
   default($head, PREDICATE\, minus, plus),
+  default($inher, RELSTORE\, [], [_]),
   ($cat = CLITIC\is_clitic
     ->  (default($inher, CLSTORE\, [$local], []),
          default($wordorder, WO_CLITIC\, enclitic, nonclitic))
@@ -385,7 +394,85 @@ fill_defaults($sign) :-
     -> default($wordorder, WO_PREDICATIVE\, plus, minus)
     ;  default($wordorder, WO_PREDICATIVE\, minus, plus)),
   default($wordorder, WO_CBLOCK\, no_cb, done_cb),
+  ($wordorder = WO_CBLOCK\in_cb
+    -> default($wordorder, WO_CANFOCUS\, minus, plus)
+    ;  default($wordorder, WO_CANFOCUS\, plus, minus)),
   default($wordorder, WO_MULTIWORD\, minus, plus).
+
+recognise_clause <- [pred].
+% A clause is a verbal phrase which has resolved all its clitics;
+% It changes its word-order description to that of a non-predicate multi-word sequence
+% and puts all complements into INHER.
+% TODO maybe also one "spare" clause modifier? How do modifiers enter NONLOCAL?
+recognise_clause(
+    SYNSEM\
+    ( NONLOCAL\INHER\
+      ( CLSTORE\[]
+      & RELSTORE\$oldrelstore
+      )
+    & LOCAL\
+      ( MAND\$mand
+      & CONT\$cont
+      & CAT\
+        ( HEAD\
+          ( $head
+          & verb
+          & PREDICATE\plus
+          )
+        & VAL\
+          ( SUBJ\$subj
+          & COMPS\$comps
+          & MOD\[] % XXX is this okay?
+          & AUX\[]
+          )
+        )
+      )
+    )
+, _
+, $mother
+) :-
+  $mother
+    = SYNSEM\
+      ( NONLOCAL\
+        ( INHER\
+          ( CLSTORE\[]
+          & RELSTORE\$newrelstore
+          )
+        & TOBIND\
+          ( CLSTORE\[]
+          & RELSTORE\[]
+          )
+        )
+      & LOCAL\
+        ( MAND\$mand
+        & CONT\$cont
+        & CAT\
+          ( HEAD\$head
+          & CLITIC\not_clitic
+          & HEADRIGHT\minus % irrelevant
+          & CLAUSE\plus
+          & VAL\
+            ( SUBJ\$subj
+            & COMPS\[]
+            & MOD\[]
+            & AUX\[]
+            & SPR\[]
+            )
+          )
+        )
+      )
+    & WORDORDER\
+      ( WO_CBLOCK\no_cb
+      & WO_CLITIC\nonclitic
+      & WO_MULTIWORD\plus
+      & WO_PREDICATIVE\minus
+      & WO_CANFOCUS\plus
+      ),
+  print("clause: no_cb"),
+  append($oldrelstore, $comps, $newrelstore).
+% but everything can be a non-clause
+recognise_clause($sign & WORDORDER\$wordorder & SYNSEM\LOCAL\CAT\CLAUSE\minus, $wordorder, $sign).
+
 
 
 % interface for UP
@@ -395,16 +482,18 @@ fill_defaults($sign) :-
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
-  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["?", $lp, $rp]),
-  principles($schema, $left, $right, $mother),
-  word_order($left, $right, $mother),
+  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["?B", $lp, $rp]),
+  principles($schema, $left, $right, $mothersign),
+  word_order($left, $right, $wordorder),
+  recognise_clause($mothersign, $wordorder, $mother),
+  %$mothersign=$mother,
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
       %DEBUG print(["MOTHER TEMP",$mother_temp]),
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  %,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["OK B", $schema, $lp, $rp])
+  ,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["OK B", $schema, $lp, $rp])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])
@@ -425,28 +514,34 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
 % getting invalid input, possibly resulting in an infinite loop
 id_schema_unary(_, $daughter, _, _) :-
   equivalent($daughter, bot).
+% resolve clitics
 id_schema_unary($schema, $daughter, $mother, $dcp) :-
+  %$daughter=LEXICON\$dp,printAVM(["?U", $dp]),
   $daughter
     = SYNSEM\
-      ( LOCAL\$local
+      ( LOCAL\CAT\CLITIC\not_clitic % only nonclitics undergo this rule
       & NONLOCAL\
         ( INHER\CLSTORE\$clitic_locals
         )
       )
     & WORDORDER\$wordorder,
   member($clitic_local, $clitic_locals),
-  % at the beginning, clitics contain their LOCAL in INHER, don't try to
-  % join those (even though it would be disallowed by other rules)
-  \+ identical($clitic_local, $local),
   $clitic
     = SYNSEM\
       ( LOCAL\$clitic_local
-      & NONLOCAL\TOBIND\CLSTORE\[$clitic_local]
+      & NONLOCAL\
+        ( INHER\
+          ( CLSTORE\[]
+          & RELSTORE\[]
+          )
+        & TOBIND\CLSTORE\[$clitic_local]
+        )
       ),
-  principles($schema, $clitic, $daughter, $mother),
-  $mother = WORDORDER\$wordorder,
+  principles($schema, $clitic, $daughter, $mothersign),
+  recognise_clause($mothersign, $wordorder, $mother),
+  %$mothersign=$mother,
   $dcp = phonology_principle_unary($daughter, $mother)
-  %,$daughter=LEXICON\$rp,printAVM(["OK U", $schema, $rp])
+  ,$daughter=LEXICON\$rp,printAVM(["OK U", $schema, $rp])
 .
 
 
@@ -535,18 +630,13 @@ lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base & ALT\$alt) & LEX_TEMPLATE\
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-
   S
-    = SYNSEM\
-      ( LOCAL\CAT\
-        ( HEAD\PREDICATE\plus
-        & VAL\
-          ( SPR\$spec
-          & COMPS\$comps
-          & MOD\$mod
-          & AUX\[]
-          )
-        )
-      & NONLOCAL\INHER\
-        ( CLSTORE\[]
+    = SYNSEM\LOCAL\CAT\
+      ( CLAUSE\plus % implies empty CLSTORE
+      & VAL\
+        ( SPR\$spec
+        & COMPS\$comps
+        & MOD\$mod
+        & AUX\[]
         )
       ),
   only_optional($spec),

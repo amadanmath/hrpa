@@ -53,6 +53,24 @@ transform($sign) :-
       ),
   overwrite($head, CASE\, nom),
   overwrite($val, COMPS\, $comps).
+transform($sign) :-
+  $sign
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\(noun & CASE\gen)
+      & VAL\$val
+      ),
+  overwrite($val, MOD\,
+    [ CAT\HEAD\noun
+    ]).
+transform($sign) :-
+  $sign
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\(noun & CASE\dat)
+      & VAL\$val
+      ),
+  overwrite($val, MOD\,
+    [ CAT\HEAD\verb
+    ]).
 transform(_).
 
 

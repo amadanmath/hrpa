@@ -1,3 +1,6 @@
+Ivan/Nnsg biti/Vcl3sgp jesti/Vnsgma jer biti/Vcl3sgp Monika/Nnsg jesti/Vnsgfa
+__END__
+
 ##
 ## gender is optional in nouns
 Ivan/Nnsg jesti/V3sgp
@@ -144,3 +147,8 @@ Monika/Nnsg biti/Vcl3sgp do Davor/Ngsg
 lijep/Ansgm Ivan/Nnsg biti/Vcl3sgp sin/Nnsg
 lijep/Ansgf Ivana/Nnsg biti/Vcl3sgp lijep/Ansgf
 lijep/Ansgf Monika/Nnsg biti/Vcl3sgp do Davor/Ngsg
+
+##
+## subordinate clause
+Ivan/Nnsg biti/Vcl3sgp jesti/Vnsgma jer biti/Vcl3sgp Monika/Nnsg jesti/Vnsgfa
+*Ivan/Nnsg biti/Vcl3sgp jesti/Vnsgma jer Monika/Nnsg biti/Vcl3sgp jesti/Vnsgfa

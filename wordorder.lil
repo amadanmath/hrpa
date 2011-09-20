@@ -17,55 +17,64 @@ word_order_rule <- [pred].
 % skip over proclitics (don't count as words)
 word_order_rule(WO_CLITIC\proclitic, $right, $right) :-
   !
-  %, printAVM(["procl + X", $right])
+  , printAVM("      WO: procl + X = X")
   .
 % nonenclitics combine
 word_order_rule(
     WO_CLITIC\nonenclitic & WO_CBLOCK\no_cb & WO_PREDICATIVE\$predleft,
     WO_CLITIC\nonenclitic & WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
-    WO_CLITIC\nonclitic & WO_CBLOCK\no_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+    WO_CLITIC\nonclitic & WO_CBLOCK\no_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred & WO_CANFOCUS\plus
   ) :-
   or($predleft, $predright, $pred)
-  %, print("noncl + noncl")
+  , print("      WO: no + no = no")
   .
 % enclitics enter clitic block
 word_order_rule(
-    WO_CBLOCK\combinable_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred,
+    WO_CBLOCK\combinable_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred & WO_CANFOCUS\$focus,
     WO_CLITIC\enclitic,
-    WO_CLITIC\nonclitic & WO_CBLOCK\in_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred
+    WO_CLITIC\nonclitic & WO_CBLOCK\in_cb & WO_MULTIWORD\$multi & WO_PREDICATIVE\$pred & WO_CANFOCUS\$focus
   ) :-
   ($pred = minus; $multi = minus)
-    %, print("X + encl")
+  , print("      WO: in/no + encl = in")
   .
 % single word current host + anything => finished host
 word_order_rule(
-    WO_MULTIWORD\minus & WO_CBLOCK\in_cb & WO_PREDICATIVE\$predleft,
+    WO_MULTIWORD\minus & WO_CBLOCK\in_cb & WO_PREDICATIVE\$predleft & WO_CANFOCUS\$focus,
     WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
-    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+    WO_CLITIC\nonclitic & WO_CBLOCK\done_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred & WO_CANFOCUS\$focus
   ) :-
   or($predleft, $predright, $pred)
-  %, print("single host + X")
+  , print("      WO: single in + no = done")
   .
 % multi word current host (not predicate) + anything => finished host
 word_order_rule(
-    WO_PREDICATIVE\minus & WO_MULTIWORD\plus & WO_CBLOCK\in_cb,
+    WO_MULTIWORD\plus & WO_CBLOCK\in_cb & WO_PREDICATIVE\minus & WO_CANFOCUS\$focus,
     WO_CBLOCK\no_cb,
-    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\plus
+    WO_CLITIC\nonclitic & WO_CBLOCK\done_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\plus & WO_CANFOCUS\$focus
   ) :-
   true % DEBUG
-  %, print("multi host + pred")
+  , print("      WO: multi in + pred no = done")
   .
 % finished host + anything => finished host
 word_order_rule(
-    WO_CBLOCK\done_cb & WO_PREDICATIVE\$predleft,
+    WO_CBLOCK\done_cb & WO_PREDICATIVE\$predleft & WO_CANFOCUS\$focus,
     WO_CBLOCK\no_cb & WO_PREDICATIVE\$predright,
-    WO_CLITIC\nonclitic & WO_CBLOCK\has_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred
+    WO_CLITIC\nonclitic & WO_CBLOCK\done_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\$pred & WO_CANFOCUS\$focus
   ) :-
   or($predleft, $predright, $pred)
-  %, print("done host + X")
+  , print("      WO: done + no = done")
+  .
+% anything (nonpredicative) + finished host (that can focus) => finished host (no more focus)
+% TODO: left side should be "heavy", not simply multiword...
+word_order_rule(
+    WO_CBLOCK\no_cb & WO_PREDICATIVE\minus & WO_MULTIWORD\plus,
+    WO_CBLOCK\done_cb & WO_PREDICATIVE\plus & WO_CANFOCUS\plus,
+    WO_CLITIC\nonclitic & WO_CBLOCK\done_cb & WO_MULTIWORD\plus & WO_PREDICATIVE\plus & WO_CANFOCUS\minus
+  ) :-
+  true % DEBUG
+  , print("      WO: focus no + done = done")
   .
 
 
-% word_order(WORDORDER\$left, WORDORDER\$right, WORDORDER\$mother) :-
-word_order(WORDORDER\$left, WORDORDER\$right, WORDORDER\$mother) :- % DEBUG
-  word_order_rule($left, $right, $mother).
+word_order(WORDORDER\$left, WORDORDER\$right, $mother_wordorder) :- % DEBUG
+  word_order_rule($left, $right, $mother_wordorder).
