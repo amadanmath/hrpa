@@ -83,7 +83,6 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
       ),
   only_optional($compcomps),
   only_optional($compspr),
-  %$head = PHONOLOGY\$hp, $comp = PHONOLOGY\$np, print(["YOP", $head, $comp]),
   find_and_delete($headcomps, $complocal, $mothercomps),
   $mother
     = SYNSEM\LOCAL\
@@ -149,7 +148,6 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
         )
       & CONT\$cont
       ),
-  %$right=SYNSEM\LOCAL\CAT\VAL\$m,($right = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["looking for ",$m]); true),
   $mod
     = SYNSEM\LOCAL\CAT\VAL\
       ( SPR\$modspr
@@ -206,10 +204,6 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
           )
         )
       ),
-%$aux=LEXICON\$lp,$other=LEXICON\$rp,printAVM([$lp, $rp]),
-%printAVM(["O",$othersynsem]),
-%printAVM(["M",$mothersynsem]),
-%printAVM(["A",$auxaux]),
   member([$verblocal, $motherlocal], $auxaux),
   (($auxsubj = [$subj], $auxcomps = [])
     -> find_and_delete($verbcomps, $subj, $mothercomps)
@@ -360,12 +354,9 @@ phonology_principle_unary($dtr, $mother) :-
   $mother = (PHONOLOGY\$phon & LEXICON\$lex).
 
 principles($schema, $left, $right, $mother) :-
-  %($left = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["BEFORE: LEFT", $left]); true),
   id_principle($schema, $left, $right, $head, $nonhead, $mother),
   nonlocal_principle($head, $nonhead, $mother),
-  head_feature_principle($head, $mother)
-  %,($left = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["AFTER: MOTHER", $mother]); true)
-  .
+  head_feature_principle($head, $mother).
 
 fill_defaults <- [pred].
 fill_defaults($sign) :-
@@ -407,7 +398,7 @@ fill_defaults($sign) :-
 
 resolve_clitics <- [pred].
 % resolve all clitics, and mark as clause
-resolve_clitics([],
+resolve_clitics(_, [],
     SYNSEM\
     ( NONLOCAL\INHER\
       ( CLSTORE\[] % sanity check - shouldn't be able to fail
@@ -462,10 +453,9 @@ resolve_clitics([],
     & WO_CANFOCUS\plus
     & WO_HOST\minus
     )) :-
-  print("IN IT!"),
   append($oldrelstore, $comps, $newrelstore).
-resolve_clitics([$clitic_local | $clitic_locals], $node, $crnode) :-
-  print("YOB-RC-1"),
+resolve_clitics($clause, [$clitic_local | $clitic_locals], $node, $crnode) :-
+  print("DUMMY"), % XXX WHY CAN'T I REMOVE THIS?!?
   $clitic
     = SYNSEM\
       ( LOCAL\$clitic_local
@@ -474,12 +464,12 @@ resolve_clitics([$clitic_local | $clitic_locals], $node, $crnode) :-
         & RELSTORE\[]
         )
       ),
-  print("YOB-RC-2"),
+  ($clause = plus
+    ->  $clitic = SYNSEM\NONLOCAL\TOBIND\CLSTORE\[$clitic_local]
+    ;   true),
   principles(_, $clitic, $node, $tempnode),
-  print("YOB-RC-3"),
   nonlocal_principle($clitic, $node, $tempnode),
-  $tempnode = SYNSEM\LOCAL\CAT\VAL\AUX\$tmp, print(["YOB-RC-4", $crnode]),
-  resolve_clitics($clitic_locals, $tempnode, $crnode).
+  resolve_clitics($clause, $clitic_locals, $tempnode, $crnode).
 
 resolve_clitics_on_adjoined_clause <- [pred].
 % two clitic hosts can't join
@@ -494,20 +484,19 @@ resolve_clitics_on_adjoined_clause(
 resolve_clitics_on_adjoined_clause(
     SYNSEM\(LOCAL\CAT\VAL\AUX\[] & NONLOCAL\INHER\CLSTORE\$clitic_locals),
     $node & SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & CLITIC\not_clitic),
-    $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\$clitic_locals) :-
-  resolve_clitics($clitic_locals, $node, $crnode),
-  print("    resolved adjoining clause"),
+    $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\[$clitic_locals]) :-
+  resolve_clitics(minus, $clitic_locals, $node, $crnode),
   phonology_principle_unary($node, $crnode)
-  , $node=WORDORDER\$wo,printAVM(["adjoined clause - yep",$wo])
+  %, printAVM(["adjoined clause - yep"])
   .
 % or do nothing
-resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node) :-
-  $node=WORDORDER\$wo,printAVM(["adjoined clause - nop",$wo])
+resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
+  %:- printAVM(["adjoined clause - nop"])
   .
 
 resolve_clitics_on_clause <- [pred].
-resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node) :-
-  $node=WORDORDER\$wo,printAVM(["clause - nop",$wo])
+resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
+  %:- printAVM(["clause - nop"])
   .
 resolve_clitics_on_clause(
     $node
@@ -518,13 +507,12 @@ resolve_clitics_on_clause(
         )
       & NONLOCAL\INHER\CLSTORE\$clitic_locals
       ),
-    $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\$clitic_locals) :-
-  print("YOB RCOC 1"),
-  resolve_clitics($clitic_locals, $node, $crnode),
-  print("YOB RCOC 2"),
-  print("    resolved clause"),
+    $crnode) :-
+  ($clitic_locals = []
+    ->  true
+    ;   resolve_clitics(plus, $clitic_locals, $node, $crnode)),
   phonology_principle_unary($node, $crnode)
-  , $node=WORDORDER\$wo,printAVM(["clause - yep",$wo])
+  %, printAVM(["clause - yep"])
   .
 
 id_schema_unary(_, _, _, _) :- fail.
@@ -532,13 +520,11 @@ id_schema_unary(_, _, _, _) :- fail.
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
-  $left=LEXICON\$lp&SYNSEM\LOCAL\CAT\HEAD\$lhead,$right=LEXICON\$rp&SYNSEM\LOCAL\CAT\HEAD\$rhead,type_toptype($lhead,$ltype),type_toptype($rhead,$rtype),printAVM(["?B", $lp, $ltype, $rp, $rtype]),
+  %$left=LEXICON\$lp&SYNSEM\LOCAL\CAT\HEAD\$lhead,$right=LEXICON\$rp&SYNSEM\LOCAL\CAT\HEAD\$rhead,type_toptype($lhead,$ltype),type_toptype($rhead,$rtype),printAVM(["?B", $lp, $ltype, $rp, $rtype]),
   resolve_clitics_on_adjoined_clause($left, $right, $crright),
-  $crright = SYNSEM\LOCAL\CAT\CLAUSE\$k,($k = plus -> print("rt: YESCLAWS+++++!!!"); print("rt: NONCLAWS-----!!!")),
   principles($schema, $left, $crright, $mothersign),
   word_order($left, $crright, $mothersign),
   resolve_clitics_on_clause($mothersign, $mother),
-  $mother = SYNSEM\LOCAL\CAT\CLAUSE\$c,($c = plus -> print("mum: YESCLAWS+++++!!!"); print("mum: NONCLAWS-----!!!")),
   %$mothersign=$mother,
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
@@ -546,7 +532,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  ,$mother=SYNSEM\LOCAL\CAT\HEAD\$mhead,type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp])
+  %,$mother=SYNSEM\LOCAL\CAT\HEAD\$mhead,type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])
