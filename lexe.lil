@@ -93,11 +93,11 @@ lexe("jako",
 % because
 lexe("jer",
   SYNSEM\LOCAL\CAT\
-  ( HEAD\conj
+  ( HEAD\(conj & SCRAMBLES\minus)
   & VAL\
-    ( COMPS\[ CAT\CLAUSE\plus ]
-    & MOD\[ CAT\CLAUSE\plus ]
+    ( COMPS\[ CAT\CLAUSE\plus & MAND\plus ]
+    & MOD\[ CAT\HEAD\PREDICATE\plus ]
     )
   )
-& WORDORDER\WO_CBLOCK\in_cb
+& WORDORDER\WO_HOST\plus
 ).

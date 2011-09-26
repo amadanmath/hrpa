@@ -26,7 +26,9 @@ cliticblock <- [bot].
 combinable_cb <- [cliticblock].
 has_cb <- [cliticblock].
 in_cb <- [combinable_cb, has_cb].
-no_cb <- [combinable_cb].
+no_or_clause_cb <- [combinable_cb].
+clause_cb <- [no_or_clause_cb].
+no_cb <- [no_or_clause_cb].
 done_cb <- [has_cb].
 
 clitictype <- [bot].
@@ -44,6 +46,7 @@ wordorder <- [bot] +
   , WO_CBLOCK\cliticblock
   , WO_CLITIC\clitictype
   , WO_CANFOCUS\bool
+  , WO_HOST\bool
   ].
 
 % phrase

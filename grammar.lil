@@ -35,11 +35,13 @@ only_optional([X | Xs]) :-
   X = MAND\minus,
   only_optional(Xs).
 
+% delete #2 from [#1]
 % the difference from delete/3: fail if not found
 find_and_delete <- [pred].
 find_and_delete([X | Xs], X, Xs).
 find_and_delete([X | Xs], Y, [X | Ys]) :- find_and_delete(Xs, Y, Ys).
 
+% delete all [#2] from [#1]
 % the difference from set_difference/3: fail if not found
 find_and_delete_all <- [pred].
 find_and_delete_all(X, [], X).
@@ -120,7 +122,7 @@ comp_head_schema_rule($comp, $head, $head, $comp, $mother) :-
 
 noun_mod_order <- [pred].
 % for noun-likes, allow mod-head order ONLY if both are head-right
-noun_mod_order($mod & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head, $mod, plus) :- !.
+% noun_mod_order($mod & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head & SYNSEM\LOCAL\CAT\HEADRIGHT\plus, $head, $mod, plus) :- !.
 % for non-noun-likes, allow mod-head order
 noun_mod_order($mod, $head, $head, $mod, plus) :-
   \+ $head = SYNSEM\LOCAL\CAT\HEAD\noun_like.
@@ -147,6 +149,7 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
         )
       & CONT\$cont
       ),
+  %$right=SYNSEM\LOCAL\CAT\VAL\$m,($right = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["looking for ",$m]); true),
   $mod
     = SYNSEM\LOCAL\CAT\VAL\
       ( SPR\$modspr
@@ -357,9 +360,12 @@ phonology_principle_unary($dtr, $mother) :-
   $mother = (PHONOLOGY\$phon & LEXICON\$lex).
 
 principles($schema, $left, $right, $mother) :-
+  %($left = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["BEFORE: LEFT", $left]); true),
   id_principle($schema, $left, $right, $head, $nonhead, $mother),
   nonlocal_principle($head, $nonhead, $mother),
-  head_feature_principle($head, $mother).
+  head_feature_principle($head, $mother)
+  %,($left = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["AFTER: MOTHER", $mother]); true)
+  .
 
 fill_defaults <- [pred].
 fill_defaults($sign) :-
@@ -382,7 +388,6 @@ fill_defaults($sign) :-
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
   default($val, AUX\, [], [_]),
-  default($head, PREDICATE\, minus, plus),
   default($inher, RELSTORE\, [], [_]),
   ($cat = CLITIC\is_clitic
     ->  (default($inher, CLSTORE\, [$local], []),
@@ -390,24 +395,22 @@ fill_defaults($sign) :-
     ;   (default($inher, CLSTORE\, [], [_])),
          default($wordorder, WO_CLITIC\, nonclitic, enclitic)),
   default($head, SCRAMBLES\, minus, plus),
-  ($head = PREDICATE\plus
-    -> default($wordorder, WO_PREDICATIVE\, plus, minus)
-    ;  default($wordorder, WO_PREDICATIVE\, minus, plus)),
+  ($head = PREDICATE\minus
+    -> default($wordorder, WO_PREDICATIVE\, minus, plus)
+    ;  default($wordorder, WO_PREDICATIVE\, plus, minus)),
   default($wordorder, WO_CBLOCK\, no_cb, done_cb),
-  ($wordorder = WO_CBLOCK\in_cb
-    -> default($wordorder, WO_CANFOCUS\, minus, plus)
-    ;  default($wordorder, WO_CANFOCUS\, plus, minus)),
+  ($wordorder = WO_HOST\minus
+    -> default($wordorder, WO_CANFOCUS\, plus, minus)
+    ;  default($wordorder, WO_CANFOCUS\, minus, plus)),
   default($wordorder, WO_MULTIWORD\, minus, plus).
 
-recognise_clause <- [pred].
-% A clause is a verbal phrase which has resolved all its clitics;
-% It changes its word-order description to that of a non-predicate multi-word sequence
-% and puts all complements into INHER.
-% TODO maybe also one "spare" clause modifier? How do modifiers enter NONLOCAL?
-recognise_clause(
+
+resolve_clitics <- [pred].
+% resolve all clitics, and mark as clause
+resolve_clitics([],
     SYNSEM\
     ( NONLOCAL\INHER\
-      ( CLSTORE\[]
+      ( CLSTORE\[] % sanity check - shouldn't be able to fail
       & RELSTORE\$oldrelstore
       )
     & LOCAL\
@@ -416,7 +419,6 @@ recognise_clause(
       & CAT\
         ( HEAD\
           ( $head
-          & verb
           & PREDICATE\plus
           )
         & VAL\
@@ -427,65 +429,116 @@ recognise_clause(
           )
         )
       )
-    )
-, _
-, $mother
-) :-
-  $mother
-    = SYNSEM\
-      ( NONLOCAL\
-        ( INHER\
-          ( CLSTORE\[]
-          & RELSTORE\$newrelstore
-          )
-        & TOBIND\
-          ( CLSTORE\[]
-          & RELSTORE\[]
-          )
-        )
-      & LOCAL\
-        ( MAND\$mand
-        & CONT\$cont
-        & CAT\
-          ( HEAD\$head
-          & CLITIC\not_clitic
-          & HEADRIGHT\minus % irrelevant
-          & CLAUSE\plus
-          & VAL\
-            ( SUBJ\$subj
-            & COMPS\[]
-            & MOD\[]
-            & AUX\[]
-            & SPR\[]
-            )
+    ),
+
+    SYNSEM\
+    ( NONLOCAL\INHER\
+      ( CLSTORE\[]
+      & RELSTORE\$newrelstore
+      )
+    & LOCAL\
+      ( MAND\$mand
+      & CONT\$cont
+      & CAT\
+        ( HEAD\$head
+        & CLITIC\not_clitic
+        & HEADRIGHT\minus % irrelevant
+        & CLAUSE\plus
+        & VAL\
+          ( SUBJ\$subj
+          & COMPS\[]
+          & MOD\[]
+          & AUX\[]
+          & SPR\[]
           )
         )
       )
-    & WORDORDER\
-      ( WO_CBLOCK\no_cb
-      & WO_CLITIC\nonclitic
-      & WO_MULTIWORD\plus
-      & WO_PREDICATIVE\minus
-      & WO_CANFOCUS\plus
-      ),
-  print("clause: no_cb"),
+    )
+  & WORDORDER\
+    ( WO_CBLOCK\clause_cb
+    & WO_CLITIC\nonclitic
+    & WO_MULTIWORD\plus
+    & WO_PREDICATIVE\minus
+    & WO_CANFOCUS\plus
+    & WO_HOST\minus
+    )) :-
+  print("IN IT!"),
   append($oldrelstore, $comps, $newrelstore).
-% but everything can be a non-clause
-recognise_clause($sign & WORDORDER\$wordorder & SYNSEM\LOCAL\CAT\CLAUSE\minus, $wordorder, $sign).
+resolve_clitics([$clitic_local | $clitic_locals], $node, $crnode) :-
+  print("YOB-RC-1"),
+  $clitic
+    = SYNSEM\
+      ( LOCAL\$clitic_local
+      & NONLOCAL\INHER\
+        ( CLSTORE\[]
+        & RELSTORE\[]
+        )
+      ),
+  print("YOB-RC-2"),
+  principles(_, $clitic, $node, $tempnode),
+  print("YOB-RC-3"),
+  nonlocal_principle($clitic, $node, $tempnode),
+  $tempnode = SYNSEM\LOCAL\CAT\VAL\AUX\$tmp, print(["YOB-RC-4", $crnode]),
+  resolve_clitics($clitic_locals, $tempnode, $crnode).
 
+resolve_clitics_on_adjoined_clause <- [pred].
+% two clitic hosts can't join
+resolve_clitics_on_adjoined_clause(
+    SYNSEM\NONLOCAL\INHER\CLSTORE\[_],
+    SYNSEM\NONLOCAL\INHER\CLSTORE\[_],
+    _) :-
+  !, fail.
+% clitic host (non-AUX) on left joins a clause on the right
+% (non-AUX, to rule out situations like "bio sam jeo"
+% where the AUX needs to be adjoined before the clitics)
+resolve_clitics_on_adjoined_clause(
+    SYNSEM\(LOCAL\CAT\VAL\AUX\[] & NONLOCAL\INHER\CLSTORE\$clitic_locals),
+    $node & SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & CLITIC\not_clitic),
+    $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\$clitic_locals) :-
+  resolve_clitics($clitic_locals, $node, $crnode),
+  print("    resolved adjoining clause"),
+  phonology_principle_unary($node, $crnode)
+  , $node=WORDORDER\$wo,printAVM(["adjoined clause - yep",$wo])
+  .
+% or do nothing
+resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node) :-
+  $node=WORDORDER\$wo,printAVM(["adjoined clause - nop",$wo])
+  .
 
+resolve_clitics_on_clause <- [pred].
+resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node) :-
+  $node=WORDORDER\$wo,printAVM(["clause - nop",$wo])
+  .
+resolve_clitics_on_clause(
+    $node
+    & SYNSEM\
+      ( LOCAL\CAT\
+        ( HEAD\PREDICATE\plus
+        & CLITIC\not_clitic
+        )
+      & NONLOCAL\INHER\CLSTORE\$clitic_locals
+      ),
+    $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\$clitic_locals) :-
+  print("YOB RCOC 1"),
+  resolve_clitics($clitic_locals, $node, $crnode),
+  print("YOB RCOC 2"),
+  print("    resolved clause"),
+  phonology_principle_unary($node, $crnode)
+  , $node=WORDORDER\$wo,printAVM(["clause - yep",$wo])
+  .
 
-% interface for UP
-% ================
-
+id_schema_unary(_, _, _, _) :- fail.
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
-  %$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["?B", $lp, $rp]),
-  principles($schema, $left, $right, $mothersign),
-  word_order($left, $right, $wordorder),
-  recognise_clause($mothersign, $wordorder, $mother),
+  $left=LEXICON\$lp&SYNSEM\LOCAL\CAT\HEAD\$lhead,$right=LEXICON\$rp&SYNSEM\LOCAL\CAT\HEAD\$rhead,type_toptype($lhead,$ltype),type_toptype($rhead,$rtype),printAVM(["?B", $lp, $ltype, $rp, $rtype]),
+  resolve_clitics_on_adjoined_clause($left, $right, $crright),
+  $crright = SYNSEM\LOCAL\CAT\CLAUSE\$k,($k = plus -> print("rt: YESCLAWS+++++!!!"); print("rt: NONCLAWS-----!!!")),
+  principles($schema, $left, $crright, $mothersign),
+  word_order($left, $crright, $mothersign),
+  resolve_clitics_on_clause($mothersign, $mother),
+  $mother = SYNSEM\LOCAL\CAT\CLAUSE\$c,($c = plus -> print("mum: YESCLAWS+++++!!!"); print("mum: NONCLAWS-----!!!")),
   %$mothersign=$mother,
   %$mother=SYNSEM\LOCAL\CAT\HEADRIGHT\$hr,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM([$schema, $lp, $rp, $hr]),
       %DEBUG print("LEFT"),print($left),print("RIGHT"),print($right),
@@ -493,7 +546,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  ,$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["OK B", $schema, $lp, $rp])
+  ,$mother=SYNSEM\LOCAL\CAT\HEAD\$mhead,type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])
@@ -507,42 +560,6 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
       %,printAVM(["SCHEMA",$schema])
 .
 
-
-
-% dummy clause, necessary because UP checks at the start whether
-% 'id_schema_unary' is defined and if we don't handle it, we'll be
-% getting invalid input, possibly resulting in an infinite loop
-id_schema_unary(_, $daughter, _, _) :-
-  equivalent($daughter, bot).
-% resolve clitics
-id_schema_unary($schema, $daughter, $mother, $dcp) :-
-  %$daughter=LEXICON\$dp,printAVM(["?U", $dp]),
-  $daughter
-    = SYNSEM\
-      ( LOCAL\CAT\CLITIC\not_clitic % only nonclitics undergo this rule
-      & NONLOCAL\
-        ( INHER\CLSTORE\$clitic_locals
-        )
-      )
-    & WORDORDER\$wordorder,
-  member($clitic_local, $clitic_locals),
-  $clitic
-    = SYNSEM\
-      ( LOCAL\$clitic_local
-      & NONLOCAL\
-        ( INHER\
-          ( CLSTORE\[]
-          & RELSTORE\[]
-          )
-        & TOBIND\CLSTORE\[$clitic_local]
-        )
-      ),
-  principles($schema, $clitic, $daughter, $mothersign),
-  recognise_clause($mothersign, $wordorder, $mother),
-  %$mothersign=$mother,
-  $dcp = phonology_principle_unary($daughter, $mother)
-  ,$daughter=LEXICON\$rp,printAVM(["OK U", $schema, $rp])
-.
 
 
 make_lexent <- [pred].
