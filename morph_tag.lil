@@ -186,7 +186,6 @@ recognise($wlist,
       ( HEAD\
         ( verb
         & SCRAMBLES\plus
-        & PREDICATE\plus
         )
       & VAL\SUBJ\
         [ ( CONT\INDEX\

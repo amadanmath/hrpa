@@ -1,4 +1,6 @@
-Ivan/Nnsg biti/Vcl3sgp jesti/Vnsgma jer biti/Vcl3sgp Monika/Nnsg jesti/Vnsgfa
+Ivan/Nnsg htjeti/Vcl3sgp jesti/Vinf
+#*Ivan/Nnsg jesti/Vinf
+#*Ivan/Nnsg jesti/Vnsgfa
 __END__
 
 ##

@@ -166,7 +166,7 @@ lexv("htjeti", $sign) :-
           % but many exceptions:
           %   questions: Hoces li pospremiti sobu?
           %   answers:   Hocu.
-          % & CLITIC\cl_aux
+          & CLITIC\cl_aux
           & VAL\
             ( AUX\
               [ [ CONT\TAM\(FINITE\$finite & MOOD\infinitive & VOICE\$voice)
