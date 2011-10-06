@@ -1,7 +1,6 @@
-Ivan/Nnsg htjeti/Vcl3sgp jesti/Vinf
 #*Ivan/Nnsg jesti/Vinf
 #*Ivan/Nnsg jesti/Vnsgfa
-__END__
+#__END__
 
 ##
 ## gender is optional in nouns

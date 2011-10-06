@@ -70,6 +70,7 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
           & SUBJ\$headsubj
           )
         & CLITIC\$cl
+        & HASTENSE\$hastense
         )
       & CONT\$cont
       ),
@@ -96,6 +97,7 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
           & SUBJ\$headsubj
           )
         & CLITIC\$cl
+        & HASTENSE\$hastense
         )
       & CONT\$cont
       )
@@ -145,6 +147,7 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
           & SUBJ\$headsubj
           )
         & CLITIC\$cl
+        & HASTENSE\$hastense
         )
       & CONT\$cont
       ),
@@ -168,6 +171,7 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
           & SUBJ\$headsubj 
           )
         & CLITIC\$cl
+        & HASTENSE\$hastense
         & HEADRIGHT\$headright
         )
       & CONT\$cont
@@ -179,13 +183,12 @@ head_mod_schema_rule($left, $right, $head, $mod, $mother) :-
 
 aux_verb_schema_rule <- [pred].
 aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
-  print("YOB AVS 0"),
   assure_nocl($aux),
   assure_nocl($verb),
-  print("YOB AVS 1"),
   $aux
     = SYNSEM\LOCAL\CAT\
       ( HEAD\$auxhead
+      & HASTENSE\$hastense
       & VAL\
         ( AUX\$auxaux
         & SPR\$auxspr
@@ -195,7 +198,6 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
         )
       & CLITIC\$cl
       ),
-  print("YOB AVS 2"),
   $verb
     = SYNSEM\LOCAL\
       ( $verblocal
@@ -208,19 +210,15 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
           )
         )
       ),
-  print("YOB AVS 3"),
 %$aux=LEXICON\$lp,$other=LEXICON\$rp,printAVM([$lp, $rp]),
 %printAVM(["O",$othersynsem]),
 %printAVM(["M",$mothersynsem]),
 %printAVM(["A",$auxaux]),
-  printAVM(["auxaux", $auxaux]),
   member([$verblocal, $motherlocal], $auxaux),
-  print("YOB AVS 4"),
   (($auxsubj = [$subj], $auxcomps = [])
     -> find_and_delete($verbcomps, $subj, $mothercomps)
     ;  $mothercomps = $verbcomps
   ),
-  print("YOB AVS 5"),
   $mother
     = SYNSEM\LOCAL\
       ( $motherlocal
@@ -233,7 +231,8 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
           & MOD\$auxmod % TODO verify!
           & SUBJ\$auxsubj
           )
-        & CLITIC\$cl
+        & CLITIC\not_clitic
+        & HASTENSE\$hastense
         )
       )
     & DTRS\
@@ -397,6 +396,7 @@ fill_defaults($sign) :-
     & WORDORDER\$wordorder,
   default($cat, CLITIC\, not_clitic, is_clitic),
   default($cat, HEADRIGHT\, plus, minus),
+  default($cat, HASTENSE\, minus, plus),
   default($val, SPR\, [], [_]),
   default($val, COMPS\, [], [_]),
   default($val, MOD\, [], [_]),
@@ -436,8 +436,8 @@ resolve_clitics(_, [],
       & CAT\
         ( HEAD\
           ( $head
-          & PREDICATE\plus
           )
+        & HASTENSE\plus
         & VAL\
           ( SUBJ\$subj
           & COMPS\$comps
@@ -448,6 +448,7 @@ resolve_clitics(_, [],
       )
     ),
 
+    $crnode & % DEBUG
     SYNSEM\
     ( NONLOCAL\INHER\
       ( CLSTORE\[]
@@ -460,6 +461,7 @@ resolve_clitics(_, [],
         ( HEAD\$head
         & CLITIC\not_clitic
         & HEADRIGHT\minus % irrelevant
+        & HASTENSE\minus
         & CLAUSE\plus
         & VAL\
           ( SUBJ\$subj
@@ -480,10 +482,7 @@ resolve_clitics(_, [],
     & WO_HOST\minus
     )) :-
   append($oldrelstore, $comps, $newrelstore).
-silly <- [pred].
-silly(_).
 resolve_clitics($clause, [$clitic_local | $clitic_locals], $node, $crnode) :-
-  print("YOB RC -"),
   $clitic
     = SYNSEM\
       ( LOCAL\$clitic_local
@@ -498,7 +497,6 @@ resolve_clitics($clause, [$clitic_local | $clitic_locals], $node, $crnode) :-
           )
         )
       ),
-  print("YOB RC 0"),
   add_clitic_tobind_if_clause($clause, $clitic_local, $clstorebind),
   %($clause = plus
   %  ->  $clitic = SYNSEM\NONLOCAL\TOBIND\CLSTORE\[$clitic_local]
@@ -506,12 +504,11 @@ resolve_clitics($clause, [$clitic_local | $clitic_locals], $node, $crnode) :-
   % XXX Indeed, the conditional is broken!
   % Also, can be apparently fixed by prefixing the predicate body with
   % "true,"
-  print("YOB RC 1"),
   principles($schema, $clitic, $node, $tempnode),
-  print("YOB RC 2"),
   nonlocal_principle($clitic, $node, $tempnode),
   print(["clitic incorporated:", $schema]),
-  resolve_clitics($clause, $clitic_locals, $tempnode, $crnode).
+  resolve_clitics($clause, $clitic_locals, $tempnode, $crnode)
+  .
 
 resolve_clitics_on_adjoined_clause <- [pred].
 % two clitic hosts can't join
@@ -534,12 +531,12 @@ resolve_clitics_on_adjoined_clause(
   .
 % or do nothing
 resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
-  % :- printAVM(["adjoined clause - nop"])
+%:- printAVM(["adjoined clause - nop"])
   .
 
 resolve_clitics_on_clause <- [pred].
 resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
-:- printAVM(["clause - nop"])
+%:- printAVM(["clause - nop"])
   .
 resolve_clitics_on_clause(
     $node
@@ -551,11 +548,9 @@ resolve_clitics_on_clause(
       & NONLOCAL\INHER\CLSTORE\$clitic_locals
       ),
     $crnode) :-
-  ($clitic_locals = []
-    ->  $node = $crnode
-    ;   resolve_clitics(plus, $clitic_locals, $node, $crnode)),
+  resolve_clitics(plus, $clitic_locals, $node, $crnode),
   phonology_principle_unary($node, $crnode)
-  , printAVM(["clause - yep"])
+  %, printAVM(["clause - yep"])
   .
 
 id_schema_unary(_, _, _, _) :- fail.
@@ -580,7 +575,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  ,$mother=SYNSEM\LOCAL\CAT\HEAD\$mhead,type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp])
+  ,$mother=SYNSEM\LOCAL\CAT\(HEAD\$mhead & CLAUSE\$clause),type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp, "clause", $clause])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])

@@ -169,6 +169,7 @@ recognise($wlist,
     ( CAT\HEAD\
       ( verb
       & SCRAMBLES\plus
+      & PREDICATE\plus
       )
     & CONT\TAM\MOOD\infinitive
     )
@@ -186,6 +187,7 @@ recognise($wlist,
       ( HEAD\
         ( verb
         & SCRAMBLES\plus
+        & PREDICATE\plus
         )
       & VAL\SUBJ\
         [ ( CONT\INDEX\
@@ -235,6 +237,7 @@ recognise($wlist,
         & SCRAMBLES\plus
         )
       & CLITIC\$clitic
+      & HASTENSE\plus
       & VAL\SUBJ\
         [ CONT\INDEX\
           ( NUMBER\$number

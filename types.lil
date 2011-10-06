@@ -52,7 +52,7 @@ wordorder <- [bot] +
 % phrase
 head <- [bot] + [PREDICATE\bool, SCRAMBLES\bool].
 val <- [bot] + [SUBJ\list, SPR\list, COMPS\list, MOD\list, AUX\list].
-cat <- [bot] + [HEAD\head, VAL\val, CLITIC\clitic, HEADRIGHT\bool, CLAUSE\bool].
+cat <- [bot] + [HEAD\head, VAL\val, HASTENSE\bool, CLITIC\clitic, HEADRIGHT\bool, CLAUSE\bool].
 cont <- [bot] + [RELS\list, HCONS\list].
 local <- [bot] + [MAND\bool, CAT\cat, CONT\cont]. % CONT, CTX
 stores <- [bot] + [CLSTORE\list, RELSTORE\list]. % QSTORE

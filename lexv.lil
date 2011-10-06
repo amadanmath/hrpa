@@ -119,7 +119,6 @@ lexv("biti", $sign) :-
         [CONT\TAM\(FINITE\$finite & MOOD\participle & TENSE\perfect & VOICE\passive),
           CONT\TAM\(FINITE\$finite & MOOD\indicative & TENSE\pluperfect & VOICE\passive)]]]])
   ); (
-fail, % DEBUG
     $sign
       = SYNSEM\LOCAL\CAT\
         ( HEAD\sverb
@@ -187,6 +186,7 @@ lexv("htjeti", $sign) :-
       = SYNSEM\LOCAL\
         ( CAT\
           ( HEAD\sverb
+          & CLITIC\not_clitic
           & VAL\COMPS\
             [ CAT\HEAD\CASE\nom
             , $object
