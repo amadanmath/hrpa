@@ -84,7 +84,6 @@ head_comp_schema_common_rule($head, $comp, $mother) :-
       ),
   only_optional($compcomps),
   only_optional($compspr),
-  %$head = PHONOLOGY\$hp, $comp = PHONOLOGY\$np, print(["YOP", $head, $comp]),
   find_and_delete($headcomps, $complocal, $mothercomps),
   $mother
     = SYNSEM\LOCAL\
@@ -196,7 +195,6 @@ aux_verb_schema_rule($aux, $verb, $aux, $verb, $mother) :-
         & COMPS\$auxcomps
         & SUBJ\$auxsubj
         )
-      & CLITIC\$cl
       ),
   $verb
     = SYNSEM\LOCAL\
@@ -276,13 +274,6 @@ head_cl_schema_rule($head, $cl, $head, $cl, $mother) :-
       & CL_DTR\$cl
       ).
 
-default <- [pred].
-default($fs, $feature, $default, $other) :-
-  (follow($fs, $feature, $value),
-      unifiable($value, $other),
-      $value = $default, !)
-    ; true.
-
 % Immediate Dominance: collects other principles
 id_principle <- [pred].
 id_principle(head_comp_schema, $left, $right, $head, $comp, $mother) :-
@@ -313,6 +304,12 @@ cl_nonlocal_bind($inher_head, $inher_nhead, $bind_head, $bind_nhead, $inher) :-
   set_difference($inher_nhead, $bind_head, $nhead),
   append($head, $nhead, $inher).
 
+default <- [pred].
+default($value, $default) :-
+    equivalent($value, bot), !,
+    $value = $default.
+default(_, _).
+
 nonlocal_principle <- [pred].
 nonlocal_principle($head, $nonhead, $mother) :-
   $head
@@ -322,13 +319,12 @@ nonlocal_principle($head, $nonhead, $mother) :-
         & RELSTORE\$h_inher_rel
         )
       & TOBIND\
-        ( $h_bind
-        & CLSTORE\$h_bind_cl
+        ( CLSTORE\$h_bind_cl
         & RELSTORE\$h_bind_rel
         )
       ),
-  default($h_bind, CLSTORE\, [], [_]),
-  default($h_bind, RELSTORE\, [], [_]),
+  default($h_bind_cl, []),
+  default($h_bind_rel, []),
   $nonhead
     = SYNSEM\NONLOCAL\
       ( INHER\
@@ -336,26 +332,18 @@ nonlocal_principle($head, $nonhead, $mother) :-
         & RELSTORE\$n_inher_rel
         )
       & TOBIND\
-        ( $n_bind
-        & CLSTORE\$n_bind_cl
+        ( CLSTORE\$n_bind_cl
         & RELSTORE\$n_bind_rel
         )
       ),
-  default($n_bind, CLSTORE\, [], [_]),
-  default($n_bind, RELSTORE\, [], [_]),
+  default($n_bind_cl, []),
+  default($n_bind_rel, []),
   $mother
     = SYNSEM\NONLOCAL\INHER\
       ( CLSTORE\$m_inher_cl
       & RELSTORE\$m_inher_rel
       ),
-  length($h_inher_cl, $hic),
-  length($n_inher_cl, $nic),
-  length($h_bind_cl, $hbc),
-  length($n_bind_cl, $nbc),
-  %printAVM(["NONLOCAL CL",$hic, $nic, $hbc, $nbc]),
   nonlocal_bind($h_inher_cl, $n_inher_cl, $h_bind_cl, $n_bind_cl, $m_inher_cl),
-  length($m_inher_cl, $mic),
-  %printAVM(["    NONLOCAL CL MOTHER", $mic]),
   nonlocal_bind($h_inher_rel, $n_inher_rel, $h_bind_rel, $n_bind_rel, $m_inher_rel).
 
 phonology_principle_binary <- [pred].
@@ -378,44 +366,6 @@ principles($schema, $left, $right, $mother) :-
   head_feature_principle($head, $mother)
   %,($left = SYNSEM\LOCAL\CAT\HEAD\conj -> print(["AFTER: MOTHER", $mother]); true)
   .
-
-fill_defaults <- [pred].
-fill_defaults($sign) :-
-  $sign
-    = SYNSEM\
-      ( LOCAL\
-        ( $local
-        & CAT\
-          ( $cat
-          & HEAD\$head
-          & VAL\$val
-          )
-        )
-      & NONLOCAL\INHER\$inher
-      )
-    & WORDORDER\$wordorder,
-  default($cat, CLITIC\, not_clitic, is_clitic),
-  default($cat, HEADRIGHT\, plus, minus),
-  default($cat, HASTENSE\, minus, plus),
-  default($val, SPR\, [], [_]),
-  default($val, COMPS\, [], [_]),
-  default($val, MOD\, [], [_]),
-  default($val, AUX\, [], [_]),
-  default($inher, RELSTORE\, [], [_]),
-  ($cat = CLITIC\is_clitic
-    ->  (default($inher, CLSTORE\, [$local], []),
-         default($wordorder, WO_CLITIC\, enclitic, nonclitic))
-    ;   (default($inher, CLSTORE\, [], [_])),
-         default($wordorder, WO_CLITIC\, nonclitic, enclitic)),
-  default($head, SCRAMBLES\, minus, plus),
-  ($head = PREDICATE\minus
-    -> default($wordorder, WO_PREDICATIVE\, minus, plus)
-    ;  default($wordorder, WO_PREDICATIVE\, plus, minus)),
-  default($wordorder, WO_CBLOCK\, no_cb, done_cb),
-  ($wordorder = WO_HOST\minus
-    -> default($wordorder, WO_CANFOCUS\, plus, minus)
-    ;  default($wordorder, WO_CANFOCUS\, minus, plus)),
-  default($wordorder, WO_MULTIWORD\, minus, plus).
 
 
 add_clitic_tobind_if_clause <- [pred].
@@ -448,7 +398,6 @@ resolve_clitics(_, [],
       )
     ),
 
-    $crnode & % DEBUG
     SYNSEM\
     ( NONLOCAL\INHER\
       ( CLSTORE\[]
@@ -504,11 +453,9 @@ resolve_clitics($clause, [$clitic_local | $clitic_locals], $node, $crnode) :-
   % XXX Indeed, the conditional is broken!
   % Also, can be apparently fixed by prefixing the predicate body with
   % "true,"
-  principles($schema, $clitic, $node, $tempnode),
+  principles(_, $clitic, $node, $tempnode),
   nonlocal_principle($clitic, $node, $tempnode),
-  print(["clitic incorporated:", $schema]),
-  resolve_clitics($clause, $clitic_locals, $tempnode, $crnode)
-  .
+  resolve_clitics($clause, $clitic_locals, $tempnode, $crnode).
 
 resolve_clitics_on_adjoined_clause <- [pred].
 % two clitic hosts can't join
@@ -525,19 +472,12 @@ resolve_clitics_on_adjoined_clause(
     $node & SYNSEM\LOCAL\CAT\(HEAD\PREDICATE\plus & CLITIC\not_clitic),
     $crnode & SYNSEM\NONLOCAL\TOBIND\CLSTORE\[$clitic_locals]) :-
   resolve_clitics(minus, $clitic_locals, $node, $crnode),
-  % print("    resolved adjoining clause"),
-  phonology_principle_unary($node, $crnode)
-  %, printAVM(["adjoined clause - yep"])
-  .
+  phonology_principle_unary($node, $crnode).
 % or do nothing
-resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
-%:- printAVM(["adjoined clause - nop"])
-  .
+resolve_clitics_on_adjoined_clause(_, $node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node).
 
 resolve_clitics_on_clause <- [pred].
-resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node)
-%:- printAVM(["clause - nop"])
-  .
+resolve_clitics_on_clause($node & SYNSEM\LOCAL\CAT\CLAUSE\minus, $node).
 resolve_clitics_on_clause(
     $node
     & SYNSEM\
@@ -549,22 +489,17 @@ resolve_clitics_on_clause(
       ),
     $crnode) :-
   resolve_clitics(plus, $clitic_locals, $node, $crnode),
-  phonology_principle_unary($node, $crnode)
-  %, printAVM(["clause - yep"])
-  .
+  phonology_principle_unary($node, $crnode).
 
 id_schema_unary(_, _, _, _) :- fail.
 
 % binary branching licence (+$schema, +$left, +$right, -$mother, -$dcp)
 id_schema_binary($schema, $left, $right, $mother, $dcp) :-
   %pretty(["LEFT",$left]),pretty(["RIGHT",$right]),
-  $left=LEXICON\$lp&SYNSEM\LOCAL\CAT\HEAD\$lhead,$right=LEXICON\$rp&SYNSEM\LOCAL\CAT\HEAD\$rhead,type_toptype($lhead,$ltype),type_toptype($rhead,$rtype),printAVM(["?B", $lp, $ltype, $rp, $rtype]),
-  %resolve_clitics_on_adjoined_clause($left, $right, $crright),
-  findall($x, (
-    resolve_clitics_on_adjoined_clause($left, $right, $x)
-    % , printAVM($x)
-    ), $xs),
-  member($crright, $xs),
+  resolve_clitics_on_adjoined_clause($left, $right, $crright),
+  %findall($x, (
+  %resolve_clitics_on_adjoined_clause($left, $right, $x)), $xs),
+  %member($crright, $xs),
   principles($schema, $left, $crright, $mothersign),
   word_order($left, $crright, $mothersign),
   resolve_clitics_on_clause($mothersign, $mother),
@@ -575,7 +510,7 @@ id_schema_binary($schema, $left, $right, $mother, $dcp) :-
  
   % TODO limit where this can happen
   $dcp = phonology_principle_binary($left, $right, $mother)
-  ,$mother=SYNSEM\LOCAL\CAT\(HEAD\$mhead & CLAUSE\$clause),type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp, "clause", $clause])
+  %,$mother=SYNSEM\LOCAL\CAT\(HEAD\$mhead & CLAUSE\$clause),type_toptype($mhead,$mtype),$left=LEXICON\$lp,$right=LEXICON\$rp,printAVM(["       DONE B", $schema, $mtype, $lp, $rp, "clause", $clause])
   %,pretty_feat($left, PHONOLOGY\)
   %,pretty_feat($right, PHONOLOGY\)
   %,pretty(["MOTHER_TEMP",$mother_temp])
@@ -670,8 +605,7 @@ lexical_entry_sign(LEX_WORD\(SURF\$word & BASE\$base & ALT\$alt) & LEX_TEMPLATE\
     base_and_template_to_sign($base, $template, $sign),
     $signs),
   nth($signs, $alt, $sign),
-  $sign = LEXICON\[$base] & PHONOLOGY\[$word],
-  fill_defaults($sign).
+  $sign = LEXICON\[$base] & PHONOLOGY\[$word].
 
 %　Valid root sign: no unfilled dependencies
 root_sign(S) :-

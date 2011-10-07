@@ -1,6 +1,5 @@
-#*Ivan/Nnsg jesti/Vinf
-#*Ivan/Nnsg jesti/Vnsgfa
-#__END__
+jako lijep/Ansgf Ivana/Nnsg jesti/V3sgp
+__END__
 
 ##
 ## gender is optional in nouns

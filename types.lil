@@ -165,6 +165,7 @@ active <- [voice].
 passive <- [voice].
 
 
+nom_predicative <- [head].
 has_anim <- [head] + [ANIMATE\bool].
 has_def <- [head] + [DEFINITE\bool].
 has_pol <- [head] + [POLAR\bool].
@@ -172,8 +173,9 @@ has_pol <- [head] + [POLAR\bool].
 has_cd <- [head, has_case, has_def]. % case, def
 has_cdd <- [head, has_degree, has_cd]. % case, def, degree
 
-noun_like <- [head, has_case, has_anim]. % case, anim
-adj_like <- [head, has_cdd].
+n_a_like <- [head, nom_predicative, has_case].
+noun_like <- [head, n_a_like, has_anim]. % case, anim
+adj_like <- [head, n_a_like, has_cdd].
 adv_like <- [head, has_degree, has_pol].
 
 % TODO add more preposition forms, together with lexicon
@@ -202,7 +204,7 @@ adverb <- [head, adv_like].
 verb <- [head].
 sverb <- [verb]. % subject is the first complement - subject agreement
 nsverb <- [verb]. % subject is not the first complement - no agreement
-prep <- [head] + [PFORM\pform]. % there might be more :)
+prep <- [head, nom_predicative] + [PFORM\pform]. % there might be more :)
 particle <- [head] + [RTYPE\rtype]. % TODO check for RTYPE...
 conj <- [head]. % conjunction
 

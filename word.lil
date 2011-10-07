@@ -71,12 +71,82 @@ transform($sign) :-
   overwrite($val, MOD\,
     [ CAT\HEAD\verb
     ]).
+nominative_if_has_case <- [pred].
+nominative_if_has_case($head & has_case) :- !, $head = CASE\nom.
+nominative_if_has_case(_).
+transform($sign) :-
+  $sign
+    = SYNSEM\LOCAL\CAT\
+      ( HEAD\
+        ( $head
+        & nom_predicative
+        & PREDICATE\plus
+        )
+      & VAL\
+        ( $val
+        & MOD\[_]
+        & COMPS\$comps
+        & SUBJ\$subj
+        )
+      ), !, % obligatory for predicates
+  nominative_if_has_case($head),
+  overwrite($val, MOD\, []),
+  $subj = [CAT\HEAD\(noun_like & CASE\nom)],
+  append($subj, $comps, $newcomps),
+  overwrite($val, COMPS\, $newcomps)
+.
 transform(_).
+
+default <- [pred].
+default($fs, $feature, $default, $other) :-
+  (follow($fs, $feature, $value),
+      unifiable($value, $other),
+      $value = $default, !)
+    ; true.
+
+fill_defaults <- [pred].
+fill_defaults($sign) :-
+  $sign
+    = SYNSEM\
+      ( LOCAL\
+        ( $local
+        & CAT\
+          ( $cat
+          & HEAD\$head
+          & VAL\$val
+          )
+        )
+      & NONLOCAL\INHER\$inher
+      )
+    & WORDORDER\$wordorder,
+  default($cat, CLITIC\, not_clitic, is_clitic),
+  default($cat, HEADRIGHT\, plus, minus),
+  default($cat, HASTENSE\, minus, plus),
+  default($val, SPR\, [], [_]),
+  default($val, COMPS\, [], [_]),
+  default($val, MOD\, [], [_]),
+  default($val, AUX\, [], [_]),
+  default($inher, RELSTORE\, [], [_]),
+  ($cat = CLITIC\is_clitic
+    ->  (default($inher, CLSTORE\, [$local], []),
+         default($wordorder, WO_CLITIC\, enclitic, nonclitic))
+    ;   (default($inher, CLSTORE\, [], [_])),
+         default($wordorder, WO_CLITIC\, nonclitic, enclitic)),
+  default($head, SCRAMBLES\, minus, plus),
+  ($head = PREDICATE\minus
+    -> default($wordorder, WO_PREDICATIVE\, minus, plus)
+    ;  default($wordorder, WO_PREDICATIVE\, plus, minus)),
+  default($wordorder, WO_CBLOCK\, no_cb, done_cb),
+  ($wordorder = WO_HOST\minus
+    -> default($wordorder, WO_CANFOCUS\, plus, minus)
+    ;  default($wordorder, WO_CANFOCUS\, minus, plus)),
+  default($wordorder, WO_MULTIWORD\, minus, plus).
 
 
 base_and_template_to_sign($base, $template, $sign) :- % changeable words (morphology resolution)
   parse_morph($template, $sign),
   find_word($base, $sign),
+  fill_defaults($sign),
   transform($sign).
 base_and_template_to_sign($base, _, $sign) :- % unchangeable words (exact match)
   lexe($base, $sign).

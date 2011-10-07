@@ -130,25 +130,31 @@ lexv("biti", $sign) :-
               )
             , $pred
             ]
-          & SUBJ\[$subj]
+          & SUBJ\[$subj & CONT\INDEX\(NUMBER\$number & GENDER\$gender)]
           )
         ),
     ( $pred % copula + NP
         = CAT\HEAD\
           ( noun_like
           & CASE\nom
+          & PREDICATE\plus
           )
     ; $pred % copula + AP
-        = CAT\
-          ( HEAD\
-            ( adjective
-            & CASE\nom
-            )
-          & VAL\MOD\[$subj] % agreement!
+        = CAT\HEAD\
+          ( adjective
+          & CASE\nom
+          & PREDICATE\plus
+          )
+        & CONT\INDEX\
+          ( GENDER\$gender
+          & NUMBER\$number
           )
     ; $pred % copula + PP
         = CAT\
-          ( HEAD\prep
+          ( HEAD\
+            ( prep
+            & PREDICATE\plus
+            )
           & VAL\COMPS\[]
           )
     )
